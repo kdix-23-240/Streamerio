@@ -1,4 +1,4 @@
-usign UniRx;
+using UniRx;
 
 public class PlayerModel
 {
