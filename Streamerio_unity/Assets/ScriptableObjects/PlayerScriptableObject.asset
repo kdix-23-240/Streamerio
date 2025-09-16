@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: PlayerScriptableObject
   m_EditorClassIdentifier: 
   InitialHp: 10
-  MaxHp: 50
-  InitialSpeed: 10
   InitialPower: 10
+  InitialSpeed: 10
+  HpDiff: 8
+  SpeedDiff: 2
+  PowerDiff: 5
+  MaxHp: 50
+  MaxSpeed: 20
+  MaxPower: 50

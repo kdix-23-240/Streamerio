@@ -325,6 +325,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1005665933748935461, guid: 04d6095457e8c5943b3bca23ca7d268c, type: 3}
+      propertyPath: _abilityType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005665933748935461, guid: 04d6095457e8c5943b3bca23ca7d268c, type: 3}
+      propertyPath: _abilityComponent
+      value: 
+      objectReference: {fileID: 810750958}
     - target: {fileID: 5842957339063884891, guid: 04d6095457e8c5943b3bca23ca7d268c, type: 3}
       propertyPath: m_Name
       value: IncreaceButton
@@ -530,6 +538,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1005665933748935461, guid: 04d6095457e8c5943b3bca23ca7d268c, type: 3}
+      propertyPath: _abilityType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005665933748935461, guid: 04d6095457e8c5943b3bca23ca7d268c, type: 3}
+      propertyPath: _abilityComponent
+      value: 
+      objectReference: {fileID: 1472860539}
     - target: {fileID: 5842957339063884891, guid: 04d6095457e8c5943b3bca23ca7d268c, type: 3}
       propertyPath: m_Name
       value: IncreaceButton
@@ -706,6 +722,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &807291875 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 707191590219669522, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
+  m_PrefabInstance: {fileID: 275366387517301690}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &807291876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 807291875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de3b5c57c4c48dc4ebfa52e86d83fef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speedAmount: {fileID: 1467519732}
 --- !u!1 &810750956
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,6 +749,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 810750957}
+  - component: {fileID: 810750958}
   m_Layer: 0
   m_Name: Power
   m_TagString: Untagged
@@ -737,6 +772,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 254431054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &810750958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810750956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 491e46ce67a753747918e14e711ae5f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _powerTestView: {fileID: 2051627575}
+  _scriptableObject: {fileID: 11400000, guid: 9f953513f45edb446b831cdb630f30ac, type: 2}
 --- !u!1 &961967434
 GameObject:
   m_ObjectHideFlags: 0
@@ -1207,6 +1256,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1875934904817771444, guid: 82f9ad5a76789a34aa5ad65279a769ed, type: 3}
+      propertyPath: _abilityType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1875934904817771444, guid: 82f9ad5a76789a34aa5ad65279a769ed, type: 3}
+      propertyPath: _abilityComponent
+      value: 
+      objectReference: {fileID: 1472860539}
     - target: {fileID: 6539040349555767277, guid: 82f9ad5a76789a34aa5ad65279a769ed, type: 3}
       propertyPath: m_Name
       value: DecreaceButton
@@ -1226,6 +1283,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1757396174339584110, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
   m_PrefabInstance: {fileID: 275366387517301690}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1467519732 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8853011786172149196, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
+  m_PrefabInstance: {fileID: 275366387517301690}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1472860537
 GameObject:
   m_ObjectHideFlags: 0
@@ -1235,6 +1303,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1472860538}
+  - component: {fileID: 1472860539}
   m_Layer: 0
   m_Name: Speed
   m_TagString: Untagged
@@ -1257,6 +1326,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 254431054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1472860539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1472860537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b7e1bdb83d857e4ba45466f6c5f747f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speedTestView: {fileID: 807291876}
+  _scriptableObject: {fileID: 11400000, guid: 9f953513f45edb446b831cdb630f30ac, type: 2}
 --- !u!1 &1500116262
 GameObject:
   m_ObjectHideFlags: 0
@@ -1752,6 +1835,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1875934904817771444, guid: 82f9ad5a76789a34aa5ad65279a769ed, type: 3}
+      propertyPath: _abilityType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1875934904817771444, guid: 82f9ad5a76789a34aa5ad65279a769ed, type: 3}
+      propertyPath: _abilityComponent
+      value: 
+      objectReference: {fileID: 810750958}
     - target: {fileID: 6539040349555767277, guid: 82f9ad5a76789a34aa5ad65279a769ed, type: 3}
       propertyPath: m_Name
       value: DecreaceButton
@@ -1766,6 +1857,24 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 422255847333557646, guid: 82f9ad5a76789a34aa5ad65279a769ed, type: 3}
   m_PrefabInstance: {fileID: 2006717037}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2051627574 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8404847851297467878, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
+  m_PrefabInstance: {fileID: 275366387517301690}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2051627575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051627574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d98bb68dc20b6094f97a2ab0810d98fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _powerAmount: {fileID: 2135561620}
 --- !u!1 &2093815301
 GameObject:
   m_ObjectHideFlags: 0
@@ -1913,6 +2022,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _debugMonitor: {fileID: 1979417156}
+--- !u!114 &2135561620 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 551762174973222968, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
+  m_PrefabInstance: {fileID: 275366387517301690}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &275366387517301690
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2036,7 +2156,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7284555991734140314, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1327878031}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8404847851297467878, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2051627575}
+    - targetCorrespondingSourceObject: {fileID: 707191590219669522, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 807291876}
   m_SourcePrefab: {fileID: 100100000, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

@@ -38,7 +38,9 @@ public class AbilityButton : MonoBehaviour
                 amount = _playerData.SpeedDiff;
                 break;
         }
-        
+
+        Debug.Log($"AbilityButton: {_abilityType} {( _isIncrease ? "Increase" : "Decrease" )} by {amount}");
+
         if (_isIncrease)
         {
             _ability.Increase(amount);
