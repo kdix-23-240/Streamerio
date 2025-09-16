@@ -13,7 +13,7 @@ public class HpModel
     }
     public void Increase(float amount)
     {
-        CurrentHp.Value = Math.Min(CurrentHp.Value + amount, );
+        CurrentHp.Value = Math.Min(CurrentHp.Value + amount, _maxHp);
     }
     public void Decrease(float amount)
     {
