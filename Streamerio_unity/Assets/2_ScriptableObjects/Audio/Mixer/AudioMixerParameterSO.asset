@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90972f1f03084f5ea6ee1210e2a4a7ae, type: 3}
+  m_Name: AudioMixerParameterSO
+  m_EditorClassIdentifier: 
+  _volumeParamDict:
+    _keyValuePairs:
+    - _key: 1
+      _value: Master
+    - _key: 2
+      _value: BGM
+    - _key: 3
+      _value: SE
