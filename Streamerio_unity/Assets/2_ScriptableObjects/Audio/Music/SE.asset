@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17d57f27e93b59249bc7019d2a8abf1d, type: 3}
+  m_Name: SE
+  m_EditorClassIdentifier: 
+  _folderPath: Assets/5_Musics/SE
+  _enumPath: Assets/0_Scripts/0_Common/Audio/Type
+  _enumNameSpace: Common.Audio
+  _enumFileName: SEType
+  _fileExtension:
+  - _value: mp3
+  ignoreFolderName: []
+  _dictionary:
+    _keyValuePairs:
+    - _key: 1
+      _value: {fileID: 8300000, guid: ede18e855110ac846b2e2089fc5d2494, type: 3}
+    - _key: 2
+      _value: {fileID: 8300000, guid: 0a1b963e7bb3e6e4ab6d60ad0760a095, type: 3}
