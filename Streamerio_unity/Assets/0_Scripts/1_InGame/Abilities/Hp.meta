@@ -1,5 +1,16 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+<<<<<<< HEAD
 guid: 27f0d76419d2f724297f52d1b0403955
+=======
+guid: b49af7516c7a548048daa40bcc80fa8d
+>>>>>>> 238ac0a (resolve conflict)
+=======
+guid: b49af7516c7a548048daa40bcc80fa8d
+=======
+guid: 27f0d76419d2f724297f52d1b0403955
+>>>>>>> 350f850 (対応できないエラー(えらーを吐いている状態))
+>>>>>>> e6673f9 (resolve conflict)
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

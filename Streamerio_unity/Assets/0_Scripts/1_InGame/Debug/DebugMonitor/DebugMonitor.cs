@@ -1,15 +1,13 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
 /// デバッグモニターは最初は非表示にする
 /// </summary>
-namespace DebugTool
+public class DebugMonitorManager : MonoBehaviour
 {
-    public class DebugMonitor : MonoBehaviour
+    void Start()
     {
-        void Start()
-        {
-            gameObject.SetActive(false);
-        }
+        gameObject.SetActive(false);
     }
 }

@@ -1,5 +1,24 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:Streamerio_unity/Assets/0_Scripts/1_InGame/Abilities.meta
 guid: a2ff13075f571204c9629821fb164c65
+=======
+guid: 9c4696f6e53366841b3029304e58afb5
+>>>>>>> f724235 (HPの増減を実装):Streamerio_unity/Assets/Scripts/Game/Abilities.meta
+=======
+guid: f9f824861cc064ccc846a9d477883929
+>>>>>>> 253908d (resolve conflict)
+=======
+guid: b851a3bc2063e4863900981b255e02be
+>>>>>>> 238ac0a (resolve conflict)
+=======
+guid: b851a3bc2063e4863900981b255e02be
+=======
+guid: a2ff13075f571204c9629821fb164c65
+>>>>>>> 350f850 (対応できないエラー(えらーを吐いている状態))
+>>>>>>> e6673f9 (resolve conflict)
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

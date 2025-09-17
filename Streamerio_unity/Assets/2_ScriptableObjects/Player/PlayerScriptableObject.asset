@@ -15,9 +15,12 @@ MonoBehaviour:
   InitialHp: 10
   InitialPower: 10
   InitialSpeed: 10
+  InitialJumpPower: 10
   HpDiff: 8
+  PowerDiff: 2
   SpeedDiff: 2
-  PowerDiff: 5
+  JumpPowerDiff: 2
   MaxHp: 50
-  MaxSpeed: 20
   MaxPower: 50
+  MaxSpeed: 50
+  MaxJumpPower: 50

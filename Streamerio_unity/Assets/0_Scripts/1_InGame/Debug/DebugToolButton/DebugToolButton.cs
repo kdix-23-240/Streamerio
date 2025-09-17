@@ -1,15 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DebugTool
+public class DebugToolButton : MonoBehaviour
 {
-    public class DebugToolButton : MonoBehaviour
-    {
-        [SerializeField] private GameObject _debugMonitor;
+    [SerializeField] private GameObject _debugMonitor;
 
-        public void OnClick()
-        {
-            _debugMonitor.SetActive(!_debugMonitor.activeSelf);
-        }
+    public void OnClick()
+    {
+        _debugMonitor.SetActive(!_debugMonitor.activeSelf);
     }
 }

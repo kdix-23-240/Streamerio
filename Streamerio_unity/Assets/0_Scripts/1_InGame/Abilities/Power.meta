@@ -1,5 +1,17 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+<<<<<<< HEAD:Streamerio_unity/Assets/0_Scripts/1_InGame/Abilities/Power.meta
 guid: 834660928b2f364479e66eec183dd708
+=======
+<<<<<<<< HEAD:Streamerio_unity/Assets/0_Scripts.meta
+guid: 30be70d88e3504d0fa3fba9494740e3c
+========
+guid: 834660928b2f364479e66eec183dd708
+>>>>>>>> 46161b0 (3種類の能力の増減実装):Streamerio_unity/Assets/0_Scripts/1_InGame/Abilities/Power.meta
+>>>>>>> 46161b0 (3種類の能力の増減実装):Streamerio_unity/Assets/Scripts/Game/Abilities/Power.meta
+=======
+guid: 9bc452819ed53c74e9471bca28f50667
+>>>>>>> 253908d (resolve conflict)
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

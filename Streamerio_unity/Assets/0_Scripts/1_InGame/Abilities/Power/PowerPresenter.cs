@@ -4,7 +4,7 @@ using R3;
 public class PowerPresenter : MonoBehaviour, IAbility
 {
     private PowerModel _powerModel;
-    public ReactiveProperty<float> Amount => _powerModel.CurrentPower;
+    public float Amount => _powerModel.CurrentPower.Value;
     [SerializeField] private PowerTestView _powerTestView;
     [SerializeField] private PlayerScriptableObject _scriptableObject;
 
