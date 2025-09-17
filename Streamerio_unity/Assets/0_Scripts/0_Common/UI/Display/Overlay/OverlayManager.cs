@@ -13,13 +13,11 @@ namespace Common.UI.Display.Overlay
         
         protected override IDisplay CreateDisplay(OverlayType type)
         {
-            IDisplay display = null;
-            switch (type)
-            {
-                case OverlayType.Common:
-                    display = Instantiate(_commonOverlay, Parent);
-                    break;
-            }
+            IDisplay display = type switch
+                {
+                    OverlayType.Common => Instantiate(_commonOverlay, Parent),
+                    _ => null
+                };
 
             display?.Initialize();
             return display;
