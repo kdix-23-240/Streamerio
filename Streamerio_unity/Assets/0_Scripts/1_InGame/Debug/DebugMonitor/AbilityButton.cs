@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DebugMonitor
+namespace DebugTool
 {
     public class AbilityButton : MonoBehaviour
     {

@@ -3,10 +3,13 @@ using UnityEngine;
 /// <summary>
 /// デバッグモニターは最初は非表示にする
 /// </summary>
-public class DebugMonitor : MonoBehaviour
+namespace DebugTool
 {
-    void Start()
+    public class DebugMonitor : MonoBehaviour
     {
-        gameObject.SetActive(false);
+        void Start()
+        {
+            gameObject.SetActive(false);
+        }
     }
 }
