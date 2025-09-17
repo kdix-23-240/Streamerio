@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -7,7 +8,7 @@ namespace DebugTool
 {
     public class DebugMonitor : MonoBehaviour
     {
-        void Start()
+        async void Start()
         {
             gameObject.SetActive(false);
         }

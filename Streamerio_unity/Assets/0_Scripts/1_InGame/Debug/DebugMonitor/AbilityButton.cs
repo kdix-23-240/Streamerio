@@ -38,9 +38,16 @@ namespace DebugTool
                 case AbilityType.Speed:
                     amount = _playerData.SpeedDiff;
                     break;
+                case AbilityType.JumpPower:
+                    UnityEngine.Debug.Log("JumpPower button clicked");
+                    amount = _playerData.JumpPowerDiff;
+                    break;
+                default:
+                    UnityEngine.Debug.LogWarning("この能力は設定されていません");
+                    return;
             }
 
-            Debug.Log($"AbilityButton: {_abilityType} {(_isIncrease ? "Increase" : "Decrease")} by {amount}");
+            UnityEngine.Debug.Log($"AbilityButton: {_abilityType} {(_isIncrease ? "Increase" : "Decrease")} by {amount}");
 
             if (_isIncrease)
             {
@@ -57,6 +64,7 @@ namespace DebugTool
     {
         Hp,
         Power,
-        Speed
+        Speed,
+        JumpPower
     }
 }
