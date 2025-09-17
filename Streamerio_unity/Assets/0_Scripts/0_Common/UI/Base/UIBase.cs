@@ -15,12 +15,6 @@ namespace Common.UI
         /// 初期化
         /// </summary>
         void Initialize();
-        
-        /// <summary>
-        /// UIを触れるようにするか設定
-        /// </summary>
-        /// <param name="isInteractive">触れる/触れない</param>
-        void SetInteractive(bool isInteractive);
     }
     
     /// <summary>
@@ -51,12 +45,6 @@ namespace Common.UI
         public virtual void Initialize()
         {
             
-        }
-        
-        public void SetInteractive(bool isInteractive)
-        {
-            _canvasGroup.interactable = isInteractive;
-            _canvasGroup.blocksRaycasts = isInteractive;
         }
     }
 }

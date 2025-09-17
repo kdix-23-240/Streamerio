@@ -44,26 +44,22 @@ namespace Common.UI.Display.Overlay
         
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            SetInteractive(true);
             await _showAnimation.PlayAsync(ct);
         }
 
         public override void Show()
         {
-            SetInteractive(true);
             CanvasGroup.alpha = _showFadeAnimationParam.Alpha;
         }
 
         public override async UniTask HideAsync(CancellationToken ct)
         {
             await _hideAnimation.PlayAsync(ct);
-            SetInteractive(false);
         }
 
         public override void Hide()
         {
             CanvasGroup.alpha = _hideFadeAnimationParam.Alpha;
-            SetInteractive(false);
         }
     }
 }
