@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Streamerio_unity/Assets/0_Scripts/1_InGame/Abilities/JumpPower.meta
 guid: fe5f6df0f8250437d8b212f25f1e2c41
-========
-guid: b3a8a7c902b4f45f5b3eeb00a6f4b380
->>>>>>>> 350f850 (対応できないエラー(えらーを吐いている状態)):Streamerio_unity/Assets/Prefabs.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

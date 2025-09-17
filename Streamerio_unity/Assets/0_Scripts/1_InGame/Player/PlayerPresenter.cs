@@ -35,4 +35,9 @@ public class PlayerPresenter : MonoBehaviour
     {
         _view.Move(delta * _playerData.InitialSpeed * Time.deltaTime);
     }
+
+    public void Jump()
+    {
+        _view.Jump(_playerData.InitialJumpPower);
+    }
 }
