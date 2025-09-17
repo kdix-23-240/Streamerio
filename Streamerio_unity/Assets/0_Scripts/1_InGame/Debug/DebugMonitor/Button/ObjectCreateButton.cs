@@ -1,12 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ObjectCreateButton : MonoBehaviour
+namespace DebugTool
 {
-    [SerializeField] private GameObject _createdObject; // 生成するオブジェクト
 
-    public void OnClick()
+    public class ObjectCreateButton : MonoBehaviour
     {
-        Instantiate(_createdObject);
+        [SerializeField] private GameObject _createdObject; // 生成するオブジェクト
+
+        public void OnClick()
+        {
+            Instantiate(_createdObject);
+        }
     }
 }
