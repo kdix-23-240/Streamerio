@@ -1,7 +1,7 @@
 using UnityEngine;
 using R3;
 
-public class PlayerPresenter
+public class PlayerPresenter : MonoBehaviour
 {
     private PlayerModel _model;
     [SerializeField] private PlayerView _view;
