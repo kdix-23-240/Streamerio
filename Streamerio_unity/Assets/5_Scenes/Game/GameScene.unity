@@ -1634,7 +1634,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1500116262}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9092a62592038eb4f8d81a9b826144da, type: 3}
+  m_Script: {fileID: 11500000, guid: ad935bffdb4a54a4db4c125292401e6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1527302263
@@ -1918,11 +1918,11 @@ PrefabInstance:
     - target: {fileID: 1823961369057642589, guid: da539eb3766d9c74a9a7297e2ce64340, type: 3}
       propertyPath: _abilityComponent
       value: 
-      objectReference: {fileID: 1500116264}
+      objectReference: {fileID: 0}
     - target: {fileID: 2084680398963115325, guid: da539eb3766d9c74a9a7297e2ce64340, type: 3}
       propertyPath: _abilityComponent
       value: 
-      objectReference: {fileID: 1500116264}
+      objectReference: {fileID: 0}
     - target: {fileID: 7177017270825495095, guid: da539eb3766d9c74a9a7297e2ce64340, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2054,7 +2054,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1830597869}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9b2392ebcce944488df3f534ace2191, type: 3}
+  m_Script: {fileID: 11500000, guid: 21d8f9f1d6e28e6428afd7ecf8e3f601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1846211059
@@ -2554,14 +2554,14 @@ PrefabInstance:
     - target: {fileID: 4767147095877403625, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
       propertyPath: _abilityComponent
       value: 
-      objectReference: {fileID: 1500116264}
+      objectReference: {fileID: 0}
     - target: {fileID: 8147903285289580608, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
       propertyPath: _abilityComponent
-      value: 
+      value:
       objectReference: {fileID: 1500116264}
     - target: {fileID: 8738985702198934613, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 120
+      value: 120ジしたときにオブジェクトの設定が壊れていたのを修正(正常に動きます))
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
