@@ -6,6 +6,7 @@ namespace Common.UI.Guard
     /// <summary>
     /// クリックをガードする
     /// </summary>
+    [RequireComponent(typeof(CanvasGroup))]
     public class ClickGuard: SingletonBase<ClickGuard>
     {
         [SerializeField, ReadOnly]
