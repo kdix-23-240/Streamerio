@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: b851a3bc2063e4863900981b255e02be
+=======
+guid: a2ff13075f571204c9629821fb164c65
+>>>>>>> 350f850 (対応できないエラー(えらーを吐いている状態))
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
