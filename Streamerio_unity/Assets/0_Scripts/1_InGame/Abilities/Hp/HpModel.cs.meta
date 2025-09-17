@@ -1,2 +1,21 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD:Streamerio_unity/Assets/0_Scripts/1_InGame/Abilities/Hp/HpModel.cs.meta
 guid: de5673907c415544eb59c69220527354
+=======
+guid: 6f0d2a97572ded747920eaeb078f9832
+>>>>>>> f724235 (HPの増減を実装):Streamerio_unity/Assets/Scripts/Game/Abilities/Hp/HpModel.cs.meta
+=======
+guid: 6f0d2a97572ded747920eaeb078f9832
+>>>>>>> 253908d (resolve conflict)
+=======
+guid: 029e05b96eb2e4ab7bd146d32ba148ff
+>>>>>>> 238ac0a (resolve conflict)
+=======
+guid: 029e05b96eb2e4ab7bd146d32ba148ff
+=======
+guid: de5673907c415544eb59c69220527354
+>>>>>>> 350f850 (対応できないエラー(えらーを吐いている状態))
+>>>>>>> e6673f9 (resolve conflict)
