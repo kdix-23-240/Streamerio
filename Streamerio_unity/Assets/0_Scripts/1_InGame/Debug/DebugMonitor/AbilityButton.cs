@@ -1,60 +1,62 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AbilityButton : MonoBehaviour
+namespace DebugMonitor
 {
-    [SerializeField] private MonoBehaviour _abilityComponent;
-    [SerializeField] private AbilityType _abilityType;
-    [SerializeField] private bool _isIncrease;
-    [SerializeField] private PlayerScriptableObject _playerData;
-
-    private IAbility _ability;
-
-    private void Awake()
+    public class AbilityButton : MonoBehaviour
     {
-        // MonoBehaviourからIAbilityを取得
-        _ability = _abilityComponent as IAbility;
-    }
+        [SerializeField] private MonoBehaviour _abilityComponent; // IAbilityを実装したプレゼンターオブジェクト
+        [SerializeField] private AbilityType _abilityType; // 調整する能力の種類
+        [SerializeField] private bool _isIncrease; // 増加させるか減少させるか
+        [SerializeField] private PlayerScriptableObject _playerData; // プレイヤーデータのスクリプタブルオブジェクト
+        private IAbility _ability;
 
-    public void OnClick()
-    {
-        Count();
-    }
-
-    protected void Count()
-    {
-        if (_ability == null) return;
-
-        float amount = 0f;
-        switch (_abilityType)
+        private void Awake()
         {
-            case AbilityType.Hp:
-                amount = _playerData.HpDiff;
-                break;
-            case AbilityType.Power:
-                amount = _playerData.PowerDiff;
-                break;
-            case AbilityType.Speed:
-                amount = _playerData.SpeedDiff;
-                break;
+            // MonoBehaviourからIAbilityを取得
+            _ability = _abilityComponent as IAbility;
         }
 
-        Debug.Log($"AbilityButton: {_abilityType} {( _isIncrease ? "Increase" : "Decrease" )} by {amount}");
-
-        if (_isIncrease)
+        public void OnClick()
         {
-            _ability.Increase(amount);
+            Count();
         }
-        else
+
+        protected void Count()
         {
-            _ability.Decrease(amount);
+            if (_ability == null) return;
+
+            float amount = 0f;
+            switch (_abilityType)
+            {
+                case AbilityType.Hp:
+                    amount = _playerData.HpDiff;
+                    break;
+                case AbilityType.Power:
+                    amount = _playerData.PowerDiff;
+                    break;
+                case AbilityType.Speed:
+                    amount = _playerData.SpeedDiff;
+                    break;
+            }
+
+            Debug.Log($"AbilityButton: {_abilityType} {(_isIncrease ? "Increase" : "Decrease")} by {amount}");
+
+            if (_isIncrease)
+            {
+                _ability.Increase(amount);
+            }
+            else
+            {
+                _ability.Decrease(amount);
+            }
         }
     }
-}
 
-public enum AbilityType
-{
-    Hp,
-    Power,
-    Speed
+    public enum AbilityType
+    {
+        Hp,
+        Power,
+        Speed
+    }
 }
