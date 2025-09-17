@@ -17,7 +17,7 @@ public class PlayerScriptableObject : ScriptableObject
 
     [Header("Player Ability Max Value")]
     public float MaxHp = 100;
-    public float MaxPower = 50;
+    public float MaxPower = 20;
     public float MaxSpeed = 20;
     public float MaxJumpPower = 20;
 }

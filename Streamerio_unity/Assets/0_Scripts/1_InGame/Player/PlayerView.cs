@@ -1,14 +1,10 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerView : MonoBehaviour
 {
-    public void Initialize(float initialPosX, float initialPosY)
+    public void Move(Vector2 newPosition)
     {
-        UpdatePosition(initialPosX, initialPosY);
-    }
-    public void UpdatePosition(float x, float y)
-    {
-        transform.position = new Vector3(x, y, transform.position.z);
+        Debug.Log($"PlayerView Move to {newPosition}");
+        gameObject.transform.position += new Vector3(newPosition.x, newPosition.y, 0);
     }
 }
