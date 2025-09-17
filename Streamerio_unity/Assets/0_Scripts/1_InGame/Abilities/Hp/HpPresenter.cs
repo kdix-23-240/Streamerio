@@ -4,7 +4,7 @@ using R3;
 public class HpPresenter : MonoBehaviour, IAbility
 {
     private HpModel _hpModel;
-    public ReactiveProperty<float> Amount => _hpModel.CurrentHp;
+    public float Amount => _hpModel.CurrentHp.Value;
     [SerializeField] private HpTestView _hpTestView;
     [SerializeField] private PlayerScriptableObject _scriptableObject;
 

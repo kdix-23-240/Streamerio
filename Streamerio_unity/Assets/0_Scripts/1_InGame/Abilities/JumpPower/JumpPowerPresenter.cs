@@ -4,7 +4,7 @@ using R3;
 public class JumpPowerPresenter : MonoBehaviour, IAbility
 {
     private JumpPowerModel _jumpPowerModel;
-    public ReactiveProperty<float> Amount => _jumpPowerModel.CurrentJumpPower;
+    public float Amount => _jumpPowerModel.CurrentJumpPower.Value;
     [SerializeField] private JumpPowerTestView _jumpPowerTestView;
     [SerializeField] private PlayerScriptableObject _scriptableObject;
 

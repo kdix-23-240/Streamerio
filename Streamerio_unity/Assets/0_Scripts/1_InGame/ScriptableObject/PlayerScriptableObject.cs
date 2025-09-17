@@ -11,9 +11,9 @@ public class PlayerScriptableObject : ScriptableObject
 
     [Header("Player Ability Diff")]
     public float HpDiff = 10;
-    public float PowerDiff = 0.2f;
-    public float SpeedDiff = 0.2f;
-    public float JumpPowerDiff = 0.1f;
+    public float PowerDiff = 2f;
+    public float SpeedDiff = 2f;
+    public float JumpPowerDiff = 2f;
 
     [Header("Player Ability Max Value")]
     public float MaxHp = 100;

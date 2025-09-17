@@ -4,7 +4,7 @@ using R3;
 public class SpeedPresenter : MonoBehaviour, IAbility
 {
     private SpeedModel _speedModel;
-    public ReactiveProperty<float> Amount => _speedModel.CurrentSpeed;
+    public float Amount => _speedModel.CurrentSpeed.Value;
     [SerializeField] private SpeedTestView _speedTestView;
     [SerializeField] private PlayerScriptableObject _scriptableObject;
 

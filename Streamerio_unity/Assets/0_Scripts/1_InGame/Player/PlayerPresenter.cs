@@ -4,12 +4,16 @@ using R3;
 public class PlayerPresenter : MonoBehaviour
 {
     private PlayerModel _model;
-    [SerializeField] private PlayerView _view;
+    private PlayerView _view;
     [SerializeField] private PlayerScriptableObject _playerData;
+    [SerializeField] private HpPresenter _hp;
+    [SerializeField] private PowerPresenter _power;
+    [SerializeField] private SpeedPresenter _speed;
+    [SerializeField] private JumpPowerPresenter _jumpPower;
 
     void Awake()
     {
-        // ModelとViewの初期化
+        _view = GetComponent<PlayerView>();
         _model = new PlayerModel(_view.gameObject.transform.position.x, _view.gameObject.transform.position.y);
     }
 
@@ -33,11 +37,11 @@ public class PlayerPresenter : MonoBehaviour
 
     public void Move(Vector2 delta)
     {
-        _view.Move(delta * _playerData.InitialSpeed * Time.deltaTime);
+        _view.Move(delta * _speed.Amount * Time.deltaTime);
     }
 
     public void Jump()
     {
-        _view.Jump(_playerData.InitialJumpPower);
+        _view.Jump(_jumpPower.Amount);
     }
 }
