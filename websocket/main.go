@@ -27,8 +27,7 @@ func main() {
 	})
 	// e.GET("/ws", Handler.HandleWebSocket)
 	e.GET("/ws-unity", Handler.Handler.HandleUnityConnection)
-	// e.GET("/attack", Handler.SendAttackMessageToClient)
-	// e.GET("/defend", Handler.SendDefendMessageToClient)
+	// e.GET("/action", Handler.Handler.ListClients)
 	e.GET("/clients", Handler.Handler.ListClients)
 	e.Logger.Fatal(e.Start(":8888"))
 }

@@ -1,29 +1,33 @@
 package handler
 
 import (
+	"crypto/rand"
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"sync"
+	"time"
 
 	"websocket/service"
 
 	"golang.org/x/net/websocket"
 
 	"github.com/labstack/echo/v4"
+	"github.com/oklog/ulid/v2"
 )
 
 type WebSocketHandler struct {
 	connections map[string]*websocket.Conn
 	mu          sync.RWMutex
 	roomService *service.RoomService
+	ulidEntropy io.Reader
 }
 
 func NewWebSocketHandler() *WebSocketHandler {
 	return &WebSocketHandler{
 		connections: make(map[string]*websocket.Conn),
 		roomService: service.NewRoomService(),
+		ulidEntropy: ulid.Monotonic(rand.Reader, 0),
 	}
 }
 
@@ -83,14 +87,14 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 }
 
 func (h *WebSocketHandler) register(ws *websocket.Conn) string {
+	// ULIDで一意IDを生成（時系列順にソート可能）
+	id := ulid.MustNew(ulid.Timestamp(time.Now()), h.ulidEntropy).String()
+
 	// 排他制御
 	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	// 接続IDを生成
-	id := len(h.connections) + 1
-	h.connections[strconv.Itoa(id)] = ws
-	return strconv.Itoa(id)
+	h.connections[id] = ws
+	h.mu.Unlock()
+	return id
 }
 
 func (h *WebSocketHandler) unregister(id string) {
