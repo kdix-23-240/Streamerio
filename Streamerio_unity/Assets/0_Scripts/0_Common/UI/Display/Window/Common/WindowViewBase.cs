@@ -16,7 +16,7 @@ namespace Common.UI.Display.Window
     /// 共通のウィンドウの見た目
     /// </summary>
     [RequireComponent(typeof(BookWindowAnimation))]
-    public class CommonWindowView: DisplayViewBase
+    public abstract class WindowViewBase: DisplayViewBase
     {
         [SerializeField, LabelText("背景"), ReadOnly]
         private DisplayBackground _background;
@@ -27,7 +27,11 @@ namespace Common.UI.Display.Window
         
         [SerializeField, LabelText("章")]
         private　SerializeDictionary<ChapterType, ChapterPanelPresenter> _chapterDict;
-        public IReadOnlyDictionary<ChapterType, ChapterPanelPresenter> ChapterDict;
+        [SerializeField, LabelText("章パネルの親")]
+        private Transform _chapterParent;
+
+        private Dictionary<ChapterType, ChapterPanelPresenter> _existingChapterDict;
+        public IReadOnlyDictionary<ChapterType, ChapterPanelPresenter> ExisitingChapterDict => _existingChapterDict;
         
         [Header("アニメション")]
         [SerializeField, LabelText("表示アニメーション")]
@@ -68,14 +72,10 @@ namespace Common.UI.Display.Window
             
             _buttonGroup.Initialize();
             _buttonGroup.Hide();
+            
+            _existingChapterDict = new Dictionary<ChapterType, ChapterPanelPresenter>();
 
             _bookWindowAnimation.Initialize();
-
-            ChapterDict = _chapterDict.ToDictionary();
-            foreach (var chapter in ChapterDict.Values)
-            {
-                chapter.Initialize(_buttonGroup, _bookWindowAnimation);
-            }
             
             _showAnim = new MoveAnimationComponent(RectTransform, _showAnimParam);
             _hideAnim = new MoveAnimationComponent(RectTransform, _hideAnimParam);
@@ -105,6 +105,19 @@ namespace Common.UI.Display.Window
             RectTransform.anchoredPosition = _hideAnimParam.Position;
             
             _background.Hide();
+        }
+
+        /// <summary>
+        /// 新しいチャプターを追加
+        /// </summary>
+        /// <param name="chapterType"></param>
+        public ChapterPanelPresenter CreateChapter(ChapterType chapterType)
+        {
+            var newChapter = Instantiate(_chapterDict[chapterType], RectTransform);
+            newChapter.Initialize(_buttonGroup, _bookWindowAnimation);
+            _existingChapterDict.Add(chapterType, newChapter);
+            
+            return newChapter;
         }
     }
 }
