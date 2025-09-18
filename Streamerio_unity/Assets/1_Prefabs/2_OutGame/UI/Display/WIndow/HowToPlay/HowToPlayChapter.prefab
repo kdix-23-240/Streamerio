@@ -177,6 +177,7 @@ MonoBehaviour:
   _canvasGroup: {fileID: 475097234512655894}
   _contentParts:
   - {fileID: 7386525862936574836}
+  - {fileID: 7929717450719093936}
   _showContentAnimParam:
     Duration: 0.1
     Ease: 2
@@ -199,3 +200,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   View: {fileID: 7151308233614114926}
+--- !u!225 &7929717450719093936 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7258336503884935020, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+  m_PrefabInstance: {fileID: 772031547046628316}
+  m_PrefabAsset: {fileID: 0}

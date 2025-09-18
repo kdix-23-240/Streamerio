@@ -1,5 +1,6 @@
 using System.Threading;
 using Alchemy.Inspector;
+using Common.UI.Part.Button;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -13,6 +14,17 @@ namespace Common.UI.Display.Window.Panel
         [SerializeField, LabelText("ページ")]
         private PagePanelPresenter[] _pages;
 
+        [Header("ボタン")]
+        [SerializeField, LabelText("閉じるボタン")]
+        private CommonButton _closeButton;
+        public CommonButton CloseButton => _closeButton;
+        [SerializeField, LabelText("次のページボタン")]
+        private CommonButton _nextButton;
+        public CommonButton NextButton => _nextButton;
+        [SerializeField, LabelText("前のページボタン")]
+        private CommonButton _backButton;
+        public CommonButton BackButton => _backButton;
+        
         private int _lastPageIndex;
         /// <summary>
         /// 最後のページ番号
@@ -32,6 +44,10 @@ namespace Common.UI.Display.Window.Panel
         public override void Initialize()
         {
             base.Initialize();
+            
+            _closeButton.Initialize();
+            _nextButton.Initialize();
+            _backButton.Initialize();
             
             _lastPageIndex = _pages.Length-1;
 

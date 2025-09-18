@@ -35,7 +35,7 @@ namespace Common.UI.Display.Window.Panel
         };
         
         private FadeAnimationComponent[] _contentShowAnims;
-        private FadeAnimationComponent _contentHideAnims;
+        private FadeAnimationComponent _contentHideAnim;
 
         public override void Initialize()
         {
@@ -49,7 +49,7 @@ namespace Common.UI.Display.Window.Panel
                 _contentShowAnims[i] = new FadeAnimationComponent(_contentParts[i], _showContentAnimParam);
             }
             
-            _contentHideAnims = new FadeAnimationComponent(CanvasGroup, _hideAnimParam);
+            _contentHideAnim = new FadeAnimationComponent(CanvasGroup, _hideAnimParam);
         }
 
         public override async UniTask ShowAsync(CancellationToken ct)
@@ -70,7 +70,7 @@ namespace Common.UI.Display.Window.Panel
 
         public override async UniTask HideAsync(CancellationToken ct)
         {
-            await _contentHideAnims.PlayAsync(ct);
+            await _contentHideAnim.PlayAsync(ct);
             SetContentAlpha(_hideAnimParam.Alpha);
         }
 

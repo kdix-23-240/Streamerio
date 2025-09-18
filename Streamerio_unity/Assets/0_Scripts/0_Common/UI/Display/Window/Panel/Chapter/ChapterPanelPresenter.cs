@@ -1,9 +1,8 @@
 using System.Threading;
 using Alchemy.Inspector;
 using Common.UI.Display.Window.Animation;
-using Common.UI.Display.Window.Group;
-using Common.UI.Guard;
 using Cysharp.Threading.Tasks;
+using OutGame.Title;
 using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,13 +24,7 @@ namespace Common.UI.Display.Window.Panel
         private ReactiveProperty<int> _currentIndexProp;
         private int _currentIndex => _currentIndexProp.Value;
 
-        private WindowButtonGroup _buttonGroup;
         private BookWindowAnimation _bookWindowAnimation;
-
-        private CancellationTokenSource _cts;
-
-        private Subject<ChapterType> _closeEvent;
-        public Subject<ChapterType> CloseEvent => _closeEvent;
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -45,18 +38,50 @@ namespace Common.UI.Display.Window.Panel
         /// <summary>
         /// 初期化
         /// </summary>
-        /// <param name="buttonGroup"></param>
         /// <param name="bookWindowAnimation"></param>
-        public void Initialize(WindowButtonGroup buttonGroup, BookWindowAnimation bookWindowAnimation)
+        public void Initialize(BookWindowAnimation bookWindowAnimation)
         {
             _view.Initialize();
             
             _currentIndexProp = new ReactiveProperty<int>();
 
-            _buttonGroup = buttonGroup;
             _bookWindowAnimation = bookWindowAnimation;
 
-            _closeEvent = new();
+            SetEvnet();
+            Bind();
+        }
+
+        /// <summary>
+        /// イベント設定
+        /// </summary>
+        private void SetEvnet()
+        {
+            _view.NextButton.SetClickEvent(()=> OpenNextPage(destroyCancellationToken).Forget());
+            _view.BackButton.SetClickEvent(()=> OpenPrePage(destroyCancellationToken).Forget());
+            _view.CloseButton.SetClickEvent(() =>
+            {
+                if (_preChapter == ChapterType.None)
+                {
+                    TitleManager.Instance.ShowTitleAsync(destroyCancellationToken).Forget();
+                }
+                else
+                {
+                    ChapterManager.Instance.OpenChapterAsync(_preChapter, destroyCancellationToken).Forget();
+                }
+            });
+        }
+        
+        /// <summary>
+        /// イベント焼き付け
+        /// </summary>
+        private void Bind()
+        {
+            _currentIndexProp
+                .Subscribe(_ =>
+                {
+                    _view.BackButton.gameObject.SetActive(_currentIndex > 0);
+                    _view.NextButton.gameObject.SetActive(_currentIndex < _view.LastPageIndex);
+                }).RegisterTo(destroyCancellationToken);
         }
 
         /// <summary>
@@ -65,8 +90,6 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         public async UniTask ShowAsync(CancellationToken ct)
         {
-            Bind();
-            
             _view.SetInteractable(true);
             _view.Show();
             
@@ -79,8 +102,6 @@ namespace Common.UI.Display.Window.Panel
         /// </summary>
         public void Show()
         {
-            Bind();
-            
             _view.SetInteractable(true);
             _view.Show();
             
@@ -89,48 +110,11 @@ namespace Common.UI.Display.Window.Panel
         }
         
         /// <summary>
-        /// イベント焼き付け
-        /// </summary>
-        private void Bind()
-        {
-            _cts = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
-            
-            _buttonGroup.NextButton.ClickEventObservable
-                .Subscribe(_ =>
-                {
-                    OpenNextPage(destroyCancellationToken).Forget();
-                }).RegisterTo(_cts.Token);
-
-            _buttonGroup.BackButton.ClickEventObservable
-                .Subscribe(_ =>
-                {
-                    OpenPrePage(destroyCancellationToken).Forget();
-                }).RegisterTo(_cts.Token);
-
-
-            _buttonGroup.CloseButton.ClickEventObservable
-                .Subscribe(_ =>
-                {
-                    _closeEvent.OnNext(_preChapter);
-                }).RegisterTo(_cts.Token);
-            
-            _currentIndexProp
-                .Subscribe(_ =>
-                {
-                    _buttonGroup.BackButton.gameObject.SetActive(_currentIndex > 0);
-                    _buttonGroup.NextButton.gameObject.SetActive(_currentIndex < _view.LastPageIndex);
-                }).RegisterTo(_cts.Token);
-        }
-        
-        /// <summary>
         /// 開いているページをアニメーションで閉じる
         /// </summary>
         /// <param name="ct"></param>
         public async UniTask HideAsync(CancellationToken ct)
         {
-            _cts?.Dispose();
-            
-            await _buttonGroup.HideAsync(ct);
             await _view.HidePageAsync(_currentIndex, ct);
             
             _view.Hide();
@@ -142,9 +126,6 @@ namespace Common.UI.Display.Window.Panel
         /// </summary>
         public void Hide()
         {
-            _cts?.Dispose();
-            
-            _buttonGroup.Hide();
             _view.HidePage(_currentIndex);
             
             _view.Hide();
@@ -157,11 +138,13 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask OpenNextPage(CancellationToken ct)
         {
-            ClickGuard.Instance.Guard(true);
-            await HideAsync(ct);
+            _view.SetInteractable(false);
+            
+            _view.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnRightAsync(ct);
             await ShowPageAsync(_currentIndex + 1, ct);
-            ClickGuard.Instance.Guard(false);
+            
+            _view.SetInteractable(true);
         }
 
         /// <summary>
@@ -170,11 +153,13 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask OpenPrePage(CancellationToken ct)
         {
-            ClickGuard.Instance.Guard(true);
-            await _view.HidePageAsync(_currentIndex, ct);
+            _view.SetInteractable(false);
+            
+            _view.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnLeftAsync(ct);
             await ShowPageAsync(_currentIndex - 1, ct);
-            ClickGuard.Instance.Guard(false);
+            
+            _view.SetInteractable(true);
         }
 
         /// <summary>
@@ -186,7 +171,6 @@ namespace Common.UI.Display.Window.Panel
         {
             _currentIndexProp.Value = Mathf.Clamp(nextIndex, 0, _view.LastPageIndex);
             await _view.ShowPageAsync(_currentIndex, ct);
-            await _buttonGroup.ShowAsync(ct);
         }
     }
 }

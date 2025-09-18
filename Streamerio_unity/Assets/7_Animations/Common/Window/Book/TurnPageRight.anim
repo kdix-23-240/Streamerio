@@ -23,7 +23,7 @@ AnimationClip:
     - time: 0
       value: {fileID: 8760810709888329790, guid: 8e19ec000146f4d9f91ea92051853b61, type: 3}
     - time: 0.083333336
-      value: {fileID: 8386236096470351724, guid: d167563f160cb435ea3e4966e02becca, type: 3}
+      value: {fileID: -3265537912715371028, guid: 3278e014b543045298a45288aa3578a3, type: 3}
     - time: 0.16666667
       value: {fileID: -1839235895815122226, guid: 99c3af697ba6a4c1ba5da5088f062a99, type: 3}
     - time: 0.25
@@ -37,7 +37,7 @@ AnimationClip:
     - time: 0.5833333
       value: {fileID: 8760810709888329790, guid: 8e19ec000146f4d9f91ea92051853b61, type: 3}
     attribute: m_Sprite
-    path: Window
+    path: Book
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 2
@@ -49,7 +49,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2353593579
+      path: 1809255439
       attribute: 2015549526
       script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
       typeID: 114
@@ -59,7 +59,7 @@ AnimationClip:
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
     - {fileID: 8760810709888329790, guid: 8e19ec000146f4d9f91ea92051853b61, type: 3}
-    - {fileID: 8386236096470351724, guid: d167563f160cb435ea3e4966e02becca, type: 3}
+    - {fileID: -3265537912715371028, guid: 3278e014b543045298a45288aa3578a3, type: 3}
     - {fileID: -1839235895815122226, guid: 99c3af697ba6a4c1ba5da5088f062a99, type: 3}
     - {fileID: 8386236096470351724, guid: d167563f160cb435ea3e4966e02becca, type: 3}
     - {fileID: -4234584803604654108, guid: b541a57febb154d3db6a60b1a9d2b7ec, type: 3}

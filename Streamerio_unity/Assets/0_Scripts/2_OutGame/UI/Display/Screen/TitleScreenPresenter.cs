@@ -58,7 +58,7 @@ namespace _0_Scripts._2_OutGame.UI.Display.Screen
         public void OnPointerClick(PointerEventData eventData)
         {
             Hide();
-            TitleManager.Instance.OpenTitleWindowAsync().Forget();
+            TitleManager.Instance.OpenTitleWindowAsync(destroyCancellationToken).Forget();
         }
     }
 }

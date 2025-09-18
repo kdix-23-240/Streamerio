@@ -4,14 +4,21 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Common.UI.Part.Button
 {
     /// <summary>
-    /// 共通のボタン
+    /// テキストのボタン
     /// </summary>
-    public class CommonButton: ButtonBase
+    public class TextButton: ButtonBase
     {
+        [Header("画像")]
+        [SerializeField, LabelText("羽")]
+        private Image _featherImage;
+        [SerializeField, LabelText("下線")]
+        private Image _lineImage;
+        
         [SerializeField, LabelText("ボタンを押した時のアニメーション")]
         private ScaleAnimationComponentParam _pushDownAnimParam = new()
         {
@@ -26,61 +33,51 @@ namespace Common.UI.Part.Button
             Duration = 0.1f,
             Ease = Ease.OutSine,
         };
-        [SerializeField, LabelText("ボタンにカーソルがあった時のアニメーション")]
-        private FadeAnimationComponentParam _enterAnimParam = new ()
-        {
-            Alpha = 0.5f,
-            Duration = 0.1f,
-            Ease = Ease.InSine,
-        };
-        [SerializeField, LabelText("ボタンにカーソルが離れた時のアニメーション")]
-        private FadeAnimationComponentParam _exitAnimParam = new()
-        {
-            Alpha = 1f,
-            Duration = 0.1f,
-            Ease = Ease.OutSine,
-        };
-
+        
         private ScaleAnimationComponent _pushDownAnim;
         private ScaleAnimationComponent _pushUpAnim;
-        private FadeAnimationComponent _enterAnim;
-        private FadeAnimationComponent _exitAnim;
-        
+
         public override void Initialize()
         {
             base.Initialize();
-
+            
+            _featherImage.enabled = false;
+            _lineImage.enabled = false;
+            
             _pushDownAnim = new ScaleAnimationComponent(RectTransform, _pushDownAnimParam);
             _pushUpAnim = new ScaleAnimationComponent(RectTransform, _pushUpAnimParam);
-            _enterAnim = new FadeAnimationComponent(CanvasGroup, _enterAnimParam);
-            _exitAnim = new FadeAnimationComponent(CanvasGroup, _exitAnimParam);
         }
 
         public override void OnPointerDown(PointerEventData eventData)
         {
-            _pushDownAnim.PlayAsync(destroyCancellationToken).Forget();            
+            _pushDownAnim.PlayAsync(destroyCancellationToken).Forget();
         }
-
+        
         public override void OnPointerUp(PointerEventData eventData)
         {
             _pushUpAnim.PlayAsync(destroyCancellationToken).Forget();
         }
-
+        
         public override void OnPointerEnter(PointerEventData eventData)
         {
-            _enterAnim.PlayAsync(destroyCancellationToken).Forget();
+            _featherImage.enabled = true;
+            _lineImage.enabled = true;
         }
-
+        
         public override void OnPointerExit(PointerEventData eventData)
         {
-            _exitAnim.PlayAsync(destroyCancellationToken).Forget();
             _pushUpAnim.PlayAsync(destroyCancellationToken).Forget();
+            
+            _featherImage.enabled = false;
+            _lineImage.enabled = false;
         }
         
         protected override void ResetButtonState()
         {
-            CanvasGroup.alpha = _exitAnimParam.Alpha;
-            RectTransform.localScale = _pushUpAnimParam.Scale * Vector3.one;
+            RectTransform.localScale = _pushDownAnimParam.Scale* Vector3.one;
+            
+            _featherImage.enabled = false;
+            _lineImage.enabled = false;
         }
     }
 }

@@ -1,8 +1,8 @@
+using System.Threading;
 using _0_Scripts._2_OutGame.UI.Display.Screen;
 using Common;
 using Common.UI.Display.Window;
 using Cysharp.Threading.Tasks;
-using OutGame.UI.Display.Window;
 using UnityEngine;
 
 namespace OutGame.Title
@@ -12,7 +12,7 @@ namespace OutGame.Title
         [SerializeField]
         private TitleScreenPresenter _screen;
         [SerializeField]
-        private TitleWindowPresenter _window;
+        private WindowPresenter _window;
         
         private void Start()
         {
@@ -26,16 +26,17 @@ namespace OutGame.Title
         /// <summary>
         /// ウィンドウを開く
         /// </summary>
-        public async UniTask OpenTitleWindowAsync()
+        public async UniTask OpenTitleWindowAsync(CancellationToken ct)
         {
-            await _window.ShowAsync(destroyCancellationToken);
+            await _window.ShowAsync(ct);
         }
         
         /// <summary>
-        /// スクリーンを表示する
+        ///  タイトルスクリーンを表示する
         /// </summary>
-        public void ShowScreen()
+        public async UniTask ShowTitleAsync(CancellationToken ct)
         {
+            await _window.HideAsync(ct);
             _screen.Show();
         }
     }
