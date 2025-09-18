@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	websocketHandler "websocket/websocketHandler"
+	Handler "websocket/handler"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -25,9 +25,10 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.GET("/ws", websocketHandler.HandleWebSocket)
-	e.GET("/attack", websocketHandler.SendAttackMessageToClient)
-	e.GET("/defend", websocketHandler.SendDefendMessageToClient)
-	e.GET("/clients", websocketHandler.ListClients)
+	// e.GET("/ws", Handler.HandleWebSocket)
+	e.GET("/ws-unity", Handler.Handler.HandleUnityConnection)
+	// e.GET("/attack", Handler.SendAttackMessageToClient)
+	// e.GET("/defend", Handler.SendDefendMessageToClient)
+	e.GET("/clients", Handler.ListClients)
 	e.Logger.Fatal(e.Start(":8888"))
 }

@@ -40,7 +40,7 @@ public class Connection : MonoBehaviour
     //   return;
     // }
 
-    websocket = new WebSocket("wss://84fb7b774e66.ngrok-free.app/ws");
+    websocket = new WebSocket("wss://5dc66f8872d7.ngrok-free.app/ws-unity");
 
     if (websocket == null)
     {

@@ -1,16 +1,17 @@
-package websocket
+// 古いコード
+
+package handler
 
 import (
 	"errors"
 	"sort"
 	"sync"
-	"sync/atomic"
+	"strconv"
 
 	"golang.org/x/net/websocket"
 )
 
-// ClientConn wraps a websocket connection with a write mutex to
-// avoid concurrent write corruption.
+
 type ClientConn struct {
 	id      string
 	ws      *websocket.Conn
@@ -22,7 +23,6 @@ func (c *ClientConn) send(message string) error {
 	defer c.writeMu.Unlock()
 	return websocket.Message.Send(c.ws, message)
 }
-
 
 
 
@@ -39,8 +39,8 @@ func NewConnectionManager() *ConnectionManager {
 }
 
 func (m *ConnectionManager) Register(ws *websocket.Conn) string {
-	idNum := id + 1
-	id := "client-" + itoa(idNum)
+	idNum := m.Id + 1
+	id := "client-" + strconv.Itoa(idNum)
 	client := &ClientConn{id: id, ws: ws}
 	m.mu.Lock()
 	m.idToConn[id] = client
@@ -75,23 +75,5 @@ func (m *ConnectionManager) ListIDs() []string {
 	return ids
 }
 
-// uint64 -> 10進数文字列
-func itoa(n uint64) string {
-	if n == 0 {
-		return "0"
-	}
-	// uint64の最大長は20
-	buf := make([]byte, 0, 20)
-	for n > 0 {
-		d := n % 10
-		buf = append(buf, byte('0'+d))
-		n /= 10
-	}
-	// 逆順にする
-	for i, j := 0, len(buf)-1; i < j; i, j = i+1, j-1 {
-		buf[i], buf[j] = buf[j], buf[i]
-	}
-	return string(buf)
-}
 
 var manager = NewConnectionManager()

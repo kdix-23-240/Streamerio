@@ -1,4 +1,6 @@
-package websocket
+// 古いコード
+
+package handler
 
 import (
 	"fmt"
