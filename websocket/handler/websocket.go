@@ -39,14 +39,15 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 			defer ws.Close()
 
 			// 接続登録
-			id := Handler.Register(ws)
-			defer Handler.Unregister(id)
+			id := Handler.register(ws)
+			defer Handler.unregister(id)
 
 			// 接続直後に必ずログを出す
 			c.Logger().Infof("Client connected: %s id=%s", c.Request().RemoteAddr, id)
 
 			// IDを通知（JSON を送信）
-			if err := Handler.SendEventToUnity(id, map[string]interface{}{
+			if err := Handler.sendEventToUnity(id, map[string]interface{}{
+				// TODO: 本番環境のURLに変更する
 				"type":    "room_created",
 				"room_id": id,
 				"qr_code": "data:image/png;base64,...",
@@ -88,7 +89,7 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 	return nil
 }
 
-func (h *WebSocketHandler) Register(ws *websocket.Conn) string {
+func (h *WebSocketHandler) register(ws *websocket.Conn) string {
 	// 排他制御
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -99,7 +100,7 @@ func (h *WebSocketHandler) Register(ws *websocket.Conn) string {
 	return strconv.Itoa(id)
 }
 
-func (h *WebSocketHandler) Unregister(id string) {
+func (h *WebSocketHandler) unregister(id string) {
 	// 排他制御
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -108,7 +109,7 @@ func (h *WebSocketHandler) Unregister(id string) {
 	delete(h.connections, id)
 }
 
-func (h *WebSocketHandler) SendEventToUnity(roomID string, payload interface{}) error {
+func (h *WebSocketHandler) sendEventToUnity(roomID string, payload interface{}) error {
 	// 排他制御
 	h.mu.RLock()
 	defer h.mu.RUnlock()
