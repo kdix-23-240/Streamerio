@@ -2,6 +2,7 @@ using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using R3;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -50,6 +51,11 @@ namespace Common.UI.Part.Button
         private FadeAnimationComponent _enterAnim;
         private FadeAnimationComponent _exitAnim;
 
+        /// <summary>
+        /// クリックした時のイベント
+        /// </summary>
+        public Observable<Unit> ClickEventObservable => _button.OnClickAsObservable();
+
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
@@ -67,11 +73,6 @@ namespace Common.UI.Part.Button
             _pushUpAnim = new ScaleAnimationComponent(RectTransform, _pushUpAnimParam);
             _enterAnim = new FadeAnimationComponent(CanvasGroup, _enterAnimParam);
             _exitAnim = new FadeAnimationComponent(CanvasGroup, _exitAnimParam);
-        }
-        
-        public void SetClickEvent(UnityAction clickEvent)
-        {
-            _button.onClick.AddListener(clickEvent);
         }
 
         public void OnPointerDown(PointerEventData eventData)

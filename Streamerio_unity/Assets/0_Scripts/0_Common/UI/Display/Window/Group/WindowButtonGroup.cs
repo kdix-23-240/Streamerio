@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Common.UI.Display.Window.Group
 {
-    public class WindowButtonGroup: UIBehaviourBase
+    public class WindowButtonGroup: UIBehaviourBase, IDisplay
     {
         [SerializeField, LabelText("閉じるボタン")]
         private CommonButton _closeButton;
@@ -51,55 +51,24 @@ namespace Common.UI.Display.Window.Group
             _hideAnimation = new FadeAnimationComponent(CanvasGroup, _hideAnimationParam);
         }
         
-        /// <summary>
-        /// 表示アニメーション再生
-        /// </summary>
-        /// <param name="isFirst"></param>
-        /// <param name="isLast"></param>
-        /// <param name="ct"></param>
-        public async UniTask ShowAsync(bool isFirst, bool isLast, CancellationToken ct)
+        public async UniTask ShowAsync(CancellationToken ct)
         {
-            SetButtonsActive(isFirst, isLast);
             await _showAnimation.PlayAsync(ct);
         }
         
-        /// <summary>
-        /// 即時表示
-        /// </summary>
-        /// <param name="isFirst"></param>
-        /// <param name="isLast"></param>
-        public void Show(bool isFirst, bool isLast)
+        public void Show()
         {
-            SetButtonsActive(isFirst, isLast);
             CanvasGroup.alpha = _showAnimationParam.Alpha;
         }
         
-        /// <summary>
-        /// 非表示アニメーション再生
-        /// </summary>
-        /// <param name="ct"></param>
         public async UniTask HideAsync(CancellationToken ct)
         {
             await _hideAnimation.PlayAsync(ct);
         }
         
-        /// <summary>
-        /// 非表示即時
-        /// </summary>
         public void Hide()
         {
             CanvasGroup.alpha = _hideAnimationParam.Alpha;
-        }
-        
-        /// <summary>
-        /// ボタンのアクティブ設定
-        /// </summary>
-        /// <param name="isFirst"></param>
-        /// <param name="isLast"></param>
-        private void SetButtonsActive(bool isFirst, bool isLast)
-        {
-            _backButton.gameObject.SetActive(!isFirst);
-            _nextButton.gameObject.SetActive(!isLast);
         }
     }
 }

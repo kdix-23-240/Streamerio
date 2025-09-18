@@ -37,14 +37,24 @@ namespace Common.UI
         {
             base.OnValidate();
 
-            _rectTransform ??= GetComponent<RectTransform>();
-            _canvasGroup ??= GetComponent<CanvasGroup>();
+            _rectTransform = GetComponent<RectTransform>();
+            _canvasGroup = GetComponent<CanvasGroup>();
         }  
 #endif
 
         public virtual void Initialize()
         {
             
+        }
+        
+        /// <summary>
+        /// インタラクティブ設定
+        /// </summary>
+        /// <param name="interactable"></param>
+        public void SetInteractable(bool interactable)
+        {
+            _canvasGroup.interactable = interactable;
+            _canvasGroup.blocksRaycasts = interactable;
         }
     }
 }

@@ -21,8 +21,9 @@ namespace Common.UI.Display.Background
         public Observable<Unit> OnClickAsObservable => _onClickEvent;
 
 #if UNITY_EDITOR
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             _gameObject = gameObject;
         }
 #endif
