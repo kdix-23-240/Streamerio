@@ -31,15 +31,10 @@ public class Connection : MonoBehaviour
     #endif
   }
 
+  // websocketのコネクションを確立する
   public void connectWebSocket()
   {
-    // 既に接続されている場合は何もしない
-    // if (websocket.State == WebSocketState.Open)
-    // {
-    //   Debug.Log("WebSocket is already connected!");
-    //   return;
-    // }
-
+    // TODO: 本番環境のURLに変更する
     websocket = new WebSocket("wss://5dc66f8872d7.ngrok-free.app/ws-unity");
 
     if (websocket == null)
@@ -51,6 +46,7 @@ public class Connection : MonoBehaviour
       Debug.Log("WebSocket is ok!");
     }
 
+    // WebSocketのイベントを焼き付け
     websocket.OnOpen += () =>
     {
       Debug.Log("Connection open!");
@@ -75,6 +71,7 @@ public class Connection : MonoBehaviour
     return;
   }
 
+  // WebSocketからメッセージを受信する
   public void reciveWebSocketMessage(byte[] bytes)
   {
     var message = System.Text.Encoding.UTF8.GetString(bytes);
@@ -82,6 +79,7 @@ public class Connection : MonoBehaviour
     
     switch (message)
     {
+      // TODO: メッセージの種類によって処理を分ける
       case "1":
         mockBuddyActions.Attack();
         break;
@@ -91,6 +89,7 @@ public class Connection : MonoBehaviour
     }
   }
 
+  // WebSocketを切断する
   public async void disconnectWebSocket()
   {
     if (websocket.State == WebSocketState.Closed)
@@ -103,6 +102,8 @@ public class Connection : MonoBehaviour
     logText.text = "Connection closed!";
   }
 
+  // UnityからWebSocketにメッセージを送信する
+  // 使わないかも
   public async void SendWebSocketMessage(string message)
   {
     if (websocket.State == WebSocketState.Closed)
@@ -111,11 +112,11 @@ public class Connection : MonoBehaviour
       return;
     }
 
-      // Sending plain text
       websocket.SendText(message);
-    
   }
 
+
+  // アプリケーションが終了したときにwebsocketを閉じる
   private async void OnApplicationQuit()
   {
     await websocket.Close();
