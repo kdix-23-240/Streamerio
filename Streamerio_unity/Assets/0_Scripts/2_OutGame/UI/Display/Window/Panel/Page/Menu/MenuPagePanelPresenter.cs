@@ -1,5 +1,6 @@
 using Alchemy.Inspector;
 using Common.UI.Display.Window.Panel;
+using Common.UI.Loading;
 using Common.UI.Part.Button;
 using Cysharp.Threading.Tasks;
 using OutGame.Title;
@@ -32,7 +33,10 @@ namespace OutGame.UI.Display.Window.Panel.Page.Menu
         {
             base.Bind();
 
-            _menuPanelView.StartButton.SetClickEvent(()=> Debug.Log("Game Start"));
+            _menuPanelView.StartButton.SetClickEvent(() =>
+            {
+                TitleManager.Instance.LoadTitleAsync().Forget();
+            });
 
             BindChapterButton(_menuPanelView.HowToPlayButton, ChapterType.HowToPlay);
             BindChapterButton(_menuPanelView.OptionButton, ChapterType.Option);

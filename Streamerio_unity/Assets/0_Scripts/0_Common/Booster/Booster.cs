@@ -1,5 +1,6 @@
 using Common.Audio;
 using Common.Scene;
+using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace Common.Booster
     {
         private void Start()
         {
+            LoadingScreenPresenter.Instance.Initialize();
             AudioManager.Instance.Initialize();
             SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
         }

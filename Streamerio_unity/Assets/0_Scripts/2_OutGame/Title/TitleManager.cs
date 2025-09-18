@@ -2,6 +2,7 @@ using System.Threading;
 using _0_Scripts._2_OutGame.UI.Display.Screen;
 using Common;
 using Common.UI.Display.Window;
+using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -21,6 +22,8 @@ namespace OutGame.Title
             
             _window.Initialize();
             _window.Hide();
+            
+            LoadingScreenPresenter.Instance.HideAsync().Forget();
         }
         
         /// <summary>
@@ -38,6 +41,12 @@ namespace OutGame.Title
         {
             await _window.HideAsync(ct);
             _screen.Show();
+        }
+        
+        public async UniTask LoadTitleAsync()
+        {
+            await _window.HideAsync(destroyCancellationToken);
+            await LoadingScreenPresenter.Instance.TitleToLoadingAsync();
         }
     }
 }
