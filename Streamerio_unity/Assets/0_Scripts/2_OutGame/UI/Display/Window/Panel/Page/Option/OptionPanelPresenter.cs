@@ -1,6 +1,8 @@
+using System.Threading;
 using Alchemy.Inspector;
 using Common.Audio;
 using Common.UI.Display.Window.Panel;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Volume = Common.Audio.Volume;
 
@@ -38,6 +40,18 @@ namespace OutGame.UI.Display.Window.Panel.Page.Option
                     AudioManager.Instance.ChangeVolume(slider.Key, new Volume(value));
                 });
             }
+        }
+
+        public override async UniTask HideAsync(CancellationToken ct)
+        {
+            AudioManager.Instance.SaveVolumes();
+            await base.HideAsync(ct);
+        }
+
+        public override void Hide()
+        {
+            AudioManager.Instance.SaveVolumes();
+            base.Hide();
         }
     }
 }
