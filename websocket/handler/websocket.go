@@ -63,22 +63,15 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 				// Client からのメッセージを読み込む
 				msg := ""
 				err := websocket.Message.Receive(ws, &msg)
+
+				// エラー処理
+				// メッセージを受信できなかった場合は、接続を切断する
 				if err != nil {
 					if err == io.EOF {
 						c.Logger().Infof("Client disconnected id=%s", id)
 					} else {
 						c.Logger().Errorf("receive failed: %v", err)
 					}
-					return
-				}
-
-				// 受け取ったメッセージをログ出力
-				c.Logger().Infof("Received from client: %s", msg)
-
-				// Client からのメッセージを元に返すメッセージを作成し送信する
-				err = sendMessageToClient(ws, fmt.Sprintf("Server: id=%s \"%s\" received!", id, msg))
-				if err != nil {
-					c.Logger().Errorf("send failed: %v", err)
 					return
 				}
 			}
@@ -123,6 +116,16 @@ func (h *WebSocketHandler) sendEventToUnity(roomID string, payload interface{}) 
 		return fmt.Errorf("send failed: %v", err)
 	}
 	return nil
+}
+
+func (h *WebSocketHandler) ListClients(c echo.Context) error {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	ids := make([]string, 0, len(h.connections))
+	for id := range h.connections {
+		ids = append(ids, id)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"clients": ids})
 }
 
 var Handler = NewWebSocketHandler()
