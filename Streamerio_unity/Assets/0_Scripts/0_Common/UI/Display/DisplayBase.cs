@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using Common.UI.Guard;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -81,32 +80,26 @@ namespace Common.UI.Display
         
         public virtual async UniTask ShowAsync(CancellationToken ct)
         {
-            ClickGuard.Instance.Guard(true);
             View.SetInteractable(true);
             await View.ShowAsync(ct);
-            ClickGuard.Instance.Guard(false);
         }
 
         public virtual void Show()
         {
             View.SetInteractable(true);
             View.Show();
-            ClickGuard.Instance.Guard(false);
         }
 
         public virtual async UniTask HideAsync(CancellationToken ct)
         {
-            ClickGuard.Instance.Guard(true);
             await View.HideAsync(ct);
             View.SetInteractable(false);
-            ClickGuard.Instance.Guard(false);
         }
 
         public virtual void Hide()
         {
             View.Hide();
             View.SetInteractable(false);
-            ClickGuard.Instance.Guard(false);
         }
     }
 

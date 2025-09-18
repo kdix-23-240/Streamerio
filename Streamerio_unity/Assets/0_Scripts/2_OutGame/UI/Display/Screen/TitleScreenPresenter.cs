@@ -1,5 +1,4 @@
 using Alchemy.Inspector;
-using Common.UI.Guard;
 using Cysharp.Threading.Tasks;
 using OutGame.Title;
 using OutGame.UI.Display.Screen;
@@ -38,10 +37,8 @@ namespace _0_Scripts._2_OutGame.UI.Display.Screen
         /// </summary>
         public void Show()
         {
-            ClickGuard.Instance.Guard(true);
             _view.SetInteractable(true);
             _view.Show();
-            ClickGuard.Instance.Guard(false);
         }
         
         /// <summary>
@@ -49,10 +46,8 @@ namespace _0_Scripts._2_OutGame.UI.Display.Screen
         /// </summary>
         public void Hide()
         {
-            ClickGuard.Instance.Guard(true);
             _view.Hide();
             _view.SetInteractable(false);
-            ClickGuard.Instance.Guard(false);
         }
         
         public void OnPointerClick(PointerEventData eventData)

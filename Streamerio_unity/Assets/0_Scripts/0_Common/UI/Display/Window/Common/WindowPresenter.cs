@@ -1,6 +1,5 @@
 using System.Threading;
 using Common.UI.Display.Window.Panel;
-using Common.UI.Guard;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -20,11 +19,9 @@ namespace Common.UI.Display.Window
 
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            ClickGuard.Instance.Guard(true);
             View.SetInteractable(true);
             await View.ShowAsync(ct);
             await ChapterManager.Instance.OpenFirstChapterAsync(ct);
-            ClickGuard.Instance.Guard(false);
         }
 
         public override void Show()
@@ -35,11 +32,9 @@ namespace Common.UI.Display.Window
 
         public override async UniTask HideAsync(CancellationToken ct)
         {
-            ClickGuard.Instance.Guard(true);
             await ChapterManager.Instance.CloseChapterAsync(ct);
             await View.HideAsync(ct);
             View.SetInteractable(false);
-            ClickGuard.Instance.Guard(false);
         }
 
         public override void Hide()
