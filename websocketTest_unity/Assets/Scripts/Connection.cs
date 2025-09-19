@@ -36,9 +36,6 @@ public class Connection : MonoBehaviour
   private MockBuddyActions mockBuddyActions;
 
   [SerializeField]
-  private TMP_Text logText;
-
-  [SerializeField]
   public static string id;
 
   private async void Start()
@@ -72,19 +69,16 @@ public class Connection : MonoBehaviour
     websocket.OnOpen += () =>
     {
       Debug.Log("Connection open!");
-      logText.text = "Connection open!";
     };
 
     websocket.OnError += (e) =>
     {
       Debug.Log("Error! " + e);
-      logText.text = "Error! " + e;
     };
 
     websocket.OnClose += (e) =>
     {
       Debug.Log("Connection closed!");
-      logText.text = "Connection closed!";
     };
 
     websocket.OnMessage += (bytes) => reciveWebSocketMessage(bytes);
@@ -141,7 +135,6 @@ public class Connection : MonoBehaviour
         var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
         if (gameEvent != null)
         {
-          if (logText != null) logText.text = $"Game event: {gameEvent.event_type} x{gameEvent.trigger_count}";
           if (gameEvent.event_type == "help")
           {
             mockBuddyActions.Defend();
