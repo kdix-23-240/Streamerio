@@ -7,6 +7,27 @@ using TMPro;
 using NativeWebSocket;
 using System.Threading.Tasks;
 
+  // JSONの型定義
+  class BaseMessage
+  {
+    public string type;
+  }
+
+  class RoomCreatedNotification
+  {
+    public string type;
+    public string room_id;
+    public string qr_code;
+    public string web_url;
+  }
+
+  class GameEventNotification
+  {
+    public string type;
+    public string event_type;
+    public int trigger_count;
+  }
+
 public class Connection : MonoBehaviour
 {
   WebSocket websocket;
@@ -17,11 +38,12 @@ public class Connection : MonoBehaviour
   [SerializeField]
   private TMP_Text logText;
 
+  [SerializeField]
+  public static string id;
+
   private async void Start()
   {
-    Debug.Log("Start");
     connectWebSocket();
-    Debug.Log("Start end");
   }
 
   private void Update()
@@ -75,19 +97,71 @@ public class Connection : MonoBehaviour
   public void reciveWebSocketMessage(byte[] bytes)
   {
     var message = System.Text.Encoding.UTF8.GetString(bytes);
-    Debug.Log("Received OnMessage! (" + message.Length + " bytes) " + message);
-    logText.text = "Received OnMessage! (" + message.Length + " bytes) " + message;
-    
-    switch (message)
+    Debug.Log($"Received: {message}");
+
+    BaseMessage baseMessage = null;
+    try
     {
-      // TODO: メッセージの種類によって処理を分ける
-      case "1":
-        mockBuddyActions.Attack();
-        break;
-      case "2":
-        mockBuddyActions.Defend();
-        break;
+      baseMessage = JsonUtility.FromJson<BaseMessage>(message);
     }
+    catch (Exception ex)
+    {
+      Debug.Log($"JSON base parse error: {ex.Message}");
+    }
+
+    if (baseMessage == null || string.IsNullOrEmpty(baseMessage.type))
+    {
+      if (logText != null) logText.text = message;
+      Debug.Log("No type field in JSON message.");
+      return;
+    }
+
+    if (baseMessage.type == "room_created")
+    {
+      try
+      {
+        var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
+        if (room != null)
+        {
+          id = room.room_id;
+          if (logText != null) logText.text = $"Room created: {room.room_id}";
+          return;
+        }
+      }
+      catch (Exception ex)
+      {
+        Debug.Log($"room_created parse error: {ex.Message}");
+      }
+      Debug.Log("Failed to parse room_created message.");
+      return;
+    }
+
+    if (baseMessage.type == "game_event")
+    {
+      try
+      {
+        var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
+        if (gameEvent != null)
+        {
+          if (logText != null) logText.text = $"Game event: {gameEvent.event_type} x{gameEvent.trigger_count}";
+          if (gameEvent.event_type == "help")
+          {
+            mockBuddyActions.Defend();
+          }
+          return;
+        }
+      }
+      catch (Exception ex)
+      {
+        Debug.Log($"game_event parse error: {ex.Message}");
+      }
+      Debug.Log("Failed to parse game_event message.");
+      return;
+    }
+
+    Debug.Log($"Unhandled JSON payload type: {baseMessage.type}");
+    if (logText != null) logText.text = $"Unhandled type: {baseMessage.type}";
+    return;
   }
 
   // WebSocketを切断する
