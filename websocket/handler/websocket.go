@@ -43,14 +43,14 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 			defer ws.Close()
 
 			// 接続登録
-			id := Handler.register(ws)
-			defer Handler.unregister(id)
+			id := h.register(ws)
+			defer h.unregister(id)
 
 			// 接続直後に必ずログを出す
 			c.Logger().Infof("Client connected: %s id=%s", c.Request().RemoteAddr, id)
 
 			// IDを通知（JSON を送信）
-			if err := Handler.sendEventToUnity(id, map[string]interface{}{
+			if err := h.sendEventToUnity(id, map[string]interface{}{
 				// TODO: 本番環境のURLに変更する
 				"type":    "room_created",
 				"room_id": id,
