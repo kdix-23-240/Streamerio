@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
-	"websocket/service"
-
 	"golang.org/x/net/websocket"
 
 	"github.com/labstack/echo/v4"
 	"github.com/oklog/ulid/v2"
+	"streamerrio-backend/internal/service"
+
 )
 
 type WebSocketHandler struct {
@@ -116,6 +116,9 @@ func (h *WebSocketHandler) RelayActionToUnity(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{"status": "ok"})
 }
 
+// SetRoomService: 後から RoomService を注入
+func (h *WebSocketHandler) SetRoomService(rs *service.RoomService) { h.roomService = rs }
+
 func (h *WebSocketHandler) register(ws *websocket.Conn) string {
 	// ULIDで一意IDを生成（時系列順にソート可能）
 	id := ulid.MustNew(ulid.Timestamp(time.Now()), h.ulidEntropy).String()
@@ -137,6 +140,7 @@ func (h *WebSocketHandler) unregister(id string) {
 }
 
 func (h *WebSocketHandler) sendEventToUnity(roomID string, payload interface{}) error {
+
 	// 排他制御
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -152,6 +156,7 @@ func (h *WebSocketHandler) sendEventToUnity(roomID string, payload interface{}) 
 	return nil
 }
 
+
 func (h *WebSocketHandler) ListClients(c echo.Context) error {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -161,5 +166,3 @@ func (h *WebSocketHandler) ListClients(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{"clients": ids})
 }
-
-var Default *WebSocketHandler = NewWebSocketHandler()
