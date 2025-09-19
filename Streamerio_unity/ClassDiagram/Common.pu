@@ -1,0 +1,49 @@
+@startuml
+title Common Package
+
+package "Common" {
+    package "Audio" {
+        class AudioManager <<Singleton>>
+        class AudioMixerController
+        class AudioMixerParameterSO <<ScriptableObject>>
+        class AudioSourcePool
+        class Source
+        class Volume
+        class MusicScriptableObjectBase <<ScriptableObject>>
+        class BGMScriptableObject
+        class SEScriptableObject
+
+        MusicScriptableObjectBase <|-- BGMScriptableObject
+        MusicScriptableObjectBase <|-- SEScriptableObject
+
+        AudioManager *-- "1" AudioMixerController
+        AudioManager *-- AudioSourcePool
+        AudioManager *-- Volume
+
+        AudioSourcePool *-- "0..*" Source
+
+        AudioMixerController --> "1" AudioMixerParameterSO : references
+        AudioManager --> "1" BGMScriptableObject : references
+        AudioManager --> "1" SEScriptableObject : references
+    }
+
+    package "Save" {
+        class SaveManager <<Singleton>>
+    }
+
+    package "Scene" {
+        class SceneManager <<Singleton>>
+    }
+
+    package "Booster" {
+        class BoosterManager
+
+        BoosterManager --> Common.Save.SaveManager : uses
+        BoosterManager --> Common.Scene.SceneManager : uses
+        BoosterManager --> Common.Audio.AudioManager : uses
+    }
+}
+
+
+
+@enduml

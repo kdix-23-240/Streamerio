@@ -31,6 +31,6 @@ namespace Common.UI.Animation
 
         [Header("イージング")]
         [SerializeField]
-        public Ease Ease;
+        public Ease Ease = Ease.Linear;
     }
 }

@@ -6,6 +6,7 @@ using Common.UI.Display.Window.Animation;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Common.UI.Display.Window
 {
@@ -16,7 +17,7 @@ namespace Common.UI.Display.Window
     public class WindowView: DisplayViewBase
     {
         [SerializeField, LabelText("背景"), ReadOnly]
-        private DisplayBackground _background;
+        private DisplayBackgroundPresenter backgroundPresenter;
         [SerializeField, LabelText("本のアニメーション"), ReadOnly]
         private BookWindowAnimation _bookWindowAnimation;
         public BookWindowAnimation BookWindowAnimation => _bookWindowAnimation;
@@ -45,7 +46,7 @@ namespace Common.UI.Display.Window
         {
             base.OnValidate();
             
-            _background ??= GetComponentInChildren<DisplayBackground>();
+            backgroundPresenter ??= GetComponentInChildren<DisplayBackgroundPresenter>();
             _bookWindowAnimation ??= GetComponent<BookWindowAnimation>();
         }
 #endif
@@ -54,8 +55,8 @@ namespace Common.UI.Display.Window
         {
             base.Initialize();
             
-            _background.Initialize();
-            _background.Hide();
+            backgroundPresenter.Initialize();
+            backgroundPresenter.Hide();
 
             _bookWindowAnimation.Initialize();
             
@@ -65,13 +66,13 @@ namespace Common.UI.Display.Window
 
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            _background.Show();
+            backgroundPresenter.Show();
             await _showAnim.PlayAsync(ct);
         }
 
         public override void Show()
         {
-            _background.Show();
+            backgroundPresenter.Show();
             RectTransform.anchoredPosition = _showAnimParam.Position;
         }
 
@@ -79,14 +80,14 @@ namespace Common.UI.Display.Window
         {
             await _hideAnim.PlayAsync(ct);
             
-            _background.Hide();
+            backgroundPresenter.Hide();
         }
 
         public override void Hide()
         {
             RectTransform.anchoredPosition = _hideAnimParam.Position;
             
-            _background.Hide();
+            backgroundPresenter.Hide();
         }
     }
 }

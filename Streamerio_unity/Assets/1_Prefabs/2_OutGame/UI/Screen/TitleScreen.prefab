@@ -67,6 +67,14 @@ MonoBehaviour:
   _rectTransform: {fileID: 8177999816988538307}
   _canvasGroup: {fileID: 7295010252067547802}
   _gameStartText: {fileID: 6919198803706085132}
+  _showFadeAnimationParam:
+    Duration: 0.1
+    Ease: 2
+    Alpha: 1
+  _hideFadeAnimationParam:
+    Duration: 0.1
+    Ease: 3
+    Alpha: 0
   _flashAnimationParam:
     Duration: 0.2
     Ease: 1
@@ -85,7 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a7444d105d43c09995d72913531d3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _view: {fileID: 3485820543372737917}
+  View: {fileID: 3485820543372737917}
 --- !u!1 &6673816667159443334
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,6 +330,10 @@ PrefabInstance:
     - target: {fileID: 697367960824311652, guid: 5e9c84cb380ec48b2b79673886ed1092, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2977273707021040110, guid: 5e9c84cb380ec48b2b79673886ed1092, type: 3}
+      propertyPath: m_text
+      value: STREAMERIO
       objectReference: {fileID: 0}
     - target: {fileID: 6108059409911705276, guid: 5e9c84cb380ec48b2b79673886ed1092, type: 3}
       propertyPath: m_Name

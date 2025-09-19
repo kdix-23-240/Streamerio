@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Common.UI.Display.Overlay
 {
-    public class OverlayPresenterBase<TView>: DisplayPresenterBase<TView>
+    public class OverlayPresenterBase<TView>: DisplayPresenterBase<TView>, IOverlay
         where TView: OverlayViewBase
     {
         
