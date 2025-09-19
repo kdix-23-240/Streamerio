@@ -2,8 +2,10 @@ using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Common.UI.Display
 {
@@ -11,64 +13,84 @@ namespace Common.UI.Display
     /// UIの表示/非表示の管理
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TManager"></typeparam>
     public abstract class DisplayManagerBase<T, TManager>: SingletonBase<TManager>
-        where T: Enum
+        where T: IDisplay
         where TManager: DisplayManagerBase<T, TManager>
     {
+        [SerializeField, Header("開閉するUI")]
+        protected List<UIBehaviour> DisplayList;
+        
         [SerializeField, LabelText("UIの親")]
         protected Transform Parent;
         
-        private Dictionary<T, IDisplay> _exisitingDisplayDictionary;
+        private Dictionary<Type, IDisplay> _exisitingDisplayDictionary;
         
-        private Queue<IDisplay> _currentDisplayQueue;
+        private Stack<IDisplay> _currentDisplayStack;
 
         /// <summary>
         /// 初期化
         /// </summary>
-        public void Initialize()
+        public virtual void Initialize()
         {
             _exisitingDisplayDictionary = new();
-            _currentDisplayQueue = new ();
+            _currentDisplayStack = new ();
         }
         
         /// <summary>
-        /// UIをアニメーションで開く
+        /// UIをアニメーションで開く(閉じられるまで待機)
         /// </summary>
-        /// <param name="type">UIの種類</param>
+        /// <typeparam name="TDisplay"></typeparam>
         /// <param name="ct"></param>
-        public async UniTask OpenDisplayAsync(T type, CancellationToken ct)
+        public virtual async UniTask OpenDisplayAsync<TDisplay>(CancellationToken ct)
+            where TDisplay: UIBehaviour, IDisplay
         {
             await ClosePreDisplayAsync(ct);
             
             IDisplay display;
-            if (!_exisitingDisplayDictionary.TryGetValue(type, out display))
+            if (!_exisitingDisplayDictionary.TryGetValue(typeof(TDisplay), out display))
             {
-                display = CreateDisplay(type);
-                _exisitingDisplayDictionary.Add(type, display);
+                display = CreateDisplay<TDisplay>();
+                _exisitingDisplayDictionary.Add(typeof(TDisplay), display);
             }
             
-            Debug.Log(display);
+            _currentDisplayStack.Push(display);
+            
             await display.ShowAsync(ct);
-            _currentDisplayQueue.Enqueue(display);
+            await UniTask.WaitWhile(() => display.IsShow, cancellationToken: ct);
         }
 
         /// <summary>
         /// UIを生成
         /// </summary>
-        /// <param name="type"></param>
+        /// <typeparam name="TDisplay"></typeparam>
         /// <returns></returns>
-        protected abstract IDisplay CreateDisplay(T type);
+        protected virtual IDisplay CreateDisplay<TDisplay>()
+            where TDisplay: UIBehaviour, IDisplay
+        {
+            var display = DisplayList
+                .FirstOrDefault(x => x != null && x.TryGetComponent<TDisplay>(out _));
+
+            if (display == null)
+            {
+                return null;
+            }
+            
+            var newDisplay = Instantiate(display.gameObject, Parent).GetComponent<TDisplay>();
+            newDisplay.Initialize();
+            Debug.Log($"CreateDisplay: {typeof(TDisplay)}");
+            
+            return newDisplay;
+        }
         
         /// <summary>
         /// UIをアニメーションですべて閉じる
         /// </summary>
         /// <param name="ct"></param>        
-        public async UniTask CloseAllDisplayAsync(CancellationToken ct)
+        public virtual async UniTask CloseAllDisplayAsync(CancellationToken ct)
         {
-            while (_currentDisplayQueue.Count > 0)
+            while (_currentDisplayStack.Count > 0)
             {
-                var preDisplay = _currentDisplayQueue.Dequeue();
+                var preDisplay = _currentDisplayStack.Pop();
                 await preDisplay.HideAsync(ct);
             }
         }
@@ -77,14 +99,14 @@ namespace Common.UI.Display
         /// 直前に開いたUIをアニメーションで閉じる
         /// </summary>
         /// <param name="ct"></param>
-        public async UniTask ClosePreDisplayAsync(CancellationToken ct)
+        public virtual async UniTask ClosePreDisplayAsync(CancellationToken ct)
         {
-            if (_currentDisplayQueue.Count == 0)
+            if (_currentDisplayStack.Count == 0)
             {
                 return;
             }
             
-            var preDisplay = _currentDisplayQueue.Dequeue();
+            var preDisplay = _currentDisplayStack.Pop();
             await preDisplay.HideAsync(ct);
         }
     }
