@@ -13,11 +13,8 @@ namespace Common.UI.Display.Window.Panel
     /// 章のパネルの繋ぎ役
     /// </summary>
     [RequireComponent(typeof(ChapterPanelView))]
-    public class ChapterPanelPresenter: UIBehaviour
+    public class ChapterPanelPresenter: DisplayPresenterBase<ChapterPanelView>
     {
-        [SerializeField, ReadOnly]
-        private ChapterPanelView _view;
-
         [SerializeField, LabelText("前のチャプター")]
         private ChapterType _preChapter;
         
@@ -26,39 +23,29 @@ namespace Common.UI.Display.Window.Panel
 
         private BookWindowAnimation _bookWindowAnimation;
 
-#if UNITY_EDITOR
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-
-            _view ??= GetComponent<ChapterPanelView>();
-        }
-#endif
-
         /// <summary>
         /// 初期化
         /// </summary>
         /// <param name="bookWindowAnimation"></param>
         public void Initialize(BookWindowAnimation bookWindowAnimation)
         {
-            _view.Initialize();
-            
             _currentIndexProp = new ReactiveProperty<int>();
 
             _bookWindowAnimation = bookWindowAnimation;
 
-            SetEvnet();
-            Bind();
+            base.Initialize();
         }
 
         /// <summary>
         /// イベント設定
         /// </summary>
-        private void SetEvnet()
+        protected override void SetEvent()
         {
-            _view.NextButton.SetClickEvent(()=> OpenNextPage(destroyCancellationToken).Forget());
-            _view.BackButton.SetClickEvent(()=> OpenPrePage(destroyCancellationToken).Forget());
-            _view.CloseButton.SetClickEvent(() =>
+            base.SetEvent();
+            
+            View.NextButton.SetClickEvent(()=> OpenNextPage(destroyCancellationToken).Forget());
+            View.BackButton.SetClickEvent(()=> OpenPrePage(destroyCancellationToken).Forget());
+            View.CloseButton.SetClickEvent(() =>
             {
                 if (_preChapter == ChapterType.None)
                 {
@@ -71,65 +58,52 @@ namespace Common.UI.Display.Window.Panel
             });
         }
         
-        /// <summary>
-        /// イベント焼き付け
-        /// </summary>
-        private void Bind()
+        protected override void Bind()
         {
             _currentIndexProp
                 .Subscribe(_ =>
                 {
-                    _view.BackButton.gameObject.SetActive(_currentIndex > 0);
-                    _view.NextButton.gameObject.SetActive(_currentIndex < _view.LastPageIndex);
+                    View.BackButton.gameObject.SetActive(_currentIndex > 0);
+                    View.NextButton.gameObject.SetActive(_currentIndex < View.LastPageIndex);
                 }).RegisterTo(destroyCancellationToken);
         }
-
-        /// <summary>
-        /// 最初のページをアニメーションで開く
-        /// </summary>
-        /// <param name="ct"></param>
-        public async UniTask ShowAsync(CancellationToken ct)
+        
+        public override async UniTask ShowAsync(CancellationToken ct)
         {
-            _view.SetInteractable(true);
-            _view.Show();
+            View.SetInteractable(true);
+            View.Show();
             
             _currentIndexProp.Value = 0;
             await ShowPageAsync(_currentIndex, ct);
         }
 
-        /// <summary>
-        /// 最初のページを開く
-        /// </summary>
-        public void Show()
+        public override void Show()
         {
-            _view.SetInteractable(true);
-            _view.Show();
+            base.Show();
             
             _currentIndexProp.Value = 0;
-            _view.ShowPage(_currentIndex);
+            View.ShowPage(_currentIndex);
         }
         
         /// <summary>
         /// 開いているページをアニメーションで閉じる
         /// </summary>
         /// <param name="ct"></param>
-        public async UniTask HideAsync(CancellationToken ct)
+        public override async UniTask HideAsync(CancellationToken ct)
         {
-            await _view.HidePageAsync(_currentIndex, ct);
+            await View.HidePageAsync(_currentIndex, ct);
             
-            _view.Hide();
-            _view.SetInteractable(false);
+            base.Hide();
         }
 
         /// <summary>
         /// 開いているページを閉じる
         /// </summary>
-        public void Hide()
+        public override void Hide()
         {
-            _view.HidePage(_currentIndex);
+            View.HidePage(_currentIndex);
             
-            _view.Hide();
-            _view.SetInteractable(false);
+            base.Hide();
         }
         
         /// <summary>
@@ -138,13 +112,13 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask OpenNextPage(CancellationToken ct)
         {
-            _view.SetInteractable(false);
+            View.SetInteractable(false);
             
-            _view.HidePageAsync(_currentIndex, ct).Forget();
+            View.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnRightAsync(ct);
             await ShowPageAsync(_currentIndex + 1, ct);
             
-            _view.SetInteractable(true);
+            View.SetInteractable(true);
         }
 
         /// <summary>
@@ -153,13 +127,13 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask OpenPrePage(CancellationToken ct)
         {
-            _view.SetInteractable(false);
+            View.SetInteractable(false);
             
-            _view.HidePageAsync(_currentIndex, ct).Forget();
+            View.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnLeftAsync(ct);
             await ShowPageAsync(_currentIndex - 1, ct);
             
-            _view.SetInteractable(true);
+            View.SetInteractable(true);
         }
 
         /// <summary>
@@ -169,8 +143,8 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask ShowPageAsync(int nextIndex, CancellationToken ct)
         {
-            _currentIndexProp.Value = Mathf.Clamp(nextIndex, 0, _view.LastPageIndex);
-            await _view.ShowPageAsync(_currentIndex, ct);
+            _currentIndexProp.Value = Mathf.Clamp(nextIndex, 0, View.LastPageIndex);
+            await View.ShowPageAsync(_currentIndex, ct);
         }
     }
 }

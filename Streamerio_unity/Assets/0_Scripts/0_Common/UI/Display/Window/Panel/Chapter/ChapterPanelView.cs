@@ -9,7 +9,7 @@ namespace Common.UI.Display.Window.Panel
     /// <summary>
     /// 章のパネルの見た目
     /// </summary>
-    public class ChapterPanelView: UIBehaviourBase
+    public class ChapterPanelView: DisplayViewBase
     {
         [SerializeField, LabelText("ページ")]
         private PagePanelPresenter[] _pages;
@@ -57,19 +57,23 @@ namespace Common.UI.Display.Window.Panel
                 page.Hide();   
             }
         }
+        
+        public override async UniTask ShowAsync(CancellationToken ct)
+        {
+            CanvasGroup.alpha = 1f;
+        }
 
-        /// <summary>
-        /// 表示
-        /// </summary>
-        public void Show()
+        public override void Show()
         {
             CanvasGroup.alpha = 1f;
         }
         
-        /// <summary>
-        /// 非表示
-        /// </summary>
-        public void Hide()
+        public override async UniTask HideAsync(CancellationToken ct)
+        {
+            CanvasGroup.alpha = 0f;
+        }
+        
+        public override void Hide()
         {
             CanvasGroup.alpha = 0f;
         }
