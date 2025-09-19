@@ -1,9 +1,9 @@
 using System.Threading;
-using _0_Scripts._2_OutGame.UI.Display.Screen;
 using Common;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
+using OutGame.UI.Display.Screen;
 using UnityEngine;
 
 namespace OutGame.Title
@@ -40,7 +40,7 @@ namespace OutGame.Title
         public async UniTask ShowTitleAsync(CancellationToken ct)
         {
             await _window.HideAsync(ct);
-            _screen.Show();
+            await _screen.ShowAsync(ct);
         }
         
         public async UniTask LoadTitleAsync()

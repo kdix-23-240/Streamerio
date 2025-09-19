@@ -1,5 +1,3 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Common.UI.Display.Window.Panel
