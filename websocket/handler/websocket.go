@@ -86,6 +86,27 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 	return nil
 }
 
+func (h *WebSocketHandler) RelayActionToUnity(c echo.Context) error {
+	// リクエストボディをそのまま JSON として受け取り、Unity へ転送する
+	var payload map[string]interface{}
+	if err := c.Bind(&payload); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"error": fmt.Sprintf("invalid json: %v", err)})
+	}
+
+	// room_idが含まれているか確認
+	roomID, ok := payload["room_id"].(string)
+	if !ok || roomID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"error": "room_id is required"})
+	}
+
+	// Unity へ送信
+	if err := h.sendEventToUnity(roomID, payload); err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{"status": "ok"})
+}
+
 func (h *WebSocketHandler) register(ws *websocket.Conn) string {
 	// ULIDで一意IDを生成（時系列順にソート可能）
 	id := ulid.MustNew(ulid.Timestamp(time.Now()), h.ulidEntropy).String()

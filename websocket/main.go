@@ -18,16 +18,15 @@ func main() {
 	// CORS 設定
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodOptions},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
 		AllowHeaders: []string{"ngrok-skip-browser-warning", echo.HeaderContentType},
 	}))
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	// e.GET("/ws", Handler.HandleWebSocket)
 	e.GET("/ws-unity", Handler.Handler.HandleUnityConnection)
-	// e.GET("/action", Handler.Handler.ListClients)
+	e.POST("/action", Handler.Handler.RelayActionToUnity)
 	e.GET("/clients", Handler.Handler.ListClients)
 	e.Logger.Fatal(e.Start(":8888"))
 }
