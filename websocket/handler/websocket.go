@@ -99,8 +99,17 @@ func (h *WebSocketHandler) RelayActionToUnity(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{"error": "room_id is required"})
 	}
 
+	// room_id を除去して転送用のペイロードを作成
+	forward := make(map[string]interface{}, len(payload))
+	for k, v := range payload {
+		if k == "room_id" {
+			continue
+		}
+		forward[k] = v
+	}
+
 	// Unity へ送信
-	if err := h.sendEventToUnity(roomID, payload); err != nil {
+	if err := h.sendEventToUnity(roomID, forward); err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{"error": err.Error()})
 	}
 
