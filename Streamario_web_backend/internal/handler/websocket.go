@@ -26,7 +26,6 @@ type WebSocketHandler struct {
 func NewWebSocketHandler() *WebSocketHandler {
 	return &WebSocketHandler{
 		connections: make(map[string]*websocket.Conn),
-		roomService: service.NewRoomService(),
 		ulidEntropy: ulid.Monotonic(rand.Reader, 0),
 	}
 }
@@ -50,7 +49,7 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 			c.Logger().Infof("Client connected: %s id=%s", c.Request().RemoteAddr, id)
 
 			// IDを通知（JSON を送信）
-			if err := h.sendEventToUnity(id, map[string]interface{}{
+			if err := h.SendEventToUnity(id, map[string]interface{}{
 				// TODO: 本番環境のURLに変更する
 				"type":    "room_created",
 				"room_id": id,
@@ -109,7 +108,7 @@ func (h *WebSocketHandler) RelayActionToUnity(c echo.Context) error {
 	}
 
 	// Unity へ送信
-	if err := h.sendEventToUnity(roomID, forward); err != nil {
+	if err := h.SendEventToUnity(roomID, forward); err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{"error": err.Error()})
 	}
 
@@ -139,7 +138,7 @@ func (h *WebSocketHandler) unregister(id string) {
 	delete(h.connections, id)
 }
 
-func (h *WebSocketHandler) sendEventToUnity(roomID string, payload interface{}) error {
+func (h *WebSocketHandler) SendEventToUnity(roomID string, payload interface{}) error {
 
 	// 排他制御
 	h.mu.RLock()
