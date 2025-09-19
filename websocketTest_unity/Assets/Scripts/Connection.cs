@@ -43,7 +43,7 @@ public class Connection : MonoBehaviour
 
   private async void Start()
   {
-    connectWebSocket();
+    // connectWebSocket();
   }
 
   private void Update()
