@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	Handler "websocket/handler"
+	websocketHandler "websocket/handler"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -22,11 +22,14 @@ func main() {
 		AllowHeaders: []string{"ngrok-skip-browser-warning", echo.HeaderContentType},
 	}))
 
+	handler := websocketHandler.NewWebSocketHandler()
+
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.GET("/ws-unity", Handler.Default.HandleUnityConnection)
-	e.POST("/action", Handler.Default.RelayActionToUnity)
-	e.GET("/clients", Handler.Default.ListClients)
+	e.GET("/ws-unity", handler.HandleUnityConnection)
+	e.GET("/clients", handler.ListClients)
+
+	e.POST("/action", handler.RelayActionToUnity)
 	e.Logger.Fatal(e.Start(":8888"))
 }
