@@ -1,30 +1,30 @@
 package handler
 
 import (
-    "crypto/rand"
-    "fmt"
-    "io"
-    "net/http"
-    "sync"
-    "time"
+	"crypto/rand"
+	"fmt"
+	"io"
+	"net/http"
+	"sync"
+	"time"
 
-    "golang.org/x/net/websocket"
+	"golang.org/x/net/websocket"
 
-    "github.com/labstack/echo/v4"
-    "github.com/oklog/ulid/v2"
+	"github.com/labstack/echo/v4"
+	"github.com/oklog/ulid/v2"
 )
 
 type WebSocketHandler struct {
-    connections map[string]*websocket.Conn
-    mu          sync.RWMutex
-    ulidEntropy io.Reader
+	connections map[string]*websocket.Conn
+	mu          sync.RWMutex
+	ulidEntropy io.Reader
 }
 
 func NewWebSocketHandler() *WebSocketHandler {
-    return &WebSocketHandler{
-        connections: make(map[string]*websocket.Conn),
-        ulidEntropy: ulid.Monotonic(rand.Reader, 0),
-    }
+	return &WebSocketHandler{
+		connections: make(map[string]*websocket.Conn),
+		ulidEntropy: ulid.Monotonic(rand.Reader, 0),
+	}
 }
 
 // Unity接続管理

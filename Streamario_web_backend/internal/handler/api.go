@@ -45,7 +45,9 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 	}
 	evType := model.EventType(req.EventType)
 	var viewerID *string
-	if req.ViewerID != "" { viewerID = &req.ViewerID }
+	if req.ViewerID != "" {
+		viewerID = &req.ViewerID
+	}
 	res, err := h.eventService.ProcessEvent(roomID, evType, viewerID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})

@@ -21,39 +21,58 @@ func NewMemoryCounter() Counter {
 }
 
 func (m *memoryCounter) Increment(roomID, eventType string) (int64, error) {
-	m.mu.Lock(); defer m.mu.Unlock()
-	if _, ok := m.counts[roomID]; !ok { m.counts[roomID] = make(map[string]int64) }
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if _, ok := m.counts[roomID]; !ok {
+		m.counts[roomID] = make(map[string]int64)
+	}
 	m.counts[roomID][eventType]++
 	return m.counts[roomID][eventType], nil
 }
 
 func (m *memoryCounter) Get(roomID, eventType string) (int64, error) {
-	m.mu.RLock(); defer m.mu.RUnlock()
-	if evMap, ok := m.counts[roomID]; ok { return evMap[eventType], nil }
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	if evMap, ok := m.counts[roomID]; ok {
+		return evMap[eventType], nil
+	}
 	return 0, nil
 }
 
 func (m *memoryCounter) Reset(roomID, eventType string) error {
-	m.mu.Lock(); defer m.mu.Unlock()
-	if evMap, ok := m.counts[roomID]; ok { evMap[eventType] = 0 }
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if evMap, ok := m.counts[roomID]; ok {
+		evMap[eventType] = 0
+	}
 	return nil
 }
 
 func (m *memoryCounter) UpdateViewerActivity(roomID, viewerID string) error {
-	m.mu.Lock(); defer m.mu.Unlock()
-	if _, ok := m.viewers[roomID]; !ok { m.viewers[roomID] = make(map[string]int64) }
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if _, ok := m.viewers[roomID]; !ok {
+		m.viewers[roomID] = make(map[string]int64)
+	}
 	m.viewers[roomID][viewerID] = time.Now().Unix()
 	return nil
 }
 
 func (m *memoryCounter) GetActiveViewerCount(roomID string) (int64, error) {
 	cutoff := time.Now().Add(-m.window).Unix()
-	m.mu.Lock(); defer m.mu.Unlock()
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	vMap, ok := m.viewers[roomID]
-	if !ok { return 0, nil }
+	if !ok {
+		return 0, nil
+	}
 	var c int64
 	for id, ts := range vMap {
-		if ts >= cutoff { c++ } else { delete(vMap, id) }
+		if ts >= cutoff {
+			c++
+		} else {
+			delete(vMap, id)
+		}
 	}
 	return c, nil
 }
