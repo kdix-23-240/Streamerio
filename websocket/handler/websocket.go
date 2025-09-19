@@ -60,7 +60,7 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 				c.Logger().Errorf("initial send failed: %v", err)
 				return
 			} else {
-				c.Logger().Info("Greeting sent")
+				c.Logger().Info("initial send success")
 			}
 
 			for {
