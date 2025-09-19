@@ -111,7 +111,6 @@ public class Connection : MonoBehaviour
 
     if (baseMessage == null || string.IsNullOrEmpty(baseMessage.type))
     {
-      if (logText != null) logText.text = message;
       Debug.Log("No type field in JSON message.");
       return;
     }
@@ -124,7 +123,6 @@ public class Connection : MonoBehaviour
         if (room != null)
         {
           id = room.room_id;
-          if (logText != null) logText.text = $"Room created: {room.room_id}";
           return;
         }
       }
@@ -160,7 +158,6 @@ public class Connection : MonoBehaviour
     }
 
     Debug.Log($"Unhandled JSON payload type: {baseMessage.type}");
-    if (logText != null) logText.text = $"Unhandled type: {baseMessage.type}";
     return;
   }
 
@@ -174,7 +171,6 @@ public class Connection : MonoBehaviour
     }
 
     websocket.Close();
-    logText.text = "Connection closed!";
   }
 
   // UnityからWebSocketにメッセージを送信する
