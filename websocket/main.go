@@ -25,8 +25,8 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.GET("/ws-unity", Handler.Handler.HandleUnityConnection)
-	e.POST("/action", Handler.Handler.RelayActionToUnity)
-	e.GET("/clients", Handler.Handler.ListClients)
+	e.GET("/ws-unity", Handler.Default.HandleUnityConnection)
+	e.POST("/action", Handler.Default.RelayActionToUnity)
+	e.GET("/clients", Handler.Default.ListClients)
 	e.Logger.Fatal(e.Start(":8888"))
 }

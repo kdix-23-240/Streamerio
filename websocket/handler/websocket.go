@@ -162,4 +162,4 @@ func (h *WebSocketHandler) ListClients(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{"clients": ids})
 }
 
-var Handler *WebSocketHandler = NewWebSocketHandler()
+var Default *WebSocketHandler = NewWebSocketHandler()
