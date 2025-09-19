@@ -427,7 +427,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mockBuddyActions: {fileID: 1119408359}
-  logText: {fileID: 1568074063}
 --- !u!54 &963194230
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -518,7 +517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1071100782
 RectTransform:
   m_ObjectHideFlags: 0
@@ -552,7 +551,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connection: {fileID: 963194229}
-  message: "unity\u3067\u30DC\u30BF\u30F3\u62BC\u3057\u305F\u3088\uFF01"
 --- !u!114 &1071100784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -599,7 +597,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1071100783}
         m_TargetAssemblyTypeName: sendMessageOnWebSocket, Assembly-CSharp
-        m_MethodName: SendMessageOnWebSocket
+        m_MethodName: connectWebSocket
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -855,7 +853,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connection: {fileID: 963194229}
-  message: "unity\u3067\u30DC\u30BF\u30F3\u62BC\u3057\u305F\u3088\uFF01"
 --- !u!114 &1217431730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -902,7 +899,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1217431729}
         m_TargetAssemblyTypeName: sendMessageOnWebSocket, Assembly-CSharp
-        m_MethodName: SendMessageOnWebSocket
+        m_MethodName: disconnectWebSocket
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1003,7 +1000,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connection: {fileID: 963194229}
-  message: "unity\u3067\u30DC\u30BF\u30F3\u62BC\u3057\u305F\u3088\uFF01"
 --- !u!114 &1243860094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1050,7 +1046,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1243860093}
         m_TargetAssemblyTypeName: sendMessageOnWebSocket, Assembly-CSharp
-        m_MethodName: SendMessageOnWebSocket
+        m_MethodName: connectWebSocket
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
