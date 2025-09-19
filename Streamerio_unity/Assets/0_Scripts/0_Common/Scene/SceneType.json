@@ -4,15 +4,19 @@
     "Num": 1
   },
   {
-    "Name": "New Scene",
-    "Num": 2
+    "Name": "GameScene",
+    "Num": 5
+  },
+  {
+    "Name": "ManagerScene",
+    "Num": 6
   },
   {
     "Name": "SampleScene",
     "Num": 3
   },
   {
-    "Name": "UITest",
-    "Num": 4
+    "Name": "Title",
+    "Num": 7
   }
 ]

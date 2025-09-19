@@ -34,6 +34,7 @@ namespace Common.Save
             {
                 float volumeValue = PlayerPrefs.GetFloat(type.ToString(), Volume.DEFAULT_VALUE);
                 volumes[type] = new Volume(volumeValue);
+                Debug.Log($"Load Volume: {type} = {volumeValue}");
             }
 
             return volumes;

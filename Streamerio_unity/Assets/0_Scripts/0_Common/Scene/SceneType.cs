@@ -4,8 +4,10 @@ namespace Common.Scene
     public enum SceneType
     {
 		None = 1,
-		NewScene = 2,
+		GameScene = 5,
+		ManagerScene = 6,
 		SampleScene = 3,
-		UITest = 4,
+		Title = 7,
+
     }
 }

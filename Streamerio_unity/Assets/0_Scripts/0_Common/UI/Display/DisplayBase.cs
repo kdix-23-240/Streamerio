@@ -78,11 +78,29 @@ namespace Common.UI.Display
             
         }
         
-        public abstract UniTask ShowAsync(CancellationToken ct);
-        public abstract void Show();
-        
-        public abstract UniTask HideAsync(CancellationToken ct);
-        public abstract void Hide();
+        public virtual async UniTask ShowAsync(CancellationToken ct)
+        {
+            View.SetInteractable(true);
+            await View.ShowAsync(ct);
+        }
+
+        public virtual void Show()
+        {
+            View.SetInteractable(true);
+            View.Show();
+        }
+
+        public virtual async UniTask HideAsync(CancellationToken ct)
+        {
+            await View.HideAsync(ct);
+            View.SetInteractable(false);
+        }
+
+        public virtual void Hide()
+        {
+            View.Hide();
+            View.SetInteractable(false);
+        }
     }
 
     /// <summary>

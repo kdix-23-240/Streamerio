@@ -15,12 +15,6 @@ namespace Common.UI
         /// 初期化
         /// </summary>
         void Initialize();
-        
-        /// <summary>
-        /// UIを触れるようにするか設定
-        /// </summary>
-        /// <param name="isInteractive">触れる/触れない</param>
-        void SetInteractive(bool isInteractive);
     }
     
     /// <summary>
@@ -43,8 +37,8 @@ namespace Common.UI
         {
             base.OnValidate();
 
-            _rectTransform ??= GetComponent<RectTransform>();
-            _canvasGroup ??= GetComponent<CanvasGroup>();
+            _rectTransform = GetComponent<RectTransform>();
+            _canvasGroup = GetComponent<CanvasGroup>();
         }  
 #endif
 
@@ -53,10 +47,14 @@ namespace Common.UI
             
         }
         
-        public void SetInteractive(bool isInteractive)
+        /// <summary>
+        /// インタラクティブ設定
+        /// </summary>
+        /// <param name="interactable"></param>
+        public void SetInteractable(bool interactable)
         {
-            _canvasGroup.interactable = isInteractive;
-            _canvasGroup.blocksRaycasts = isInteractive;
+            _canvasGroup.interactable = interactable;
+            _canvasGroup.blocksRaycasts = interactable;
         }
     }
 }
