@@ -8,15 +8,18 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// RoomRepository: ルーム永続化アクセス用インタフェース
 type RoomRepository interface {
-	Create(room *model.Room) error
-	Get(id string) (*model.Room, error)
+	Create(room *model.Room) error     // 新規作成
+	Get(id string) (*model.Room, error) // ID取得 (存在しなければ nil)
 }
 
 type roomRepository struct{ db *sqlx.DB }
 
+// NewRoomRepository: 実装生成
 func NewRoomRepository(db *sqlx.DB) RoomRepository { return &roomRepository{db: db} }
 
+// Create: rooms テーブルに挿入 (CreatedAt 未設定時は現在時刻)
 func (r *roomRepository) Create(room *model.Room) error {
 	if room.CreatedAt.IsZero() {
 		room.CreatedAt = time.Now()
@@ -27,6 +30,7 @@ func (r *roomRepository) Create(room *model.Room) error {
 	return err
 }
 
+// Get: 指定IDのルームを取得 (存在しない場合 nil を返す)
 func (r *roomRepository) Get(id string) (*model.Room, error) {
 	var rm model.Room
 	q := `SELECT id, streamer_id, created_at, expires_at, status, settings FROM rooms WHERE id=$1`

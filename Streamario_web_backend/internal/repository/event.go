@@ -7,14 +7,17 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// EventRepository: イベント永続化用インタフェース
 type EventRepository interface {
-	CreateEvent(event *model.Event) error
+	CreateEvent(event *model.Event) error // 単一イベント挿入
 }
 
 type eventRepository struct{ db *sqlx.DB }
 
+// NewEventRepository: 実装生成
 func NewEventRepository(db *sqlx.DB) EventRepository { return &eventRepository{db: db} }
 
+// CreateEvent: events テーブルへ挿入 (TriggeredAt 未設定なら現在時刻)
 func (r *eventRepository) CreateEvent(event *model.Event) error {
 	if event.TriggeredAt.IsZero() {
 		event.TriggeredAt = time.Now()

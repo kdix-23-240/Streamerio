@@ -10,16 +10,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// APIHandler: REST エンドポイント集約 (ルーム取得 / イベント送信 / 統計取得)
 type APIHandler struct {
 	roomService  *service.RoomService
 	eventService *service.EventService
 }
 
+// NewAPIHandler: 依存するサービスを束ねて構築
 func NewAPIHandler(roomService *service.RoomService, eventService *service.EventService) *APIHandler {
 	return &APIHandler{roomService: roomService, eventService: eventService}
 }
 
-// GET /api/rooms/:id
+// GetRoom: ルーム情報取得 (存在しない場合 404)
 func (h *APIHandler) GetRoom(c echo.Context) error {
 	id := c.Param("id")
 	room, err := h.roomService.GetRoom(id)
@@ -29,12 +31,12 @@ func (h *APIHandler) GetRoom(c echo.Context) error {
 	return c.JSON(http.StatusOK, room)
 }
 
-// POST /api/rooms/:id/events
+// SendEvent: イベントを受信し閾値チェックまで実施
 func (h *APIHandler) SendEvent(c echo.Context) error {
 	roomID := c.Param("id")
-	// Ensure room exists (auto-create if missing)
-	if _, err := h.roomService.EnsureRoom(roomID); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to ensure room"})
+	// 自動生成せず 既存ルームのみ許容
+	if _, err := h.roomService.GetRoom(roomID); err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
 	}
 	var req struct {
 		EventType string `json:"event_type"`
@@ -55,11 +57,11 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// GET /api/rooms/:id/stats
+// GetRoomStats: 現在のイベント種別ごとのカウントと閾値を返す
 func (h *APIHandler) GetRoomStats(c echo.Context) error {
 	roomID := c.Param("id")
-	if _, err := h.roomService.EnsureRoom(roomID); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to ensure room"})
+	if _, err := h.roomService.GetRoom(roomID); err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
 	}
 	stats, err := h.eventService.GetRoomStats(roomID)
 	if err != nil {

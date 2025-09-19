@@ -5,19 +5,20 @@ import (
 	"os"
 )
 
-// Config アプリ全体の設定値
+// Config: アプリケーション全体の設定値コンテナ
+// 取得元は基本的に環境変数。存在しない項目はデフォルトを適用。
 type Config struct {
-	Port        string
-	FrontendURL string
-	DatabaseURL string
-	RedisURL    string // host:port 形式 (例: localhost:6379)
+	Port        string // APIサーバ待受ポート
+	FrontendURL string // CORS 許可先 ("*" は全許可)
+	DatabaseURL string // PostgreSQL 接続 DSN or URL
+	RedisURL    string // Redis アドレス (host:port)
 }
 
-// Load 環境変数から設定を読み込む。欠けている値には安全なデフォルトを適用。
+// Load: 環境変数から設定を組み立て (不足はデフォルト補完)
 // 優先順位:
-// 1. 直接的な URL (DATABASE_URL, REDIS_URL)
-// 2. 個別値の合成 (DB_HOST など)
-// 3. デフォルト
+//  1. 直接 URL (DATABASE_URL / REDIS_URL)
+//  2. 個別値を合成 (DB_HOST, DB_PORT, ...)
+//  3. デフォルト (localhost 等)
 func Load() (*Config, error) {
 	cfg := &Config{}
 

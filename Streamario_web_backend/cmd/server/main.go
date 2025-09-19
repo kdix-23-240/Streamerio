@@ -1,89 +1,84 @@
 package main
 
 import (
-	stdlog "log"
-	"net/http"
+    stdlog "log"
+    "net/http"
 
-	"streamerrio-backend/internal/config"
-	"streamerrio-backend/internal/handler"
-	"streamerrio-backend/internal/repository"
-	"streamerrio-backend/internal/service"
-	"streamerrio-backend/pkg/counter"
+    "streamerrio-backend/internal/config"
+    "streamerrio-backend/internal/handler"
+    "streamerrio-backend/internal/repository"
+    "streamerrio-backend/internal/service"
+    "streamerrio-backend/pkg/counter"
 
-	// PostgreSQLドライバーを使用
-	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	elog "github.com/labstack/gommon/log"
-	_ "github.com/lib/pq"
-	"github.com/redis/go-redis/v9"
+    // PostgreSQLドライバー
+    "github.com/jmoiron/sqlx"
+    "github.com/joho/godotenv"
+    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4/middleware"
+    elog "github.com/labstack/gommon/log"
+    _ "github.com/lib/pq"
+    "github.com/redis/go-redis/v9"
 )
 
 func main() {
-	// 環境変数読み込み
+	// 1. 環境変数読み込み (.env があれば適用)
 	godotenv.Load()
 
+	// 2. 設定ロード
 	cfg, err := config.Load()
 	if err != nil {
 		stdlog.Fatal("Failed to load config:", err)
 	}
 
-	// データベース接続
+	// 3. DB 接続確立
 	db, err := sqlx.Connect("postgres", cfg.DatabaseURL)
 	if err != nil {
 		stdlog.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
 
-	// Redis クライアント & カウンター初期化
+	// 4. Redis 初期化 & カウンタ (イベント数 / 視聴者アクティビティ)
 	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisURL})
 	redisCounter := counter.NewRedisCounter(rdb)
 
-	// リポジトリ初期化
+	// 5. リポジトリ (永続層) 準備
 	eventRepo := repository.NewEventRepository(db)
 	roomRepo := repository.NewRoomRepository(db)
 
-	// サービス初期化
+	// 6. サービス層生成
 	roomService := service.NewRoomService(roomRepo, cfg)
-
-	// WebSocketハンドラーを初期化し、サービスに注入
-	// 既存のグローバル WebSocket ハンドラを使用 (仕様: websocket.go は編集しない)
-	wsHandler := handler.Handler
-	// アダプタ (sendEventToUnity を公開インタフェースに合わせる)
+	// 既存グローバルではなく新規インスタンスを生成し RoomService を注入
+	wsHandler := handler.NewWebSocketHandler()
+	wsHandler.SetRoomService(roomService)
 	sender := webSocketAdapter{ws: wsHandler}
 	eventService := service.NewEventService(redisCounter, eventRepo, sender)
-
-	// APIハンドラー初期化
 	apiHandler := handler.NewAPIHandler(roomService, eventService)
 
-	// Echo初期化
+	// 7. Echo フレームワーク初期化 & ミドルウェア
 	e := echo.New()
 	e.Logger.SetLevel(elog.DEBUG)
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())   // アクセスログ
+	e.Use(middleware.Recover())  // パニック回復
 
-	// CORS設定
+	// 8. CORS 設定 (暫定で * を許容 / TODO: 本番は限定)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{cfg.FrontendURL, "*"},
 		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
 		AllowHeaders: []string{"ngrok-skip-browser-warning", echo.HeaderContentType},
 	}))
 
-	// ルーティング設定
+	// 9. ルーティング定義
 	e.GET("/", healthCheck)
-
-	// WebSocketエンドポイント
+	// WebSocket
 	e.GET("/ws-unity", wsHandler.HandleUnityConnection)
 	e.GET("/clients", wsHandler.ListClients)
-
-	// 新規APIエンドポイント
+	// REST API
 	api := e.Group("/api")
 	api.GET("/rooms/:id", apiHandler.GetRoom)
 	api.POST("/rooms/:id/events", apiHandler.SendEvent)
 	api.GET("/rooms/:id/stats", apiHandler.GetRoomStats)
 
-	// サーバー起動
+	// 10. サーバ起動
 	stdlog.Printf("🚀 Streamerrio Server starting on port %s", cfg.Port)
 	e.Logger.Fatal(e.Start(":" + cfg.Port))
 }
@@ -96,9 +91,9 @@ func healthCheck(c echo.Context) error {
 	})
 }
 
-// webSocketAdapter adapts legacy handler to WebSocketSender interface
+// webSocketAdapter: 既存 WebSocketHandler をサービス側インタフェースに適合させる薄いアダプタ
 type webSocketAdapter struct{ ws *handler.WebSocketHandler }
 
 func (a webSocketAdapter) SendEventToUnity(roomID string, payload map[string]interface{}) error {
-	return a.ws.SendEventToUnity(roomID, payload)
+    return a.ws.SendEventToUnity(roomID, payload)
 }

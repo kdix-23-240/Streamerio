@@ -1,27 +1,29 @@
 package service
 
 import (
-	"crypto/rand"
-	"errors"
-	"time"
+    "crypto/rand"
+    "errors"
+    "time"
 
-	"streamerrio-backend/internal/config"
-	"streamerrio-backend/internal/model"
-	"streamerrio-backend/internal/repository"
+    "streamerrio-backend/internal/config"
+    "streamerrio-backend/internal/model"
+    "streamerrio-backend/internal/repository"
 
-	"github.com/oklog/ulid/v2"
+    "github.com/oklog/ulid/v2"
 )
 
-// RoomService handles room lifecycle.
+// RoomService: ルームのライフサイクル管理 (取得/生成/存在保証)
 type RoomService struct {
 	repo repository.RoomRepository
 	cfg  *config.Config
 }
 
+// NewRoomService: 依存注入してサービス生成
 func NewRoomService(repo repository.RoomRepository, cfg *config.Config) *RoomService {
 	return &RoomService{repo: repo, cfg: cfg}
 }
 
+// CreateRoom: ルームを永続化 (ID必須, CreatedAt補完)
 func (s *RoomService) CreateRoom(room *model.Room) error {
 	if room.ID == "" {
 		return errors.New("room id required")
@@ -32,6 +34,7 @@ func (s *RoomService) CreateRoom(room *model.Room) error {
 	return s.repo.Create(room)
 }
 
+// GetRoom: 存在しない/期限切れならエラーを返す取得処理
 func (s *RoomService) GetRoom(id string) (*model.Room, error) {
 	room, err := s.repo.Get(id)
 	if err != nil {
@@ -46,7 +49,7 @@ func (s *RoomService) GetRoom(id string) (*model.Room, error) {
 	return room, nil
 }
 
-// GenerateRoom creates a new room with ULID id.
+// GenerateRoom: ULIDを用いて新規ルームを生成し保存
 func (s *RoomService) GenerateRoom(streamerID string) (*model.Room, error) {
 	entropy := ulid.Monotonic(rand.Reader, 0)
 	id := ulid.MustNew(ulid.Timestamp(time.Now()), entropy).String()
@@ -57,25 +60,23 @@ func (s *RoomService) GenerateRoom(streamerID string) (*model.Room, error) {
 		Status:     "active",
 		Settings:   "{}",
 	}
-	// TTL機能は現行 Config に無いため省略（必要なら Config に追加予定）
+	// TTL 機能は現状未実装 (Config 拡張で追加予定)
 	if err := s.repo.Create(room); err != nil {
 		return nil, err
 	}
 	return room, nil
 }
 
-// EnsureRoom returns existing room or creates a minimal one with given id.
-func (s *RoomService) EnsureRoom(id string) (*model.Room, error) {
+// CreateIfNotExists: (WebSocket発行IDをDBへ確定させる用途) 存在しなければ指定 streamerID で作成
+func (s *RoomService) CreateIfNotExists(id, streamerID string) error {
 	existing, err := s.repo.Get(id)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if existing != nil {
-		return existing, nil
+		return nil
 	}
-	rm := &model.Room{ID: id, StreamerID: "anonymous", CreatedAt: time.Now(), Status: "active", Settings: "{}"}
-	if err := s.repo.Create(rm); err != nil {
-		return nil, err
-	}
-	return rm, nil
+	now := time.Now()
+	return s.repo.Create(&model.Room{ID: id, StreamerID: streamerID, CreatedAt: now, Status: "active", Settings: "{}"})
 }
+

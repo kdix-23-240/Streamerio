@@ -1,16 +1,16 @@
 package service
 
 import (
-	"fmt"
-	"log"
-	"math"
+    "fmt"
+    "log"
+    "math"
 
-	"streamerrio-backend/internal/model"
-	"streamerrio-backend/internal/repository"
-	"streamerrio-backend/pkg/counter"
+    "streamerrio-backend/internal/model"
+    "streamerrio-backend/internal/repository"
+    "streamerrio-backend/pkg/counter"
 )
 
-// WebSocketSender defines minimal interface to push events to Unity.
+// WebSocket 送信用インタフェース (Unity へゲームイベント通知するための最小限)
 type WebSocketSender interface {
 	SendEventToUnity(roomID string, payload map[string]interface{}) error
 }
@@ -22,11 +22,12 @@ type EventService struct {
 	configs   map[model.EventType]*model.EventConfig
 }
 
+// NewEventService: 依存（カウンタ / リポジトリ / WebSocket）を束ねてサービス生成
 func NewEventService(counter counter.Counter, eventRepo repository.EventRepository, wsHandler WebSocketSender) *EventService {
 	return &EventService{counter: counter, eventRepo: eventRepo, wsHandler: wsHandler, configs: getDefaultEventConfigs()}
 }
 
-// ProcessEvent increments count, evaluates threshold and notifies Unity when reached.
+// ProcessEvent: 1イベント処理の本流 (DB保存→視聴者アクティビティ更新→カウント加算→閾値判定→発動通知/リセット)
 func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, viewerID *string) (*model.EventResult, error) {
 	// 1. Record event
 	ev := &model.Event{RoomID: roomID, EventType: eventType, ViewerID: viewerID, Metadata: "{}"}
@@ -48,7 +49,7 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, vi
 	// 4. Active viewer count
 	viewers := s.getActiveViewerCount(roomID)
 
-	// 5. Threshold (no level concept)
+	// 5. Threshold 
 	cfg := s.configs[eventType]
 	threshold := s.calculateDynamicThreshold(cfg, viewers)
 
@@ -75,6 +76,7 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, vi
 	return res, nil
 }
 
+// calculateDynamicThreshold: 視聴者数に応じた動的閾値を算出し上下限でクランプ
 func (s *EventService) calculateDynamicThreshold(cfg *model.EventConfig, viewerCount int) int {
 	mult := s.getViewerMultiplier(viewerCount)
 	raw := float64(cfg.BaseThreshold) * mult
@@ -88,6 +90,7 @@ func (s *EventService) calculateDynamicThreshold(cfg *model.EventConfig, viewerC
 	return val
 }
 
+// getViewerMultiplier: 視聴者数帯ごとの倍率テーブル
 func (s *EventService) getViewerMultiplier(v int) float64 {
 	switch {
 	case v <= 5:
@@ -103,6 +106,7 @@ func (s *EventService) getViewerMultiplier(v int) float64 {
 	}
 }
 
+// getActiveViewerCount: アクティブ視聴者数取得 (0 やエラー時は 1 にフォールバック)
 func (s *EventService) getActiveViewerCount(roomID string) int {
 	c, err := s.counter.GetActiveViewerCount(roomID)
 	if err != nil || c < 1 {
@@ -115,6 +119,7 @@ func (s *EventService) getActiveViewerCount(roomID string) int {
 }
 
 // Stats (simplified, no level)
+// RoomEventStat: 統計表示用の簡易集計構造体
 type RoomEventStat struct {
 	EventType     model.EventType `json:"event_type"`
 	CurrentCount  int             `json:"current_count"`
@@ -124,6 +129,7 @@ type RoomEventStat struct {
 	ViewerCount   int             `json:"viewer_count"`
 }
 
+// GetRoomStats: 全イベント種別について現在カウントと閾値をまとめて返却
 func (s *EventService) GetRoomStats(roomID string) ([]RoomEventStat, error) {
 	viewers := s.getActiveViewerCount(roomID)
 	stats := make([]RoomEventStat, 0, len(s.configs))
@@ -139,6 +145,7 @@ func (s *EventService) GetRoomStats(roomID string) ([]RoomEventStat, error) {
 }
 
 // Default configs (unchanged thresholds foundation)
+// getDefaultEventConfigs: 初期閾値設定マップ生成
 func getDefaultEventConfigs() map[model.EventType]*model.EventConfig {
 	return map[model.EventType]*model.EventConfig{
 		model.HELP_SPEED:    {EventType: model.HELP_SPEED, BaseThreshold: 5, MinThreshold: 3, MaxThreshold: 50, LevelMultiplier: 1.3},
