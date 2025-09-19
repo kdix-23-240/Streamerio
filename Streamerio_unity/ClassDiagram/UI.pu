@@ -1,0 +1,157 @@
+@startuml
+title UI
+
+package "Common" {
+    package "Audio" {
+        class AudioManager <<Singleton>>
+    }
+
+    package "Save" {
+        class SaveManager <<Singleton>>
+    }
+
+    package "Scene" {
+        class SceneManager <<Singleton>>
+    }
+}
+
+package "Common.UI" {
+    ' class PresenterBase <<Abstract>>
+    ' class UIBehaviourBase <<Abstract>>
+
+    package "Display"{
+        interface IDisplay
+        ' class DisplayPresenterBase <<Abstract>>
+        ' class DisplayViewBase <<Abstract>>
+
+        ' DisplayPresenterBase <|.. IDisplay
+        ' DisplayViewBase <|-- UIBehaviourBase
+        ' DisplayViewBase <|.. IDisplay
+
+        ' package "Animation" {
+        '     interface IUIAnimationComponent
+
+        '     class FadeAnimationComponent
+        '     class FlashAnimationComponent
+        '     class IrisInAnimationComponent
+        '     class IrisOutAnimationComponent
+        '     class MoveAnimationComponent
+        '     class ScaleAnimationComponent
+
+
+        '     FadeAnimationComponent <|.. IUIAnimationComponent
+        '     FlashAnimationComponent <|.. IUIAnimationComponent
+        '     IrisInAnimationComponent <|.. IUIAnimationComponent
+        '     IrisOutAnimationComponent <|.. IUIAnimationComponent
+        '     MoveAnimationComponent <|.. IUIAnimationComponent
+        '     ScaleAnimationComponent <|.. IUIAnimationComponent
+        ' }
+
+        package "Window"{
+            class WindowPresenter
+            class WindowView
+
+            ' class BookWindowAnimation
+
+            WindowPresenter <|.. IDisplay
+
+            WindowPresenter --> WindowView: references
+            WindowPresenter --> Common.UI.Display.Window.Panel.Chapter.ChapterManager : uses
+
+            ' WindowView --> BookWindowAnimation : references
+            ' WindowView *-- "2" MoveAnimationComponent
+
+            package "Panel"{
+                package "Chapter"{
+                    class ChapterPanelPresenter
+                    class ChapterPanelView
+                    class ChapterManager
+
+                    ChapterPanelPresenter <|.. IDisplay
+
+                    ChapterPanelPresenter --> ChapterPanelView : references
+                    ' ChapterPanelPresenter --> BookWindowAnimation : references
+
+                    ChapterPanelView --> "0..*" Common.UI.Display.Window.Panel.Page.PagePanelPresenter : references
+
+                    ChapterManager *-- "0..*" ChapterPanelPresenter
+                    ' ChapterManager --> BookWindowAnimation : references
+
+                }
+
+                package "Page" {
+                    class PagePanelPresenter
+                    class PagePanelView
+
+                    PagePanelPresenter <|.. IDisplay
+
+                    PagePanelPresenter --> PagePanelView : references
+                }
+            }
+        }
+
+        package "Loading" {
+            class LoadingScreenPresenter <<Singleton>>
+            class LoadingScreenView
+
+            LoadingScreenPresenter --> LoadingScreenView: references
+        }
+
+        ' package "Part"{
+        '     package "Button"{
+        '         class ButtonBase <<Abstract>>
+        '         class CommonButton
+        '         class TextButton
+
+        '         ButtonBase <|-- CommonButton
+        '         ButtonBase <|-- TextButton
+        '     }
+        ' }
+    }
+}
+
+package "OutGame" {
+    package "Title" {
+        class TitleManager<<Singleton>>
+
+        TitleManager --> Common.UI.Display.Loading.LoadingScreenPresenter : uses
+        TitleManager --> Common.UI.Display.Window.WindowPresenter : references
+        TitleManager --> OutGame.UI.Display.Screen.TitleScreenPresenter : uses
+    }
+
+    package "UI" {
+        package "Display" {
+            package "Screen" {
+                class TitleScreenPresenter
+                class TitleScreenView
+
+                TitleScreenPresenter <|.. IDisplay
+
+                TitleScreenPresenter --> TitleScreenView: references
+            }
+
+            package "Window.Panel.Page" {
+                class MenuPagePanelPresenter
+                class MenuPagePanelView
+
+                class OptionPagePanelPresenter
+                class OptionPagePanelView
+
+                MenuPagePanelPresenter <|-- PagePanelPresenter
+                MenuPagePanelView <|-- PagePanelView
+
+                OptionPagePanelPresenter <|-- PagePanelPresenter
+                OptionPagePanelView <|-- PagePanelView
+
+                MenuPagePanelPresenter --> MenuPagePanelView: references
+                OptionPagePanelPresenter --> OptionPagePanelView: references
+
+                MenuPagePanelPresenter --> Common.Scene.SceneManager : uses
+
+                OptionPagePanelPresenter --> Common.Audio.AudioManager : uses
+                OptionPagePanelPresenter --> Common.Save.SaveManager : uses
+            }
+        }
+    }
+}
+@enduml
