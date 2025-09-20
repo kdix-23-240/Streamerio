@@ -67,10 +67,6 @@ func main() {
 		AllowHeaders: []string{"ngrok-skip-browser-warning", echo.HeaderContentType},
 	}))
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-
 	// 9. ルーティング定義
 	e.GET("/", healthCheck)
 	// WebSocket
