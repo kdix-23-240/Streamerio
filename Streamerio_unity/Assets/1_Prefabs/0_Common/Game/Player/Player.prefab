@@ -515,6 +515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 8145684218851035899}
+  _moveDelay: 0.5
 --- !u!95 &8145684218851035899
 Animator:
   serializedVersion: 7
