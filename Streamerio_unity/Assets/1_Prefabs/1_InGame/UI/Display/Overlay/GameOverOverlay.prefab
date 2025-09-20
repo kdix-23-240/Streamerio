@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2650931670149569166}
   - component: {fileID: 751952581058124830}
   - component: {fileID: 420209241968235850}
+  - component: {fileID: 471047049676248621}
   m_Layer: 5
   m_Name: GameOverText
   m_TagString: Untagged
@@ -136,6 +137,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!225 &471047049676248621
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005021689061278201}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1818038447260946053
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -297,6 +310,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6856e28197c47dbaca1c4d226dd73b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &9130289768002474396 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7462383762858712857, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+  m_PrefabInstance: {fileID: 1818038447260946053}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2764842458431541269
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -442,6 +460,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+--- !u!225 &4742580607831035660 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7462383762858712857, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+  m_PrefabInstance: {fileID: 2764842458431541269}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &6077987670098928488 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8216791150846653309, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
@@ -638,7 +661,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 7562624646717844250}
   _canvasGroup: {fileID: 5755888549671696687}
-  _uiParts: []
+  _uiParts:
+  - {fileID: 471047049676248621}
+  - {fileID: 4742580607831035660}
+  - {fileID: 9130289768002474396}
   _showFadeAnimationParam:
     Duration: 0.1
     Ease: 2
