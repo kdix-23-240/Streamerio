@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "W3J5ARUYTm8=",
+  "success": true,
+  "projectFilePath": "/Users/honmayuudai/MyHobby/hackson/58_tmp/Streamerio/QrSample/QrSample.csproj",
+  "expectedPackageFiles": [
+    "/Users/honmayuudai/.nuget/packages/microsoft.win32.systemevents/9.0.9/microsoft.win32.systemevents.9.0.9.nupkg.sha512",
+    "/Users/honmayuudai/.nuget/packages/qrcoder/1.6.0/qrcoder.1.6.0.nupkg.sha512",
+    "/Users/honmayuudai/.nuget/packages/system.drawing.common/9.0.9/system.drawing.common.9.0.9.nupkg.sha512"
+  ],
+  "logs": []
+}
