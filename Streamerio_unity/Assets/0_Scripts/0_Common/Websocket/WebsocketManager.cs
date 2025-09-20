@@ -1,38 +1,47 @@
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Common;
+using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using NativeWebSocket;
 
-public class Connection : MonoBehaviour
+public class WebsocketManager : SingletonBase<WebsocketManager>
 {
-  private bool isConnected = false;
-  WebSocket websocket;
+  private bool _isConnected = false;
+  private WebSocket _websocket;
 
   [SerializeField]
-  public static string id;
+  private string _websocketId = string.Empty;
+  public string WebsocketId => _websocketId;
+  
+  private string _url = string.Empty;
+  
+  private string _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
 
   private void Update()
   {
-    if (isConnected)
+    if (_isConnected)
     {
     #if !UNITY_WEBGL || UNITY_EDITOR
-      websocket.DispatchMessageQueue();
+      _websocket.DispatchMessageQueue();
     #endif
     }
   }
 
   // websocketのコネクションを確立する
-  public void connectWebSocket()
+  public async UniTask ConnectWebSocket()
   {
-    if (isConnected)
+    if (_isConnected)
     {
       Debug.Log("WebSocket is already connected!");
       return;
     }
+    
+    // WebSocketのインスタンスを生成
+    _websocket = new WebSocket("wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity");
 
-    // TODO: 本番環境のURLに変更する
-    websocket = new WebSocket("wss://5dc66f8872d7.ngrok-free.app/ws-unity");
-
-    if (websocket == null)
+    if (_websocket == null)
     {
       Debug.Log("WebSocket is null!");
       return;
@@ -42,31 +51,31 @@ public class Connection : MonoBehaviour
     }
 
     // WebSocketのイベントを焼き付け
-    websocket.OnOpen += () =>
+    _websocket.OnOpen += () =>
     {
       Debug.Log("Connection open!");
-      isConnected = true;
+      _isConnected = true;
     };
 
-    websocket.OnError += (e) =>
+    _websocket.OnError += (e) =>
     {
       Debug.Log("Error! " + e);
     };
 
-    websocket.OnClose += (e) =>
+    _websocket.OnClose += (e) =>
     {
       Debug.Log("Connection closed!");
-      isConnected = false;
+      _isConnected = false;
     };
 
-    websocket.OnMessage += (bytes) => reciveWebSocketMessage(bytes);
+    _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
 
-    websocket.Connect();
+    await _websocket.Connect();
     return;
   }
 
   // WebSocketからメッセージを受信する
-  public void reciveWebSocketMessage(byte[] bytes)
+  private void ReceiveWebSocketMessage(byte[] bytes)
   {
     var message = System.Text.Encoding.UTF8.GetString(bytes);
     Debug.Log($"Received: {message}");
@@ -94,7 +103,7 @@ public class Connection : MonoBehaviour
         var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
         if (room != null)
         {
-          id = room.room_id;
+          _websocketId = room.room_id;
           return;
         }
       }
@@ -113,15 +122,30 @@ public class Connection : MonoBehaviour
         var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
         if (gameEvent != null)
         {
-          if (gameEvent.event_type == "help")
+          switch (gameEvent.event_type)
           {
-            // Helpアクションを実行
+            case "skill1":
+              // Skill1アクションを実行
+              break;
+            case "skill2":
+              // Skill2アクションを実行
+              break;
+            case "skill3":
+              // Skill3アクションを実行
+              break;
+            case "enemy1":
+              // Skill4アクションを実行
+              break;
+            case "enemy2":
+              // Skill5アクションを実行
+              break;
+            case "enemy3":
+              // Skill5アクションを実行
+              break;
+            default:
+              Debug.Log($"Unknown event_type: {gameEvent.event_type}");
+              break;
           }
-          else if (gameEvent.event_type == "attack")
-          {
-            // Attackアクションを実行
-          }
-          return;
         }
       }
       catch (Exception ex)
@@ -137,41 +161,54 @@ public class Connection : MonoBehaviour
   }
 
   // WebSocketを切断する
-  public async void disconnectWebSocket()
+  public async void DisconnectWebSocket()
   {
-    if (!isConnected)
+    if (!_isConnected)
     {
       Debug.Log("WebSocket is not connected!");
       return;
     }
 
-    if (websocket.State == WebSocketState.Closed)
+    if (_websocket.State == WebSocketState.Closed)
     {
       Debug.Log("WebSocket is already closed!");
       return;
     }
 
-    websocket.Close();
+    await _websocket.Close();
+  }
+  
+  public async UniTask<string> GetFrontUrlAsync()
+  {
+    if (_url != string.Empty)
+    {
+      return _url;
+    }
+    
+    await UniTask.WaitWhile(() => _websocketId == string.Empty);
+    _url = ZString.Format(_frontendUrlFormat, _websocketId);
+    
+    return _url;
   }
 
   // UnityからWebSocketにメッセージを送信する
   // 使わないかも
   public async void SendWebSocketMessage(string message)
   {
-    if (websocket.State == WebSocketState.Closed)
+    if (_websocket.State == WebSocketState.Closed)
     {
       Debug.Log("WebSocket is not connected!");
       return;
     }
 
-      websocket.SendText(message);
+    await _websocket.SendText(message);
   }
 
 
   // アプリケーションが終了したときにwebsocketを閉じる
   private async void OnApplicationQuit()
   {
-    await websocket.Close();
+    await _websocket.Close();
   }
   
   // JSONの型定義
@@ -184,7 +221,6 @@ public class Connection : MonoBehaviour
   {
     public string type;
     public string room_id;
-    public string qr_code;
     public string web_url;
   }
 

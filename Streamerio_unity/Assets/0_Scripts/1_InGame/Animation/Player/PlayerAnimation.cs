@@ -1,42 +1,38 @@
+using Alchemy.Inspector;
+using Cysharp.Text;
 using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
 public class PlayerAnimation : MonoBehaviour
 {
+    [SerializeField, ReadOnly]
     private Animator _animator;
-    void Awake()
+
+#if UNITY_EDITOR
+    private void OnValidate()
     {
-        _animator = GetComponent<Animator>();
+        _animator ??= GetComponent<Animator>();
+    }
+#endif
+
+    public void PlayRun(bool isMove)
+    {
+        _animator.SetBool("IsMove", isMove);
     }
 
-    void Start()
+    public void PlayJump(bool isJump)
     {
-
+        _animator.SetBool("IsJump", isJump);
     }
 
-    public void PlayIdle()
+    public void PlayAttack(int num)
     {
-        _animator.SetBool("isMove", false);
-        _animator.SetBool("isJump", false);
+        var key = ZString.Concat("Attack", num);
+        _animator.SetTrigger(key);
     }
 
-    public void PlayRun()
+    public void PlayDeath()
     {
-        _animator.SetBool("isMove", true);
+        _animator.SetTrigger("Death");
     }
-
-    public void PlayJump()
-    {
-        _animator.SetBool("isJump", true);
-    }
-
-    public void PlayAttack1()
-    {
-        _animator.SetTrigger("Attack1");
-    }
-
-    public void PlayAttack2()
-    {
-        _animator.SetTrigger("Attack2");
-    }
-
 }

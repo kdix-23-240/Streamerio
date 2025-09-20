@@ -1,5 +1,6 @@
 using UnityEngine;
 using R3;
+using UnityEditor;
 
 public class PlayerPresenter : MonoBehaviour
 {
@@ -15,7 +16,6 @@ public class PlayerPresenter : MonoBehaviour
     {
         _view = GetComponent<PlayerView>();
         _model = new PlayerModel(_view.gameObject.transform.position.x, _view.gameObject.transform.position.y);
-
     }
 
     void Start()
@@ -44,5 +44,10 @@ public class PlayerPresenter : MonoBehaviour
     public void Jump()
     {
         _view.Jump(_jumpPower.Amount);
+    }
+
+    public void Attack(int num)
+    {
+        
     }
 }
