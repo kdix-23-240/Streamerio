@@ -32,6 +32,22 @@
     "Num": 26
   },
   {
+    "Name": "PlayerAttack",
+    "Num": 30
+  },
+  {
+    "Name": "PlayerDamage",
+    "Num": 31
+  },
+  {
+    "Name": "PlayerGround",
+    "Num": 32
+  },
+  {
+    "Name": "PlayerJump",
+    "Num": 33
+  },
+  {
     "Name": "NESRPG0112",
     "Num": 29
   },
