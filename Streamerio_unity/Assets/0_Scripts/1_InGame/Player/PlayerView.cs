@@ -3,9 +3,11 @@ using UnityEngine;
 public class PlayerView : MonoBehaviour
 {
     private bool _isGrounded = false; // 地面に接地しているかどうかのフラグ
+    public bool IsGrounded => _isGrounded;
     public void Move(Vector2 newPosition)
     {
         // Debug.Log($"PlayerView Move to {newPosition}");
+        // _animation.PlayRun();
         gameObject.transform.position += new Vector3(newPosition.x, newPosition.y, 0);
     }
 

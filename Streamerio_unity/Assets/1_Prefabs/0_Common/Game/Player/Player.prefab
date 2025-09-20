@@ -103,6 +103,8 @@ GameObject:
   - component: {fileID: 2466733290080802324}
   - component: {fileID: 4646284319733624157}
   - component: {fileID: 4409877946499361828}
+  - component: {fileID: -5918779555519875830}
+  - component: {fileID: 8145684218851035899}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -312,3 +314,37 @@ MonoBehaviour:
   _bulletPrefab: {fileID: 4674679045833974610, guid: 0f0a599e2b9794e7d9816e73a5d5fdd6, type: 3}
   _parentObject: {fileID: 0}
   _bulletScriptableObject: {fileID: 11400000, guid: 5061369ce5bf241c39890f7807e8f165, type: 2}
+--- !u!114 &-5918779555519875830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8996671410111435039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e98bf842bca4f4657bb67e66c877ef27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!95 &8145684218851035899
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8996671410111435039}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a6f3d01bb29b94fd1a72f51639e9f96c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
