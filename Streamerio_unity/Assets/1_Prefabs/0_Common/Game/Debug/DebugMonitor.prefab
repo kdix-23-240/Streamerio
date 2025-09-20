@@ -1068,7 +1068,8 @@ PrefabInstance:
       propertyPath: m_Text
       value: Skill2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4364918008912338386, guid: 334c15ca72f8e1044930e772322dd3dc, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

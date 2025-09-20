@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 6142611109986013976}
   - component: {fileID: 6602499405872885044}
   - component: {fileID: 2514703291584863871}
-  - component: {fileID: 7613182208078136992}
+  - component: {fileID: 600150966017256100}
   m_Layer: 5
   m_Name: Button (Legacy)
   m_TagString: Untagged
@@ -239,7 +239,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7613182208078136992}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ObjectCreateButton, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
@@ -251,7 +251,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &7613182208078136992
+--- !u!114 &600150966017256100
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -260,7 +260,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 9107910040924277374}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b746bb3056c654887975904550ef9c77, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c64cbe76e8454d43b1422d0a1c68e51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _createdObject: {fileID: 0}
+  _strongEnemyScriptableObject: {fileID: 11400000, guid: ac5956bc8e5694ff884203981fe5f051, type: 2}
+  _middleEnemyScriptableObject: {fileID: 11400000, guid: 3011427f49d25447d9b20934fa00aad0, type: 2}
+  _weakEnemyScriptableObject: {fileID: 11400000, guid: 435cdd354054b46219b7aa6951942591, type: 2}
+  _parentObject: {fileID: 0}
