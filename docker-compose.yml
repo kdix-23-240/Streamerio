@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      context: Streamario_web_backend
+    ports:
+      - "8888:8888"
+    container_name: go_app
+  
