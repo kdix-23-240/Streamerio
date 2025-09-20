@@ -1,5 +1,8 @@
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Common;
+using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using NativeWebSocket;
 
@@ -11,6 +14,10 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   [SerializeField]
   private string _websocketId;
   public string WebsocketId => _websocketId;
+  
+  private string _url;
+  
+  private string _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
 
   private void Update()
   {
@@ -23,7 +30,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   }
 
   // websocketのコネクションを確立する
-  public void ConnectWebSocket()
+  public async UniTask ConnectWebSocket()
   {
     if (_isConnected)
     {
@@ -61,14 +68,14 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       _isConnected = false;
     };
 
-    _websocket.OnMessage += (bytes) => ReciveWebSocketMessage(bytes);
+    _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
 
-    _websocket.Connect();
+    await _websocket.Connect();
     return;
   }
 
   // WebSocketからメッセージを受信する
-  private void ReciveWebSocketMessage(byte[] bytes)
+  private void ReceiveWebSocketMessage(byte[] bytes)
   {
     var message = System.Text.Encoding.UTF8.GetString(bytes);
     Debug.Log($"Received: {message}");
@@ -170,6 +177,19 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
 
     await _websocket.Close();
   }
+  
+  public async UniTask<string> GetFrontUrlAsync()
+  {
+    if (_url != string.Empty)
+    {
+      return _url;
+    }
+    
+    await UniTask.WaitWhile(() => _websocketId == string.Empty);
+    _url = ZString.Format(_frontendUrlFormat, _websocketId);
+    
+    return _url;
+  }
 
   // UnityからWebSocketにメッセージを送信する
   // 使わないかも
@@ -201,7 +221,6 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   {
     public string type;
     public string room_id;
-    public string qr_code;
     public string web_url;
   }
 
