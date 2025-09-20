@@ -21,6 +21,7 @@ public class PlayerPresenter : MonoBehaviour
     void Start()
     {
         Bind();
+        _view.Bind();
     }
 
     private void Bind()
