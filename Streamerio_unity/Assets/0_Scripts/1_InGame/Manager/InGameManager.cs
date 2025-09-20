@@ -1,9 +1,11 @@
 using Alchemy.Inspector;
 using Common;
+using Common.Audio;
 using Common.Save;
 using Common.Scene;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
+using Cysharp.Threading.Tasks;
 using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
@@ -36,6 +38,8 @@ namespace InGame
 
         private async void Start()
         {
+            AudioManager.Instance.PlayAsync(BGMType.sisingetunoyamingetunoyami, destroyCancellationToken).Forget();
+            
             var isPlayed = SaveManager.Instance.LoadPlayed();
             
             _howToPlayWindow.Initialize();
@@ -107,6 +111,7 @@ namespace InGame
         {
             await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
             await _gameOverOverlay.ShowAsync(destroyCancellationToken);
+            AudioManager.Instance.StopBGM();
             Debug.Log("ゲームオーバー");
         }
         
@@ -117,6 +122,7 @@ namespace InGame
         {
             await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
             await _clearOverlay.ShowAsync(destroyCancellationToken);
+            AudioManager.Instance.StopBGM();
             Debug.Log("ゲームクリア");
         }
     }

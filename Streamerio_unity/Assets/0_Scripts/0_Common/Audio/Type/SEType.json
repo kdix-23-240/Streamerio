@@ -1,10 +1,34 @@
 [
   {
-    "Name": "maou_se_system48",
-    "Num": 1
+    "Name": "Explosion01",
+    "Num": 19
   },
   {
-    "Name": "maou_se_system49",
-    "Num": 2
+    "Name": "Explosion02",
+    "Num": 20
+  },
+  {
+    "Name": "Explosion03",
+    "Num": 21
+  },
+  {
+    "Name": "Explosion04",
+    "Num": 22
+  },
+  {
+    "Name": "Explosion05",
+    "Num": 23
+  },
+  {
+    "Name": "Explosion06",
+    "Num": 24
+  },
+  {
+    "Name": "Explosion07",
+    "Num": 25
+  },
+  {
+    "Name": "Explosion08",
+    "Num": 26
   }
 ]
