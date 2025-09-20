@@ -1,26 +1,24 @@
 package main
 
 import (
-
 	stdlog "log"
-    "net/http"
+	"net/http"
 
-    "streamerrio-backend/internal/config"
-    "streamerrio-backend/internal/handler"
-    "streamerrio-backend/internal/repository"
-    "streamerrio-backend/internal/service"
-    "streamerrio-backend/pkg/counter"
+	"streamerrio-backend/internal/config"
+	"streamerrio-backend/internal/handler"
+	"streamerrio-backend/internal/repository"
+	"streamerrio-backend/internal/service"
+	"streamerrio-backend/pkg/counter"
 
-    // PostgreSQLドライバー
-    "github.com/jmoiron/sqlx"
-    "github.com/joho/godotenv"
-    "github.com/labstack/echo/v4"
-    "github.com/labstack/echo/v4/middleware"
-    elog "github.com/labstack/gommon/log"
-    _ "github.com/lib/pq"
-    "github.com/redis/go-redis/v9"
+	// PostgreSQLドライバー
+	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	elog "github.com/labstack/gommon/log"
+	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
-
 
 func main() {
 	// 1. 環境変数読み込み (.env があれば適用)
@@ -59,8 +57,8 @@ func main() {
 	// 7. Echo フレームワーク初期化 & ミドルウェア
 	e := echo.New()
 	e.Logger.SetLevel(elog.DEBUG)
-	e.Use(middleware.Logger())   // アクセスログ
-	e.Use(middleware.Recover())  // パニック回復
+	e.Use(middleware.Logger())  // アクセスログ
+	e.Use(middleware.Recover()) // パニック回復
 
 	// 8. CORS 設定 (暫定で * を許容 / TODO: 本番は限定)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -101,5 +99,5 @@ func healthCheck(c echo.Context) error {
 type webSocketAdapter struct{ ws *handler.WebSocketHandler }
 
 func (a webSocketAdapter) SendEventToUnity(roomID string, payload map[string]interface{}) error {
-    return a.ws.SendEventToUnity(roomID, payload)
+	return a.ws.SendEventToUnity(roomID, payload)
 }
