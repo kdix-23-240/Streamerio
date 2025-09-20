@@ -1,4 +1,5 @@
 using Alchemy.Inspector;
+using Common.Audio;
 using Common.UI.Display;
 using Cysharp.Threading.Tasks;
 using OutGame.Title;
@@ -15,6 +16,7 @@ namespace OutGame.UI.Display.Screen
     {
         public void OnPointerClick(PointerEventData eventData)
         {
+            AudioManager.Instance.PlayAsync(SEType.NESRPG0112, destroyCancellationToken).Forget();
             Hide();
             TitleManager.Instance.OpenTitleWindowAsync(destroyCancellationToken).Forget();
         }

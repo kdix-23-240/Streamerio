@@ -526,6 +526,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de3b5c57c4c48dc4ebfa52e86d83fef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+
 --- !u!114 &917862276 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5447539212878660129, guid: d075c21bf6b42466bb602705be117d46, type: 3}
@@ -2353,17 +2354,6 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!114 &1828203250 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7345612559403418779, guid: 7c8bf23e55b0a4e7eab7eb982ec3f273, type: 3}
-  m_PrefabInstance: {fileID: 1409739951}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad935bffdb4a54a4db4c125292401e6c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1855150953
 PrefabInstance:
   m_ObjectHideFlags: 0
