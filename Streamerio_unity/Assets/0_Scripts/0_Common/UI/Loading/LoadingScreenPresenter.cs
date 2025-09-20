@@ -55,5 +55,14 @@ namespace Common.UI.Loading
             _view.SetInteractable(true);
             await _view.TitleToLoadingAsync(destroyCancellationToken);
         }
+        
+        /// <summary>
+        /// ローディングからインゲームへのアニメーション
+        /// </summary>
+        public async UniTask LoadingToInGameAsync()
+        {
+            await _view.LoadingToInGameAsync(destroyCancellationToken);
+            _view.SetInteractable(false);
+        }
     }
 }

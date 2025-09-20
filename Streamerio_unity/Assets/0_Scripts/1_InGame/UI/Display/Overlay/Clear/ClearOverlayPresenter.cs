@@ -15,7 +15,6 @@ namespace InGame.UI.Display.Overlay
             View.Background.OnClickAsObservable
                 .Subscribe( async _ =>
                 {
-                    Debug.Log("ClearOverlayPresenter: Clicked");
                     await LoadingScreenPresenter.Instance.ShowAsync();
                     SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
                 }).RegisterTo(destroyCancellationToken);

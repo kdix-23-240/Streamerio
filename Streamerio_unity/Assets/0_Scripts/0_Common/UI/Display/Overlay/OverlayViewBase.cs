@@ -67,6 +67,7 @@ namespace Common.UI.Display.Overlay
         
         public override void Show()
         {
+            CanvasGroup.alpha = _showFadeAnimationParam.Alpha;
             _background.Show();
             SetAlphaParts(_showFadeAnimationParam.Alpha);
         }
@@ -80,6 +81,8 @@ namespace Common.UI.Display.Overlay
 
         public override void Hide()
         {
+            CanvasGroup.alpha = _hideFadeAnimationParam.Alpha;
+            _background.Hide();
             SetAlphaParts(_hideFadeAnimationParam.Alpha);
         }
         
