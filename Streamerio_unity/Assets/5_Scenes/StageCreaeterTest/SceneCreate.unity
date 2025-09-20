@@ -1007,61 +1007,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 996484237900241090, guid: 04d6095457e8c5943b3bca23ca7d268c, type: 3}
   m_PrefabInstance: {fileID: 1274182984}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1293244867
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1293244869}
-  - component: {fileID: 1293244868}
-  m_Layer: 0
-  m_Name: StageCreater
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1293244868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1293244867}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d307315173014158b455379831aa88a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stagePrefabs:
-  - {fileID: 4473003693697665092, guid: 5dd0b506028d04a2b8418fefce302c80, type: 3}
-  - {fileID: 96720387030220786, guid: 52d07d55e988f4446a8f5cb9c323251c, type: 3}
-  goalPrefab: {fileID: 3635631882634262614, guid: 457ba2ec09b06404d9820e05700949b5, type: 3}
-  stageCountToGoal: 10
-  startStage: {fileID: 797166184}
-  player: {fileID: 6583393167888128268}
-  generateDistance: 20
-  spawnFirstImmediately: 1
-  showLog: 1
-  drawGizmos: 1
---- !u!4 &1293244869
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1293244867}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.840671, y: 3.3670712, z: 12.964029}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1361507454 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 615611084756348569, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
@@ -3037,6 +2982,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyRandomActivator: {fileID: 431031885}
+--- !u!1001 &1321415427502649966
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 550934121132340350, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 6583393167888128268}
+    - target: {fileID: 550934121132340350, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: startStage
+      value: 
+      objectReference: {fileID: 797166184}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 12.840671
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.3670712
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 12.964029
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7614061203380849739, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8545470609389786589, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
+      propertyPath: m_Name
+      value: StageCreater
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0719b636b23b94ed1baf2b0e569781bf, type: 3}
 --- !u!1001 &6583393167888128267
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3515,5 +3525,5 @@ SceneRoots:
   - {fileID: 545541908}
   - {fileID: 1638043237}
   - {fileID: 7752630308737482844}
-  - {fileID: 1293244869}
+  - {fileID: 1321415427502649966}
   - {fileID: 104849616}
