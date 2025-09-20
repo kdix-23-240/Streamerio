@@ -5,13 +5,17 @@ import "time"
 type EventType string
 
 const (
-	SKILL1    EventType = "skill1"
-	SKILL2     EventType = "skill2"
-	SKILL3     EventType = "skill3"
-	ENEMY1   EventType = "enemy1"
-	ENEMY2   EventType = "enemy2"
-	ENEMY3   EventType = "enemy3"
+	SKILL1 EventType = "skill1"
+	SKILL2 EventType = "skill2"
+	SKILL3 EventType = "skill3"
+	ENEMY1 EventType = "enemy1"
+	ENEMY2 EventType = "enemy2"
+	ENEMY3 EventType = "enemy3"
 )
+
+func ListEventTypes() []EventType {
+	return []EventType{SKILL1, SKILL2, SKILL3, ENEMY1, ENEMY2, ENEMY3}
+}
 
 type Event struct {
 	ID          int64     `json:"id" db:"id"`

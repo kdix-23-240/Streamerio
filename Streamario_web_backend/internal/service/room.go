@@ -1,15 +1,15 @@
 package service
 
 import (
-    "crypto/rand"
-    "errors"
-    "time"
+	"crypto/rand"
+	"errors"
+	"time"
 
-    "streamerrio-backend/internal/config"
-    "streamerrio-backend/internal/model"
-    "streamerrio-backend/internal/repository"
+	"streamerrio-backend/internal/config"
+	"streamerrio-backend/internal/model"
+	"streamerrio-backend/internal/repository"
 
-    "github.com/oklog/ulid/v2"
+	"github.com/oklog/ulid/v2"
 )
 
 // RoomService: ルームのライフサイクル管理 (取得/生成/存在保証)
@@ -59,6 +59,7 @@ func (s *RoomService) GenerateRoom(streamerID string) (*model.Room, error) {
 		CreatedAt:  time.Now(),
 		Status:     "active",
 		Settings:   "{}",
+		EndedAt:    nil,
 	}
 	// TTL 機能は現状未実装 (Config 拡張で追加予定)
 	if err := s.repo.Create(room); err != nil {
@@ -77,7 +78,12 @@ func (s *RoomService) CreateIfNotExists(id, streamerID string) error {
 		return nil
 	}
 	now := time.Now()
-	return s.repo.Create(&model.Room{ID: id, StreamerID: streamerID, CreatedAt: now, Status: "active", Settings: "{}"})
+	return s.repo.Create(&model.Room{ID: id, StreamerID: streamerID, CreatedAt: now, Status: "active", Settings: "{}", EndedAt: nil})
+}
+
+// MarkEnded: ルームを終了状態へ更新
+func (s *RoomService) MarkEnded(id string, endedAt time.Time) error {
+	return s.repo.MarkEnded(id, endedAt)
 }
 
 // UpdateRoom: ルームを更新

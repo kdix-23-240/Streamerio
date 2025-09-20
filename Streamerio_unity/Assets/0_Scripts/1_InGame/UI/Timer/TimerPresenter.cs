@@ -45,6 +45,13 @@ namespace InGame.UI.Timer
                 {
                     _view.UpdateTimerView(value);
                 }).RegisterTo(destroyCancellationToken);
+            
+            _model.ValueProp
+                .Where(value => value <= 0)
+                .Subscribe(_ =>
+                {
+                    InGameManager.Instance.GameOver();
+                }).RegisterTo(destroyCancellationToken);
         }
 
         /// <summary>

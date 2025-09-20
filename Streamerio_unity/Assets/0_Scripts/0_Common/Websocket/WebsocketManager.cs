@@ -14,14 +14,21 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   [SerializeField]
   private string _websocketId = string.Empty;
   public string WebsocketId => _websocketId;
-
-  private Dictionary<FrontKey, Subject<Unit>> _frontEventDict;
+  
+  private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
   
   private string _url = string.Empty;
   
   private string _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
-
+  
+  private void Awake()
+  {
+    foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
+    {
+      _frontEventDict[key] = new Subject<Unit>();
+    }
+  }
   private void Update()
   {
     if (_isConnected)
@@ -125,9 +132,11 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
         var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
         if (gameEvent != null)
         {
-          var keyType = (FrontKey)System.Enum.Parse(typeof(FrontKey), gameEvent.type, true);
-          _frontEventDict[keyType].OnNext(Unit.Default);
+          var keyType = (FrontKey)System.Enum.Parse(typeof(FrontKey), gameEvent.event_type, true);
+          _frontEventDict[keyType]?.OnNext(Unit.Default);
         }
+        
+        return;
       }
       catch (Exception ex)
       {
@@ -174,7 +183,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
 
   // UnityからWebSocketにメッセージを送信する
   // 使わないかも
-  public async void SendWebSocketMessage(string message)
+  public async UniTask SendWebSocketMessage(string message)
   {
     if (_websocket.State == WebSocketState.Closed)
     {
@@ -210,6 +219,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public string type;
     public string event_type;
     public int trigger_count;
+    
   }
 }
 

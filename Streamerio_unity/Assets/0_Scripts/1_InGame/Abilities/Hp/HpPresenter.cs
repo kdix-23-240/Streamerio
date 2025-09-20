@@ -1,3 +1,4 @@
+using InGame;
 using InGame.UI.Heart;
 using UnityEngine;
 using R3;
@@ -32,8 +33,7 @@ public class HpPresenter : MonoBehaviour, IAbility
             _hpView.UpdateHP(hp);
             if (hp <= 0)
             {
-                Debug.Log("Player Died");
-                // 死亡処理をここに追加
+                InGameManager.Instance.GameOver();
             }
         }).AddTo(this);
     }
