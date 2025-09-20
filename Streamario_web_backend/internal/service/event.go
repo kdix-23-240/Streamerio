@@ -29,6 +29,11 @@ func NewEventService(counter counter.Counter, eventRepo repository.EventReposito
 
 // ProcessEvent: 1イベント処理の本流 (DB保存→視聴者アクティビティ更新→カウント加算→閾値判定→発動通知/リセット)
 func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, viewerID *string) (*model.EventResult, error) {
+	// eventType が有効かチェック
+	if _, ok := s.configs[eventType]; !ok {
+		return nil, fmt.Errorf("invalid event type: %s", eventType)
+	}
+
 	// 1. Record event
 	ev := &model.Event{RoomID: roomID, EventType: eventType, ViewerID: viewerID, Metadata: "{}"}
 	if err := s.eventRepo.CreateEvent(ev); err != nil {
