@@ -41,7 +41,7 @@ public class PlayerView : MonoBehaviour
     
     public void Move(Vector2 newPosition)
     { 
-        Debug.Log($"PlayerView Move to {newPosition}");
+        //Debug.Log($"PlayerView Move to {newPosition}");
         
         _animation.PlayRun(newPosition.x);
         
