@@ -29,6 +29,11 @@ public class HpPresenter : MonoBehaviour, IAbility
         _hpModel.CurrentHp.Subscribe(hp =>
         {
             _hpTestView.UpdateView(hp);
+            if (hp <= 0)
+            {
+                Debug.Log("Player Died");
+                // 死亡処理をここに追加
+            }
         }).AddTo(this);
     }
 
