@@ -2,6 +2,7 @@ package handler
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,16 +13,15 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/oklog/ulid/v2"
-	"streamerrio-backend/internal/model"
 	"streamerrio-backend/internal/service"
-
 )
 
 type WebSocketHandler struct {
-	connections map[string]*websocket.Conn
-	mu          sync.RWMutex
-	roomService *service.RoomService
-	ulidEntropy io.Reader
+	connections    map[string]*websocket.Conn
+	mu             sync.RWMutex
+	roomService    *service.RoomService
+	sessionService *service.GameSessionService
+	ulidEntropy    io.Reader
 }
 
 func NewWebSocketHandler() *WebSocketHandler {
@@ -75,6 +75,25 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 					}
 					return
 				}
+
+				var incoming struct {
+					Type string `json:"type"`
+				}
+				if err := json.Unmarshal([]byte(msg), &incoming); err != nil {
+					continue
+				}
+				switch incoming.Type {
+				case "game_end":
+					if h.sessionService == nil {
+						c.Logger().Warn("game_end received but sessionService not set")
+						continue
+					}
+					if _, err := h.sessionService.EndGame(id); err != nil {
+						c.Logger().Errorf("game end handling failed id=%s err=%v", id, err)
+					}
+				default:
+					// その他のメッセージは現状無視
+				}
 			}
 		},
 	}
@@ -116,11 +135,14 @@ func (h *WebSocketHandler) RelayActionToUnity(c echo.Context) error {
 // SetRoomService: 後から RoomService を注入
 func (h *WebSocketHandler) SetRoomService(rs *service.RoomService) { h.roomService = rs }
 
+// SetGameSessionService: ゲーム終了処理サービスを注入
+func (h *WebSocketHandler) SetGameSessionService(gs *service.GameSessionService) {
+	h.sessionService = gs
+}
+
 func (h *WebSocketHandler) register(ws *websocket.Conn, c echo.Context) string {
-	// ULIDで一意IDを生成（時系列順にソート可能）
 	id := ulid.MustNew(ulid.Timestamp(time.Now()), h.ulidEntropy).String()
 
-	// ここで DB 登録 (存在しなければ)
 	if h.roomService != nil {
 		if err := h.roomService.CreateIfNotExists(id, "unity"); err != nil {
 			c.Logger().Errorf("room db create failed id=%s err=%v", id, err)
@@ -129,7 +151,6 @@ func (h *WebSocketHandler) register(ws *websocket.Conn, c echo.Context) string {
 		}
 	}
 
-	// 排他制御
 	h.mu.Lock()
 	h.connections[id] = ws
 	h.mu.Unlock()
@@ -137,17 +158,11 @@ func (h *WebSocketHandler) register(ws *websocket.Conn, c echo.Context) string {
 }
 
 func (h *WebSocketHandler) unregister(id string, c echo.Context) {
-	// 排他制御
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	// 接続IDを削除
 	delete(h.connections, id)
-
-	// ルームのstatusをarchiveに更新
-	if err := h.roomService.UpdateRoom(id, &model.Room{Status: "archive"}); err != nil {
-		c.Logger().Errorf("room db update failed id=%s err=%v", id, err)
-	}
+	c.Logger().Infof("Client unregistered id=%s", id)
 }
 
 func (h *WebSocketHandler) SendEventToUnity(roomID string, payload interface{}) error {
@@ -166,7 +181,6 @@ func (h *WebSocketHandler) SendEventToUnity(roomID string, payload interface{}) 
 	}
 	return nil
 }
-
 
 func (h *WebSocketHandler) ListClients(c echo.Context) error {
 	h.mu.RLock()

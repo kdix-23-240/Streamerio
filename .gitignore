@@ -164,3 +164,5 @@ crashlytics-build.properties
 # データベースのバックアップやログファイルなどを含む
 # ignoreしていいのかは知らん
 /db
+
+.serena
