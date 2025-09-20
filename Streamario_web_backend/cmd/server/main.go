@@ -3,6 +3,7 @@ package main
 import (
 	stdlog "log"
 	"net/http"
+	"strings"
 
 	"streamerrio-backend/internal/config"
 	"streamerrio-backend/internal/handler"
@@ -38,7 +39,16 @@ func main() {
 	defer db.Close()
 
 	// 4. Redis 初期化 & カウンタ (イベント数 / 視聴者アクティビティ)
-	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisURL})
+	var rdb *redis.Client
+	if strings.HasPrefix(cfg.RedisURL, "redis://") || strings.HasPrefix(cfg.RedisURL, "rediss://") {
+		opt, err := redis.ParseURL(cfg.RedisURL)
+		if err != nil {
+			stdlog.Fatal("Invalid REDIS_URL:", err)
+		}
+		rdb = redis.NewClient(opt)
+	} else {
+		rdb = redis.NewClient(&redis.Options{Addr: cfg.RedisURL})
+	}
 	redisCounter := counter.NewRedisCounter(rdb)
 
 	// 5. リポジトリ (永続層) 準備

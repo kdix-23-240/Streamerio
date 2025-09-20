@@ -13,12 +13,12 @@ services:
       DB_NAME: streamario
       DB_SSLMODE: disable
       PORT: 8888
-      REDIS_URL: redis:6379
+      # Upstashなど外部Redisを使用する場合は、実行時にREDIS_URLを指定してください
+      # 例: rediss://:password@us1-tough-mole-12345.upstash.io:6379
+      # REDIS_URL: ""
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_started
 
   db:
     image: postgres:latest
@@ -40,11 +40,12 @@ services:
       retries: 5
       start_period: 30s
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    container_name: redis
-    command: redis-server --appendonly yes
-    volumes:
-      - ./db/redis_data:/data
+  # ローカルRedisを使いたい場合は以下を復活させてください
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   container_name: redis
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - ./db/redis_data:/data
