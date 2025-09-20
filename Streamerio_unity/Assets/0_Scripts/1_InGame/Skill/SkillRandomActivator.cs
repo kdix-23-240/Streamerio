@@ -22,7 +22,7 @@ public class SkillRandomActivator : MonoBehaviour
     public void ActivateStrongSkill()
     {
         int randomIndex = Random.Range(0, _strongSkillScriptableObject.Skills.Length);
-        // Instantiate(_strongSkillScriptableObject.Skills[randomIndex], _parentObject.transform);
+        Instantiate(_strongSkillScriptableObject.Skills[randomIndex], _parentObject.transform);
         Debug.Log("Strong Skill Spawned");
     }
     public void ActivateMiddleSkill()
