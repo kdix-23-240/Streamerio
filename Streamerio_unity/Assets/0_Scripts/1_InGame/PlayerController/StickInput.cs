@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,6 +35,7 @@ public class StickInput : MonoBehaviour, IController
 
     public void Attack()
     {
+        AudioManager.Instance.PlayAsync(SEType.PlayerAttack, destroyCancellationToken).Forget();
         _bulletShooter.Shoot();
     }
 }

@@ -3,7 +3,8 @@ namespace Common.Audio
     
     public enum BGMType
     {
-		maou_bgm_neorock83 = 1,
+		kuraituuro = 2,
+		sisingetunoyamingetunoyami = 3,
 
     }
 }

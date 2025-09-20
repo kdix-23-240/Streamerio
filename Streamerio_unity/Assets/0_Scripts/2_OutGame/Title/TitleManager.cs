@@ -1,5 +1,6 @@
 using System.Threading;
 using Common;
+using Common.Audio;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace OutGame.Title
         
         private void Start()
         {
+            AudioManager.Instance.PlayAsync(BGMType.kuraituuro, destroyCancellationToken).Forget();
+            
             _screen.Initialize();
             _screen.Show();
             
@@ -47,6 +50,7 @@ namespace OutGame.Title
         {
             await _window.HideAsync(destroyCancellationToken);
             await LoadingScreenPresenter.Instance.TitleToLoadingAsync();
+            AudioManager.Instance.StopBGM();
         }
     }
 }

@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class BulletShooter : MonoBehaviour
@@ -11,9 +12,10 @@ public class BulletShooter : MonoBehaviour
         _animator = GetComponent<PlayerAnimation>();
     }
 
-    public void Shoot()
+    public async void Shoot()
     {
-        _animator.PlayAttack1();
+        _animator.PlayAttack(1);
+        await UniTask.WaitForSeconds(0.5f);
         NormalBullet bullet = _bulletPool.GetBullet();
         if (bullet != null)
         {

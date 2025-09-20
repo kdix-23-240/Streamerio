@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87d8c5535b38d8949970203e89e2e62d, type: 3}
   m_Name: BGM
   m_EditorClassIdentifier: 
-  _folderPath: Assets/5_Musics/BGM
+  _folderPath: Assets/4_Musics/BGM
   _enumPath: Assets/0_Scripts/0_Common/Audio/Type
   _enumNameSpace: Common.Audio
   _enumFileName: BGMType
@@ -21,5 +21,7 @@ MonoBehaviour:
   ignoreFolderName: []
   _dictionary:
     _keyValuePairs:
-    - _key: 1
-      _value: {fileID: 8300000, guid: 1e39041454105d94d82330b3a510c648, type: 3}
+    - _key: 2
+      _value: {fileID: 8300000, guid: 22936aa67765c406db20a68ded07064e, type: 3}
+    - _key: 3
+      _value: {fileID: 8300000, guid: ef7f8cdc6c7794ed1a75b8d971ebda0a, type: 3}

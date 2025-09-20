@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9be7c94eff92048408f5a77c33fc5298, type: 3}
   m_Name: PlayerScriptableObject
   m_EditorClassIdentifier: 
-  InitialHp: 10
+  InitialHp: 100
   InitialPower: 10
   InitialSpeed: 10
   InitialJumpPower: 10

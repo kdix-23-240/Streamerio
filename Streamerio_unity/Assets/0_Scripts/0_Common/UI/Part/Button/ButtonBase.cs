@@ -1,5 +1,7 @@
 using System;
 using Alchemy.Inspector;
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 using UnityEngine.Events;
@@ -33,6 +35,7 @@ namespace Common.UI.Part.Button
                 .ThrottleFirst(TimeSpan.FromSeconds(0.1f))
                 .Subscribe(_ =>
                 {
+                    AudioManager.Instance.PlayAsync(SEType.SNESRPG01, destroyCancellationToken).Forget();
                     onClick?.Invoke();
                     ResetButtonState();
                 }).RegisterTo(destroyCancellationToken);
