@@ -11,6 +11,8 @@ namespace Common.Audio
 		Explosion06 = 24,
 		Explosion07 = 25,
 		Explosion08 = 26,
+		NESRPG0112 = 29,
+		SNESRPG01 = 28,
 
     }
 }

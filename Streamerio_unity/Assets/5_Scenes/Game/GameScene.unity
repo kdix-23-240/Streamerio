@@ -634,6 +634,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de3b5c57c4c48dc4ebfa52e86d83fef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &809216120 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5447539212878660129, guid: d075c21bf6b42466bb602705be117d46, type: 3}
+  m_PrefabInstance: {fileID: 7752630308737482844}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cffb10d8ceb41d980916a30c96642b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &810750956
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,7 +1373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad935bffdb4a54a4db4c125292401e6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _hpTestView: {fileID: 1830597870}
+  _hpView: {fileID: 809216120}
   _scriptableObject: {fileID: 11400000, guid: 9f953513f45edb446b831cdb630f30ac, type: 2}
 --- !u!224 &1603156869 stripped
 RectTransform:
@@ -2471,17 +2482,6 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!114 &1830597870 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6683038507785846965, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
-  m_PrefabInstance: {fileID: 275366387517301690}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21d8f9f1d6e28e6428afd7ecf8e3f601, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1855150953
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3320,10 +3320,6 @@ PrefabInstance:
       propertyPath: _clearOverlay
       value: 
       objectReference: {fileID: 7260203380963558032}
-    - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
-      propertyPath: _inGameScreen
-      value: 
-      objectReference: {fileID: 7752630308737482845}
     - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
       propertyPath: _inGameScreen
       value: 
