@@ -662,6 +662,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _skillRandomActivator: {fileID: 431031884}
+--- !u!114 &797166184 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -3209939003452807569, guid: 5dd0b506028d04a2b8418fefce302c80, type: 3}
+  m_PrefabInstance: {fileID: 104849616}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aac4fbad9fc51447cbe65bceebe810a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &807291876 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4325006575370108173, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
@@ -1212,11 +1223,13 @@ MonoBehaviour:
   - {fileID: 96720387030220786, guid: 52d07d55e988f4446a8f5cb9c323251c, type: 3}
   goalPrefab: {fileID: 3635631882634262614, guid: 457ba2ec09b06404d9820e05700949b5, type: 3}
   stageCountToGoal: 10
-  startLeftAnchor: {fileID: 1472174929}
+  startStage: {fileID: 797166184}
   player: {fileID: 6583393167888128268}
   generateDistance: 20
   cleanupDistance: 70
+  spawnFirstImmediately: 1
   showLog: 1
+  drawGizmos: 1
 --- !u!4 &1293244869
 Transform:
   m_ObjectHideFlags: 0
@@ -1311,11 +1324,6 @@ MonoBehaviour:
   _player: {fileID: 6583393167888128271}
   _joystick: {fileID: 270267345}
   _jumpButton: {fileID: 506152862}
---- !u!4 &1472174929 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 342668608842013743, guid: 5dd0b506028d04a2b8418fefce302c80, type: 3}
-  m_PrefabInstance: {fileID: 104849616}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1472860537
 GameObject:
   m_ObjectHideFlags: 0

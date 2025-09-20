@@ -17,7 +17,6 @@ public class StageCreater : MonoBehaviour
     [Header("生成制御")]
     [SerializeField] private Transform player;
     [SerializeField] private float generateDistance = 25f;   // プレイヤー前方この距離で次生成
-    [SerializeField] private float cleanupDistance = 70f;    // プレイヤー後方破棄距離
     [SerializeField] private bool spawnFirstImmediately = true; // 起動直後に1つ目生成
 
     [Header("デバッグ")]
@@ -28,7 +27,6 @@ public class StageCreater : MonoBehaviour
     private float _nextGenerateX;                    // 次生成判定用X
     private int _generatedCount;                     // 追加生成数(スタート除外)
     private bool _goalSpawned;
-    private readonly List<GameObject> _spawned = new(); // 生成したステージ(スタート除く)
 
     void Start()
     {
@@ -44,7 +42,6 @@ public class StageCreater : MonoBehaviour
         {
             SpawnNext();
         }
-        CleanupOld();
     }
 
     private bool Validate()
@@ -100,8 +97,6 @@ public class StageCreater : MonoBehaviour
             if (showLog) Debug.LogWarning($"[StageCreater] 接続点不足 {inst.name}");
         }
 
-        _spawned.Add(inst);
-
         if (spawnGoal)
         {
             _goalSpawned = true;
@@ -113,22 +108,6 @@ public class StageCreater : MonoBehaviour
         }
 
         if (showLog) Debug.Log($"[StageCreater] Spawn={inst.name} count={_generatedCount} nextX={_nextGenerateX}");
-    }
-
-    private void CleanupOld()
-    {
-        if (!player) return;
-        float limit = player.position.x - cleanupDistance;
-        for (int i = _spawned.Count - 1; i >= 0; i--)
-        {
-            var go = _spawned[i];
-            if (!go) { _spawned.RemoveAt(i); continue; }
-            if (go.transform.position.x < limit)
-            {
-                Destroy(go);
-                _spawned.RemoveAt(i);
-            }
-        }
     }
 
 #if UNITY_EDITOR
