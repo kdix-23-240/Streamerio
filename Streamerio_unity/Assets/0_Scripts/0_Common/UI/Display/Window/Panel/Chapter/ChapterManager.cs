@@ -12,13 +12,13 @@ namespace Common.UI.Display.Window.Panel
         [SerializeField, LabelText("最初に開く章")]
         private ChapterType _firstChapterType = ChapterType.Menu;
         [SerializeField, LabelText("章パネル")]
-        private　SerializeDictionary<ChapterType, ChapterPanelPresenter> _chapterDict;
+        private　SerializeDictionary<ChapterType, ChapterPanelPresenterBase> _chapterDict;
         [SerializeField, LabelText("章パネルの親")]
         private Transform _chapterParent;
         
-        private Dictionary<ChapterType, ChapterPanelPresenter> _existingChapterDict;
+        private Dictionary<ChapterType, ChapterPanelPresenterBase> _existingChapterDict;
         
-        private ChapterType _currentChapterType;
+        private Stack<ChapterType> _chapterStack;
 
         private BookWindowAnimation _bookWindowAnimation;
         
@@ -28,21 +28,28 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="bookWindowAnimation"></param>
         public void Initialize(BookWindowAnimation bookWindowAnimation)
         {
-            _existingChapterDict = new Dictionary<ChapterType, ChapterPanelPresenter>();
+            _existingChapterDict = new Dictionary<ChapterType, ChapterPanelPresenterBase>();
             
             _bookWindowAnimation = bookWindowAnimation;
+            
+            _chapterStack = new Stack<ChapterType>();
         }
 
         /// <summary>
         /// チャプターパネルをアニメーションで開く
         /// </summary>
         /// <param name="type"></param>
+        /// <param name="ct"></param>
         public async UniTask OpenChapterAsync(ChapterType type, CancellationToken ct)
         {
-            if(_currentChapterType != ChapterType.None)
-                await GetChapter(_currentChapterType).HideAsync(ct);
+            if (_chapterStack.Count > 0)
+            {
+                var currentChapter = _chapterStack.Pop();
+                await GetChapter(currentChapter).HideAsync(ct);
+                _chapterStack.Push(currentChapter);
+            }
             
-            _currentChapterType = type;
+            _chapterStack.Push(type);
             await GetChapter(type).ShowAsync(ct);
         }
         
@@ -52,10 +59,14 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="type"></param>
         public void OpenChapter(ChapterType type)
         {
-            if(_currentChapterType != ChapterType.None)
-                GetChapter(_currentChapterType).Hide();
+            if (_chapterStack.Count > 0)
+            {
+                var currentChapter = _chapterStack.Pop();
+                GetChapter(currentChapter).Hide();
+                _chapterStack.Push(currentChapter);
+            }
             
-            _currentChapterType = type;
+            _chapterStack.Push(type);
             GetChapter(type).Show();
         }
         
@@ -80,23 +91,46 @@ namespace Common.UI.Display.Window.Panel
         /// チャプターパネルを閉じる
         /// </summary>
         /// <param name="ct"></param>
-        public async UniTask CloseChapterAsync(CancellationToken ct)
+        /// <returns>全てのパネルを閉じたか</returns>
+        public async UniTask<bool> CloseChapterAsync(CancellationToken ct)
         {
-            if(_currentChapterType != ChapterType.None)
-                await GetChapter(_currentChapterType).HideAsync(ct);
+            if(_chapterStack.Count == 0)
+            {
+                return true;
+            }
             
-            _currentChapterType = ChapterType.None;
+            var currentChapterType = _chapterStack.Pop();
+            await GetChapter(currentChapterType).HideAsync(ct);
+            
+            if(_chapterStack.TryPop(out var nextChapterType))
+            {
+                await OpenChapterAsync(nextChapterType, ct);
+                return false;
+            }
+            
+            return true;
         }
         
         /// <summary>
         /// チャプターパネルを閉じる
         /// </summary>
-        public void CloseChapter()
+        public bool CloseChapter()
         {
-            if(_currentChapterType != ChapterType.None)
-                GetChapter(_currentChapterType).Hide();
+            if(_chapterStack.Count == 0)
+            {
+                return true;
+            }
             
-            _currentChapterType = ChapterType.None;
+            var currentChapterType = _chapterStack.Pop(); 
+            GetChapter(currentChapterType).Hide();
+            
+            if(_chapterStack.TryPop(out var nextChapterType))
+            {
+                OpenChapter(nextChapterType);
+                return false;
+            }
+            
+            return true;
         }
         
         /// <summary>
@@ -104,7 +138,7 @@ namespace Common.UI.Display.Window.Panel
         /// </summary>
         /// <param name="chapterType"></param>
         /// <returns></returns>
-        private ChapterPanelPresenter GetChapter(ChapterType chapterType)
+        private ChapterPanelPresenterBase GetChapter(ChapterType chapterType)
         {
             if (_existingChapterDict.TryGetValue(chapterType, out var chapter))
             {
@@ -121,7 +155,7 @@ namespace Common.UI.Display.Window.Panel
         /// 新しいチャプターパネルを作成
         /// </summary>
         /// <param name="chapterType"></param>
-        private ChapterPanelPresenter CreateChapter(ChapterType chapterType)
+        private ChapterPanelPresenterBase CreateChapter(ChapterType chapterType)
         {
             var newChapter = Instantiate(_chapterDict[chapterType], _chapterParent);
             newChapter.Initialize(_bookWindowAnimation);

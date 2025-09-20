@@ -27,6 +27,8 @@ namespace Common.UI.Dialog
         
         private DialogType _currentDialogType = DialogType.None;
         
+        public IDisplay CurrentDialog => _dialogDict.ContainsKey(_currentDialogType) ? _dialogDict[_currentDialogType] : null;
+        
         public void Initialize()
         {
             _dialogDict = new Dictionary<DialogType, IDisplay>();

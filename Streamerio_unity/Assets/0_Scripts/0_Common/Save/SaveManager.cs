@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using Alchemy.Inspector;
 using Common.Audio;
 
 using UnityEngine;
@@ -12,6 +12,26 @@ namespace Common.Save
     /// </summary>
     public class SaveManager : SingletonBase<SaveManager>
     {
+        [SerializeField, LabelText("一度遊んだかのキー名")]
+        private string _playedKey = "Played";
+        
+        /// <summary>
+        /// 一度遊んだことを保存
+        /// </summary>
+        public void SavePlayed(bool isPlayed = true)
+        {
+            PlayerPrefs.SetInt(_playedKey, isPlayed ? 1 : 0);
+        }
+        
+        /// <summary>
+        /// 一度遊んだかロード
+        /// </summary>
+        /// <returns></returns>
+        public bool LoadPlayed()
+        {
+            return PlayerPrefs.GetInt(_playedKey, 0) == 1;
+        }
+        
         /// <summary>
         /// 音量をPlayerPrefsに保存(Enum名で保存)
         /// </summary>

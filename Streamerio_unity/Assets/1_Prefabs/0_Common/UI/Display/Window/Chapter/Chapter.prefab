@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1471831479195647030}
   - component: {fileID: 7402418485949910078}
   - component: {fileID: 4350624966923224872}
-  - component: {fileID: 7750090005652430143}
+  - component: {fileID: 119322963868913983}
   m_Layer: 5
   m_Name: Chapter
   m_TagString: Untagged
@@ -71,7 +71,7 @@ MonoBehaviour:
   _closeButton: {fileID: 1517123696662366416}
   _nextButton: {fileID: 7180955355398873679}
   _backButton: {fileID: 5501537900420268474}
---- !u!114 &7750090005652430143
+--- !u!114 &119322963868913983
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -80,11 +80,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1601084803911639077}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 302047d26c194adeb3d3391944934c64, type: 3}
+  m_Script: {fileID: 11500000, guid: 750997739fa24ef991db6e9794cdb9c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _view: {fileID: 4350624966923224872}
-  _preChapter: 0
+  View: {fileID: 4350624966923224872}
 --- !u!1 &7097632441674823643
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,6 +207,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3282542186263804884, guid: af022ea16ca904ecd928dd53d1ab5163, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
+    - target: {fileID: 3282542186263804884, guid: af022ea16ca904ecd928dd53d1ab5163, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 968898699081592503, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
     - target: {fileID: 7095780143786405144, guid: af022ea16ca904ecd928dd53d1ab5163, type: 3}
       propertyPath: m_Name
       value: Header

@@ -5,7 +5,9 @@ using Common.UI.Display;
 using Common.UI.Display.Background;
 using Common.UI.Part.Button;
 using Cysharp.Threading.Tasks;
+using R3;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Common.UI.Dialog
 {
@@ -20,14 +22,40 @@ namespace Common.UI.Dialog
         {
             View.CloseButton.SetClickEvent(() =>
             {
-                Debug.Log("Close Button Clicked");
-                DialogManager.Instance.ClosePreDialogAsync(destroyCancellationToken).Forget();
+                CloseEvent();
             });
+        }
+        
+        protected override void Bind()
+        {
+            base.Bind();
+            View.Background.OnClickAsObservable
+                .Subscribe(_ =>
+                {
+                    CloseEvent();
+                }).RegisterTo(destroyCancellationToken);
+        }
+
+        /// <summary>
+        /// 閉じる時のイベント
+        /// </summary>
+        protected abstract void CloseEvent();
+        
+        public override async UniTask ShowAsync(CancellationToken ct)
+        {
+            await base.ShowAsync(ct);
+            await UniTask.WaitWhile(() => IsShow, cancellationToken: ct);
         }
     }
     
     public abstract class DialogViewBase : DisplayViewBase
     {
+        [SerializeField, LabelText("背景")]
+        private DisplayBackgroundPresenter _background;
+        public DisplayBackgroundPresenter Background => _background;
+        [SerializeField, LabelText("動かすオブジェクト")]
+        private RectTransform _moveRectTransform;
+        
         [SerializeField, LabelText("閉じるボタン")]
         private CommonButton _closeButton;
         public CommonButton CloseButton => _closeButton;
@@ -45,32 +73,37 @@ namespace Common.UI.Dialog
         {
             base.Initialize();
             
+            _background.Initialize();
             _closeButton.Initialize();
 
-            _showAnimation = new PathAnimationComponent(RectTransform, _showAnimationParam);
-            _hideAnimation = new PathAnimationComponent(RectTransform, _hideAnimationParam);
+            _showAnimation = new PathAnimationComponent(_moveRectTransform, _showAnimationParam);
+            _hideAnimation = new PathAnimationComponent(_moveRectTransform, _hideAnimationParam);
         }
         
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            RectTransform.anchoredPosition = _showAnimationParam.Path[0];
+            _moveRectTransform.anchoredPosition = _showAnimationParam.Path[0];
+            await _background.ShowAsync(ct);
             await _showAnimation.PlayAsync(ct);
         }
         
         public override void Show()
         {
-            RectTransform.anchoredPosition = _showAnimationParam.Path[^1];
+            _moveRectTransform.anchoredPosition = _showAnimationParam.Path[^1];
+            _background.Show();
         }
         
         public override async UniTask HideAsync(CancellationToken ct)
         {
-            RectTransform.anchoredPosition = _hideAnimationParam.Path[0];
+            _moveRectTransform.anchoredPosition = _hideAnimationParam.Path[0];
             await _hideAnimation.PlayAsync(ct);
+            await _background.HideAsync(ct);
         }
         
         public override void Hide()
         {
-            RectTransform.anchoredPosition = _hideAnimationParam.Path[^1];
+            _moveRectTransform.anchoredPosition = _hideAnimationParam.Path[^1];
+            _background.Hide();
         }
     }
 }

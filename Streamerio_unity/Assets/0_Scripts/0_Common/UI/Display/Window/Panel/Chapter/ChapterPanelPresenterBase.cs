@@ -1,23 +1,18 @@
 using System.Threading;
-using Alchemy.Inspector;
 using Common.UI.Display.Window.Animation;
 using Cysharp.Threading.Tasks;
 using OutGame.Title;
 using R3;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Common.UI.Display.Window.Panel
 {
     /// <summary>
     /// 章のパネルの繋ぎ役
     /// </summary>
-    [RequireComponent(typeof(ChapterPanelView))]
-    public class ChapterPanelPresenter: DisplayPresenterBase<ChapterPanelView>
+    [RequireComponent(typeof(CommonChapterPanelView))]
+    public abstract class ChapterPanelPresenterBase: DisplayPresenterBase<CommonChapterPanelView>
     {
-        [SerializeField, LabelText("前のチャプター")]
-        private ChapterType _preChapter;
-        
         private ReactiveProperty<int> _currentIndexProp;
         private int _currentIndex => _currentIndexProp.Value;
 
@@ -45,15 +40,12 @@ namespace Common.UI.Display.Window.Panel
             
             View.NextButton.SetClickEvent(()=> OpenNextPage(destroyCancellationToken).Forget());
             View.BackButton.SetClickEvent(()=> OpenPrePage(destroyCancellationToken).Forget());
-            View.CloseButton.SetClickEvent(() =>
+            View.CloseButton.SetClickEvent(async () =>
             {
-                if (_preChapter == ChapterType.None)
+                var  isAllClose = await ChapterManager.Instance.CloseChapterAsync(destroyCancellationToken);
+                if (isAllClose)
                 {
-                    TitleManager.Instance.ShowTitleAsync(destroyCancellationToken).Forget();
-                }
-                else
-                {
-                    ChapterManager.Instance.OpenChapterAsync(_preChapter, destroyCancellationToken).Forget();
+                    AllCloseEvent();
                 }
             });
         }
@@ -67,6 +59,11 @@ namespace Common.UI.Display.Window.Panel
                     View.NextButton.gameObject.SetActive(_currentIndex < View.LastPageIndex);
                 }).RegisterTo(destroyCancellationToken);
         }
+
+        /// <summary>
+        /// すべての章が閉じられたときのイベント
+        /// </summary>
+        protected abstract void AllCloseEvent();
         
         public override async UniTask ShowAsync(CancellationToken ct)
         {
