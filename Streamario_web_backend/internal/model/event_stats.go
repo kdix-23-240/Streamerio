@@ -46,6 +46,12 @@ type RoomResultSummary struct {
 	ViewerTotals []ViewerTotal          `json:"viewer_totals"`
 }
 
+type TeamTopSummary struct {
+	TopSkill  *EventTop `json:"top_skill"`
+	TopEnemy  *EventTop `json:"top_enemy"`
+	TopAll    *EventTop `json:"top_all"`
+}
+
 // ViewerSummary: 終了後に返す視聴者別内訳
 type ViewerSummary struct {
 	ViewerID   string            `json:"viewer_id"`

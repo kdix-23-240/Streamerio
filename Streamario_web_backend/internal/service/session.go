@@ -57,10 +57,16 @@ func (s *GameSessionService) EndGame(roomID string) (*model.RoomResultSummary, e
 
 	// Unity へ終了サマリーを送信
 	if s.wsSender != nil {
+		teamTops := s.buildTeamTop(summary)
 		payload := map[string]interface{}{
 			"type":          "game_end_summary",
 			"top_by_button": summary.TopByEvent,
 			"top_overall":   summary.TopOverall,
+			"team_tops": map[string]interface{}{
+				"skill": s.eventTopToPayload(teamTops.TopSkill),
+				"enemy": s.eventTopToPayload(teamTops.TopEnemy),
+				"all":   s.eventTopToPayload(teamTops.TopAll),
+			},
 		}
 		if err := s.wsSender.SendEventToUnity(roomID, payload); err != nil {
 			log.Printf("warn: failed to send end summary to unity room=%s err=%v", roomID, err)
@@ -179,4 +185,41 @@ func cloneStringPointer(src *string) *string {
 	}
 	val := *src
 	return &val
+}
+
+func (s *GameSessionService) buildTeamTop(summary *model.RoomResultSummary) model.TeamTopSummary {
+	fetch := func(filter func(model.EventType) bool) *model.EventTop {
+		var best *model.EventTop
+		for et, top := range summary.TopByEvent {
+			if !filter(et) || top.ViewerID == "" {
+				continue
+			}
+			if best == nil || top.Count > best.Count || (top.Count == best.Count && top.ViewerID < best.ViewerID) {
+				tmp := top
+				best = &tmp
+			}
+		}
+		return best
+	}
+
+	return model.TeamTopSummary{
+		TopSkill: fetch(func(et model.EventType) bool {
+			return et == model.SKILL1 || et == model.SKILL2 || et == model.SKILL3
+		}),
+		TopEnemy: fetch(func(et model.EventType) bool {
+			return et == model.ENEMY1 || et == model.ENEMY2 || et == model.ENEMY3
+		}),
+		TopAll: summary.TopOverall,
+	}
+}
+
+func (s *GameSessionService) eventTopToPayload(top *model.EventTop) map[string]interface{} {
+	if top == nil {
+		return nil
+	}
+	return map[string]interface{}{
+		"viewer_id":   top.ViewerID,
+		"viewer_name": top.ViewerName,
+		"count":       top.Count,
+	}
 }
