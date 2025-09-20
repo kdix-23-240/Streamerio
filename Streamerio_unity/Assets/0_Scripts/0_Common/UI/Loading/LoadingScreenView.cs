@@ -65,6 +65,14 @@ namespace Common.UI.Loading
         }
         
         /// <summary>
+        /// 表示
+        /// </summary>
+        public void Show()
+        {
+            _irisOutMaterial.SetFloat(_loadingInAnimationParam.RadiusPropertyName, _loadingInAnimationParam.MinRadius);
+        }
+        
+        /// <summary>
         /// 非表示アニメーション
         /// </summary>
         public async UniTask HideAsync(CancellationToken ct)

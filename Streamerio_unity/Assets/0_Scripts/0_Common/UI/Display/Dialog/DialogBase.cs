@@ -44,7 +44,14 @@ namespace Common.UI.Dialog
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             await base.ShowAsync(ct);
+            View.Background.SetInteractable(true);
             await UniTask.WaitWhile(() => IsShow, cancellationToken: ct);
+        }
+        
+        public override void Show()
+        {
+            base.Show();
+            View.Background.SetInteractable(true);
         }
     }
     
