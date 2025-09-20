@@ -12,6 +12,7 @@ public class WeakEnemy : MonoBehaviour
 
     [Header("当たり判定")]
     [SerializeField] private string playerTag = "Player"; // 何に当たったらダメージを与えるかの判定用
+    [SerializeField] private string bulletTag = "Bullet"; // 弾のタグ
     [SerializeField] private float hitCooldown = 0.4f;     // 連続ヒット抑制
 
     private float _lastHitTime = -999f;
@@ -30,15 +31,38 @@ public class WeakEnemy : MonoBehaviour
         transform.Translate(Vector2.left * speed * Time.deltaTime);
     }
 
-    // private void OnTriggerEnter2D(Collider2D other)
-    // {
-    //     if (other.CompareTag(playerTag)) Attack();
-    // }
-
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag(playerTag)) Attack();
+        // まず何と接触したか確認
+        //Debug.Log($"Triggered by: {collision.gameObject.name}, Tag: {collision.gameObject.tag}");
+        
+        if (collision.gameObject.CompareTag(playerTag))
+        {
+            //Debug.Log("Player detected!");
+            Attack();
+        }
+            if (collision.gameObject.CompareTag(bulletTag))
+            {
+                //Debug.Log("Enemy hit by bullet!");
+                // 弾に当たったらダメージを受ける
+                var bullet = collision.gameObject.GetComponent<NormalBullet>();
+                if (bullet != null)
+                {
+                TakeDamage((int)bullet.Damage);
+                // オブジェクトプールを使用している場合はDestroyではなくプールに戻す
+                var bulletPool = FindObjectOfType<BulletPool>();
+                if (bulletPool != null)
+                {
+                    bulletPool.ReturnBullet(bullet);
+                }
+                else
+                {
+                    Destroy(collision.gameObject);
+                }
+            }
+        }
     }
+
 
     private void Attack()
     {
@@ -46,7 +70,7 @@ public class WeakEnemy : MonoBehaviour
         if (Time.time - _lastHitTime < hitCooldown) return;
 
         hpPresenter.Decrease(damage);
-        Debug.Log($"Enemy attacked! Player HP: {hpPresenter.Amount}");
+        //Debug.Log($"Enemy attacked! Player HP: {hpPresenter.Amount}");
         _lastHitTime = Time.time;
     }
 

@@ -4,10 +4,14 @@ using Cysharp.Threading.Tasks;
 public class NormalBullet : MonoBehaviour
 {
     private float _speed;
+    private float _damage;
+
+    public float Damage => _damage;
     [SerializeField] private BulletScriptableObject _bulletScriptableObject;
     void Awake()
     {
         _speed = _bulletScriptableObject.Speed;
+        _damage = _bulletScriptableObject.Damage;
     }
     void Update()
     {
