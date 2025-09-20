@@ -1,0 +1,214 @@
+using System;
+using Common;
+using UnityEngine;
+using NativeWebSocket;
+
+public class WebsocketManager : SingletonBase<WebsocketManager>
+{
+  private bool _isConnected = false;
+  private WebSocket _websocket;
+
+  [SerializeField]
+  private string _websocketId;
+  public string WebsocketId => _websocketId;
+
+  private void Update()
+  {
+    if (_isConnected)
+    {
+    #if !UNITY_WEBGL || UNITY_EDITOR
+      _websocket.DispatchMessageQueue();
+    #endif
+    }
+  }
+
+  // websocketのコネクションを確立する
+  public void ConnectWebSocket()
+  {
+    if (_isConnected)
+    {
+      Debug.Log("WebSocket is already connected!");
+      return;
+    }
+    
+    // WebSocketのインスタンスを生成
+    _websocket = new WebSocket("wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity");
+
+    if (_websocket == null)
+    {
+      Debug.Log("WebSocket is null!");
+      return;
+    }
+    else{
+      Debug.Log("WebSocket is ok!");
+    }
+
+    // WebSocketのイベントを焼き付け
+    _websocket.OnOpen += () =>
+    {
+      Debug.Log("Connection open!");
+      _isConnected = true;
+    };
+
+    _websocket.OnError += (e) =>
+    {
+      Debug.Log("Error! " + e);
+    };
+
+    _websocket.OnClose += (e) =>
+    {
+      Debug.Log("Connection closed!");
+      _isConnected = false;
+    };
+
+    _websocket.OnMessage += (bytes) => ReciveWebSocketMessage(bytes);
+
+    _websocket.Connect();
+    return;
+  }
+
+  // WebSocketからメッセージを受信する
+  private void ReciveWebSocketMessage(byte[] bytes)
+  {
+    var message = System.Text.Encoding.UTF8.GetString(bytes);
+    Debug.Log($"Received: {message}");
+
+    BaseMessage baseMessage = null;
+    try
+    {
+      baseMessage = JsonUtility.FromJson<BaseMessage>(message);
+    }
+    catch (Exception ex)
+    {
+      Debug.Log($"JSON base parse error: {ex.Message}");
+    }
+
+    if (baseMessage == null || string.IsNullOrEmpty(baseMessage.type))
+    {
+      Debug.Log("No type field in JSON message.");
+      return;
+    }
+
+    if (baseMessage.type == "room_created")
+    {
+      try
+      {
+        var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
+        if (room != null)
+        {
+          _websocketId = room.room_id;
+          return;
+        }
+      }
+      catch (Exception ex)
+      {
+        Debug.Log($"room_created parse error: {ex.Message}");
+      }
+      Debug.Log("Failed to parse room_created message.");
+      return;
+    }
+
+    if (baseMessage.type == "game_event")
+    {
+      try
+      {
+        var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
+        if (gameEvent != null)
+        {
+          switch (gameEvent.event_type)
+          {
+            case "skill1":
+              // Skill1アクションを実行
+              break;
+            case "skill2":
+              // Skill2アクションを実行
+              break;
+            case "skill3":
+              // Skill3アクションを実行
+              break;
+            case "enemy1":
+              // Skill4アクションを実行
+              break;
+            case "enemy2":
+              // Skill5アクションを実行
+              break;
+            case "enemy3":
+              // Skill5アクションを実行
+              break;
+            default:
+              Debug.Log($"Unknown event_type: {gameEvent.event_type}");
+              break;
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Debug.Log($"game_event parse error: {ex.Message}");
+      }
+      Debug.Log("Failed to parse game_event message.");
+      return;
+    }
+
+    Debug.Log($"Unhandled JSON payload type: {baseMessage.type}");
+    return;
+  }
+
+  // WebSocketを切断する
+  public async void DisconnectWebSocket()
+  {
+    if (!_isConnected)
+    {
+      Debug.Log("WebSocket is not connected!");
+      return;
+    }
+
+    if (_websocket.State == WebSocketState.Closed)
+    {
+      Debug.Log("WebSocket is already closed!");
+      return;
+    }
+
+    await _websocket.Close();
+  }
+
+  // UnityからWebSocketにメッセージを送信する
+  // 使わないかも
+  public async void SendWebSocketMessage(string message)
+  {
+    if (_websocket.State == WebSocketState.Closed)
+    {
+      Debug.Log("WebSocket is not connected!");
+      return;
+    }
+
+    await _websocket.SendText(message);
+  }
+
+
+  // アプリケーションが終了したときにwebsocketを閉じる
+  private async void OnApplicationQuit()
+  {
+    await _websocket.Close();
+  }
+  
+  // JSONの型定義
+  private class BaseMessage
+  {
+    public string type;
+  }
+
+  private class RoomCreatedNotification
+  {
+    public string type;
+    public string room_id;
+    public string qr_code;
+    public string web_url;
+  }
+
+  private class GameEventNotification
+  {
+    public string type;
+    public string event_type;
+    public int trigger_count;
+  }
+}
