@@ -5,14 +5,14 @@ public class PlayerView : MonoBehaviour
     private bool _isGrounded = false; // 地面に接地しているかどうかのフラグ
     public void Move(Vector2 newPosition)
     {
-        Debug.Log($"PlayerView Move to {newPosition}");
+        // Debug.Log($"PlayerView Move to {newPosition}");
         gameObject.transform.position += new Vector3(newPosition.x, newPosition.y, 0);
     }
 
     public void Jump(float force)
     {
         if (!CheckIsGrounded()) return;
-        Debug.Log($"PlayerView Jump with force {force}");
+        // Debug.Log($"PlayerView Jump with force {force}");
         // ジャンプの実装例（Rigidbody2Dがアタッチされている場合）
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
