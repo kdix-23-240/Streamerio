@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Common.UI.Animation
 {
     /// <summary>
-    /// 円が開くアニメーション
+    /// 円が閉じるアニメーション
     /// </summary>
     public class IrisInAnimationComponent: IrisAnimationComponent
     {
@@ -23,7 +23,7 @@ namespace Common.UI.Animation
     }
     
     /// <summary>
-    /// 円が閉じるアニメーション
+    /// 円が開くアニメーション
     /// </summary>
     public class IrisOutAnimationComponent: IrisAnimationComponent
     {
