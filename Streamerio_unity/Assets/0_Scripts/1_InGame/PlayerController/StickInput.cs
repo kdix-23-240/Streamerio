@@ -34,5 +34,6 @@ public class StickInput : MonoBehaviour, IController
     public void Attack()
     {
         _bulletShooter.Shoot();
+        
     }
 }
