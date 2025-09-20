@@ -66,7 +66,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 8177999816988538307}
   _canvasGroup: {fileID: 7295010252067547802}
-  _gameStartText: {fileID: 6919198803706085132}
+  _gameStartText: {fileID: 1733000211055546222}
   _showFadeAnimationParam:
     Duration: 0.1
     Ease: 2
@@ -75,12 +75,6 @@ MonoBehaviour:
     Duration: 0.1
     Ease: 3
     Alpha: 0
-  _flashAnimationParam:
-    Duration: 0.2
-    Ease: 1
-    MinAlpha: 0
-    MaxAlpha: 1
-    FlashCount: -1
 --- !u!114 &5468571624533860983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,6 +100,7 @@ GameObject:
   - component: {fileID: 5712540624564922759}
   - component: {fileID: 2454769552238091802}
   - component: {fileID: 6919198803706085132}
+  - component: {fileID: 1733000211055546222}
   m_Layer: 5
   m_Name: GameStartText
   m_TagString: Untagged
@@ -162,8 +157,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: GAME START
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3ea3e7bad60324e4bb47c342ef7b1a7a, type: 2}
-  m_sharedMaterial: {fileID: 968898699081592503, guid: 3ea3e7bad60324e4bb47c342ef7b1a7a, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
+  m_sharedMaterial: {fileID: 968898699081592503, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -243,6 +238,26 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1733000211055546222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6673816667159443334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02a13cf243cd43b89d5579d7c4401d54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rectTransform: {fileID: 1974740286193260758}
+  _canvasGroup: {fileID: 6919198803706085132}
+  _flashAnimationParam:
+    Duration: 1
+    Ease: 1
+    MinAlpha: 0
+    MaxAlpha: 1
+    FlashCount: -1
 --- !u!1001 &1969073027710263390
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -335,6 +350,14 @@ PrefabInstance:
       propertyPath: m_text
       value: STREAMERIO
       objectReference: {fileID: 0}
+    - target: {fileID: 2977273707021040110, guid: 5e9c84cb380ec48b2b79673886ed1092, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
+    - target: {fileID: 2977273707021040110, guid: 5e9c84cb380ec48b2b79673886ed1092, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 968898699081592503, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
     - target: {fileID: 6108059409911705276, guid: 5e9c84cb380ec48b2b79673886ed1092, type: 3}
       propertyPath: m_Name
       value: TitleText
