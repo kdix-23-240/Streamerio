@@ -37,6 +37,7 @@ namespace OutGame.UI.Display.Window.Panel.Page.Menu
             _menuPanelView.StartButton.SetClickEvent(async () =>
             {
                 await TitleManager.Instance.LoadTitleAsync();
+                WebsocketManager.Instance.ConnectWebSocket();
                 SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
             });
 
