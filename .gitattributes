@@ -73,7 +73,6 @@
 *.aif lfs-file
 *.aiff lfs-file
 *.it lfs-file
-*.mod lfs-file
 *.mp3 lfs-file
 *.ogg lfs-file
 *.s3m lfs-file
