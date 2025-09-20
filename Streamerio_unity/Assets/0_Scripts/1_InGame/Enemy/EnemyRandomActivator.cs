@@ -1,4 +1,5 @@
 using UnityEngine;
+using R3;
 
 public class EnemyRandomActivator : MonoBehaviour
 {
@@ -7,6 +8,17 @@ public class EnemyRandomActivator : MonoBehaviour
     [SerializeField] private WeakEnemyScriptableObject _weakEnemyScriptableObject;
     [SerializeField] private GameObject _parentObject;
 
+    void Start()
+    {
+        Bind();
+    }
+    
+    private void Bind()
+    {
+        WebsocketManager.Instance.FrontEventDict[FrontKey.enemy3].Subscribe(_ => ActivateStrongEnemy());
+        WebsocketManager.Instance.FrontEventDict[FrontKey.enemy2].Subscribe(_ => ActivateMiddleEnemy());
+        WebsocketManager.Instance.FrontEventDict[FrontKey.enemy2].Subscribe(_ => ActivateWeakEnemy());        
+    }
     public void ActivateStrongEnemy()
     {
         int randomIndex = Random.Range(0, _strongEnemyScriptableObject.Enemys.Length);
