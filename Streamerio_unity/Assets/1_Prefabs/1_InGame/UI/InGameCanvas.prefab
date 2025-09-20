@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7952938576864000158}
     m_Modifications:
+    - target: {fileID: 5216590905921175777, guid: e808800ab44c54e7c97f7c2c4641ea60, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6951310895289017517, guid: e808800ab44c54e7c97f7c2c4641ea60, type: 3}
       propertyPath: m_Name
       value: Footer
@@ -90,6 +94,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8652106559914034734, guid: e808800ab44c54e7c97f7c2c4641ea60, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056391236467049917, guid: e808800ab44c54e7c97f7c2c4641ea60, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

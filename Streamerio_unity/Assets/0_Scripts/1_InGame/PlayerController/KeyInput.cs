@@ -3,6 +3,8 @@ using UnityEngine;
 public class KeyInput : MonoBehaviour, IController
 {
     [SerializeField] private PlayerPresenter _player;
+    [SerializeField] private BulletShooter _bulletShooter;
+
     void Update()
     {
         float moveX = Input.GetAxis("Horizontal");
@@ -23,5 +25,9 @@ public class KeyInput : MonoBehaviour, IController
     public void Jump()
     {
         _player.Jump();
+    }
+
+    public void Attack()
+    {
     }
 }
