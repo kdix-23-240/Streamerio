@@ -1,4 +1,3 @@
-using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
@@ -32,6 +31,6 @@ namespace Common.UI.Animation
 
         [Header("イージング")]
         [SerializeField]
-        public Ease Ease;
+        public Ease Ease = Ease.Linear;
     }
 }
