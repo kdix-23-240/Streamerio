@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using InGame;
 using InGame.UI.Heart;
 using UnityEngine;
@@ -45,6 +47,7 @@ public class HpPresenter : MonoBehaviour, IAbility
 
     public void Decrease(float amount)
     {
+        AudioManager.Instance.PlayAsync(SEType.PlayerDamage, destroyCancellationToken).Forget();
         _hpModel.Decrease(amount);
     }
 }

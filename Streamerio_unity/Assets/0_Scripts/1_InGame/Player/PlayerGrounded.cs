@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 
@@ -16,6 +18,7 @@ public class PlayerGrounded : MonoBehaviour
     
     public void OnTriggerExit2D(Collider2D collision)
     {
+        AudioManager.Instance.PlayAsync(SEType.PlayerJump, destroyCancellationToken).Forget();
         _isGrounded.Value = false;
     }
 }

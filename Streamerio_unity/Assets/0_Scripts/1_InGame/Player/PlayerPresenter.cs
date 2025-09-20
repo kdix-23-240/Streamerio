@@ -1,6 +1,7 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using R3;
-using UnityEditor;
 
 public class PlayerPresenter : MonoBehaviour
 {
@@ -44,6 +45,7 @@ public class PlayerPresenter : MonoBehaviour
 
     public void Jump()
     {
+        AudioManager.Instance.PlayAsync(SEType.PlayerJump, destroyCancellationToken).Forget();
         _view.Jump(_jumpPower.Amount);
     }
 
