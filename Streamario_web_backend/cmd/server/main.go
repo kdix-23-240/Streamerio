@@ -67,7 +67,7 @@ func main() {
 	wsHandler.SetRoomService(roomService)
 	sender := webSocketAdapter{ws: wsHandler}
 	eventService := service.NewEventService(redisCounter, eventRepo, sender)
-	sessionService := service.NewGameSessionService(roomService, eventRepo, redisCounter, sender)
+	sessionService := service.NewGameSessionService(roomService, eventRepo, viewerRepo, redisCounter, sender)
 	viewerService := service.NewViewerService(viewerRepo)
 	wsHandler.SetGameSessionService(sessionService)
 	apiHandler := handler.NewAPIHandler(roomService, eventService, sessionService, viewerService)

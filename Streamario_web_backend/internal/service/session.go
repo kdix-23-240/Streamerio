@@ -15,12 +15,13 @@ import (
 type GameSessionService struct {
 	roomService *RoomService
 	eventRepo   repository.EventRepository
+	viewerRepo  repository.ViewerRepository
 	counter     counter.Counter
 	wsSender    WebSocketSender
 }
 
-func NewGameSessionService(roomService *RoomService, eventRepo repository.EventRepository, counter counter.Counter, sender WebSocketSender) *GameSessionService {
-	return &GameSessionService{roomService: roomService, eventRepo: eventRepo, counter: counter, wsSender: sender}
+func NewGameSessionService(roomService *RoomService, eventRepo repository.EventRepository, viewerRepo repository.ViewerRepository, counter counter.Counter, sender WebSocketSender) *GameSessionService {
+	return &GameSessionService{roomService: roomService, eventRepo: eventRepo, viewerRepo: viewerRepo, counter: counter, wsSender: sender}
 }
 
 // EndGame: Unity からの終了通知時に呼ぶ。集計→ルーム終了→Unity へ結果送信までを担う。
@@ -111,7 +112,13 @@ func (s *GameSessionService) GetViewerSummary(roomID, viewerID string) (*model.V
 			counts[et] = 0
 		}
 	}
-	return &model.ViewerSummary{ViewerID: viewerID, Counts: counts, Total: total}, nil
+	var namePtr *string
+	if s.viewerRepo != nil {
+		if viewer, err := s.viewerRepo.Get(viewerID); err == nil && viewer != nil && viewer.Name != nil {
+			namePtr = cloneStringPointer(viewer.Name)
+		}
+	}
+	return &model.ViewerSummary{ViewerID: viewerID, ViewerName: namePtr, Counts: counts, Total: total}, nil
 }
 
 // buildRoomSummary: DB の events をもとに終了サマリーを構築（EndedAt は呼び出し側で設定）
@@ -131,7 +138,7 @@ func (s *GameSessionService) buildRoomSummary(roomID string) (*model.RoomResultS
 
 	topByEvent := make(map[model.EventType]model.EventTop, len(model.ListEventTypes()))
 	for _, et := range model.ListEventTypes() {
-		topByEvent[et] = model.EventTop{ViewerID: "", Count: 0}
+		topByEvent[et] = model.EventTop{ViewerID: "", ViewerName: nil, Count: 0}
 	}
 
 	var topOverall *model.EventTop
@@ -141,10 +148,10 @@ func (s *GameSessionService) buildRoomSummary(roomID string) (*model.RoomResultS
 		}
 		current := topByEvent[agg.EventType]
 		if agg.Count > current.Count || (agg.Count == current.Count && (current.ViewerID == "" || agg.ViewerID < current.ViewerID)) {
-			topByEvent[agg.EventType] = model.EventTop{ViewerID: agg.ViewerID, Count: agg.Count}
+			topByEvent[agg.EventType] = model.EventTop{ViewerID: agg.ViewerID, ViewerName: cloneStringPointer(agg.ViewerName), Count: agg.Count}
 		}
 		if topOverall == nil || agg.Count > topOverall.Count || (agg.Count == topOverall.Count && (topOverall.ViewerID == "" || agg.ViewerID < topOverall.ViewerID)) {
-			tmp := model.EventTop{ViewerID: agg.ViewerID, Count: agg.Count}
+			tmp := model.EventTop{ViewerID: agg.ViewerID, ViewerName: cloneStringPointer(agg.ViewerName), Count: agg.Count}
 			topOverall = &tmp
 		}
 	}
@@ -164,4 +171,12 @@ func (s *GameSessionService) buildRoomSummary(roomID string) (*model.RoomResultS
 		EventTotals:  totalMap,
 		ViewerTotals: viewerTotals,
 	}, nil
+}
+
+func cloneStringPointer(src *string) *string {
+	if src == nil {
+		return nil
+	}
+	val := *src
+	return &val
 }
