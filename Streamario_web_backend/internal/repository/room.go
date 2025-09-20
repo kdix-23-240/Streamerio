@@ -10,8 +10,10 @@ import (
 
 // RoomRepository: ルーム永続化アクセス用インタフェース
 type RoomRepository interface {
-	Create(room *model.Room) error     // 新規作成
+	Create(room *model.Room) error      // 新規作成
 	Get(id string) (*model.Room, error) // ID取得 (存在しなければ nil)
+	Delete(id string) error             // ID削除
+	Update(id string, room *model.Room) error // ID更新
 }
 
 type roomRepository struct{ db *sqlx.DB }
@@ -41,4 +43,18 @@ func (r *roomRepository) Get(id string) (*model.Room, error) {
 		return nil, err
 	}
 	return &rm, nil
+}
+
+// Update: 指定IDのルームを更新
+func (r *roomRepository) Update(id string, room *model.Room) error {
+	q := `UPDATE rooms SET streamer_id=$1, created_at=$2, expires_at=$3, status=$4, settings=$5 WHERE id=$6`
+	_, err := r.db.Exec(q, room.StreamerID, room.CreatedAt, room.ExpiresAt, room.Status, room.Settings, id)
+	return err
+}
+
+// Delete: 指定IDのルームを削除
+func (r *roomRepository) Delete(id string) error {
+	q := `DELETE FROM rooms WHERE id=$1`
+	_, err := r.db.Exec(q, id)
+	return err
 }

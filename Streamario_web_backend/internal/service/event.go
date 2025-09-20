@@ -153,11 +153,11 @@ func (s *EventService) GetRoomStats(roomID string) ([]RoomEventStat, error) {
 // getDefaultEventConfigs: 初期閾値設定マップ生成
 func getDefaultEventConfigs() map[model.EventType]*model.EventConfig {
 	return map[model.EventType]*model.EventConfig{
-		model.HELP_SPEED:    {EventType: model.HELP_SPEED, BaseThreshold: 5, MinThreshold: 3, MaxThreshold: 50, LevelMultiplier: 1.3},
-		model.HELP_JUMP:     {EventType: model.HELP_JUMP, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 60, LevelMultiplier: 1.3},
-		model.HELP_HEAL:     {EventType: model.HELP_HEAL, BaseThreshold: 12, MinThreshold: 8, MaxThreshold: 100, LevelMultiplier: 1.4},
-		model.HINDER_SLOW:   {EventType: model.HINDER_SLOW, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 45, LevelMultiplier: 1.3},
-		model.HINDER_SLIP:   {EventType: model.HINDER_SLIP, BaseThreshold: 7, MinThreshold: 5, MaxThreshold: 55, LevelMultiplier: 1.4},
-		model.HINDER_DAMAGE: {EventType: model.HINDER_DAMAGE, BaseThreshold: 10, MinThreshold: 6, MaxThreshold: 80, LevelMultiplier: 1.5},
+		model.SKILL1:    {EventType: model.SKILL1, BaseThreshold: 5, MinThreshold: 3, MaxThreshold: 50, LevelMultiplier: 1.3},
+		model.SKILL2:     {EventType: model.SKILL2, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 60, LevelMultiplier: 1.3},
+		model.SKILL3:     {EventType: model.SKILL3, BaseThreshold: 12, MinThreshold: 8, MaxThreshold: 100, LevelMultiplier: 1.4},
+		model.ENEMY1:   {EventType: model.ENEMY1, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 45, LevelMultiplier: 1.3},
+		model.ENEMY2:   {EventType: model.ENEMY2, BaseThreshold: 7, MinThreshold: 5, MaxThreshold: 55, LevelMultiplier: 1.4},
+		model.ENEMY3: {EventType: model.ENEMY3, BaseThreshold: 10, MinThreshold: 6, MaxThreshold: 80, LevelMultiplier: 1.5},
 	}
 }
