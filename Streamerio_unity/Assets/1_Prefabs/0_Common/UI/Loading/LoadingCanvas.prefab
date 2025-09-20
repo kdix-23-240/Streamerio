@@ -121,6 +121,22 @@ MonoBehaviour:
     Center: {x: 0.5, y: 0.5}
     MinRadius: 0
     MaxRadius: 1.5
+  _titleToLoadingAnimationParam:
+    Duration: 1
+    Ease: 3
+    CenterPropertyName: _CenterUV
+    RadiusPropertyName: _Radius
+    Center: {x: 0.73, y: 0.73}
+    MinRadius: 0
+    MaxRadius: 1.8
+  _loadingToInGameAnimationParam:
+    Duration: 1
+    Ease: 2
+    CenterPropertyName: _CenterUV
+    RadiusPropertyName: _Radius
+    Center: {x: 0.5, y: 0.73}
+    MinRadius: 0
+    MaxRadius: 1.3
 --- !u!114 &1007013334669152481
 MonoBehaviour:
   m_ObjectHideFlags: 0
