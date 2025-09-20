@@ -16,29 +16,30 @@ services:
       # Upstashなど外部Redisを使用する場合は、実行時にREDIS_URLを指定してください
       # 例: rediss://:password@us1-tough-mole-12345.upstash.io:6379
       # REDIS_URL: ""
-    depends_on:
-      db:
-        condition: service_healthy
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
 
-  db:
-    image: postgres:latest
-    ports:
-      - "5432:5432"
-    container_name: postgres
-    environment:
-      POSTGRES_DB: streamario
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
-    volumes:
-      - ./db/postgres_data:/var/lib/postgresql/data
-      - ./Streamario_web_backend/db/migrations:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d streamario"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+  # ローカルdbを使いたい場合は以下を復活させてください
+  # db:
+  #   image: postgres:latest
+  #   ports:
+  #     - "5432:5432"
+  #   container_name: postgres
+  #   environment:
+  #     POSTGRES_DB: streamario
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+  #   volumes:
+  #     - ./db/postgres_data:/var/lib/postgresql/data
+  #     - ./Streamario_web_backend/db/migrations:/docker-entrypoint-initdb.d
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d streamario"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 30s
 
   # ローカルRedisを使いたい場合は以下を復活させてください
   # redis:

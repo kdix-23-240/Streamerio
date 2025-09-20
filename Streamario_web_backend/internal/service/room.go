@@ -80,3 +80,12 @@ func (s *RoomService) CreateIfNotExists(id, streamerID string) error {
 	return s.repo.Create(&model.Room{ID: id, StreamerID: streamerID, CreatedAt: now, Status: "active", Settings: "{}"})
 }
 
+// UpdateRoom: ルームを更新
+func (s *RoomService) UpdateRoom(id string, room *model.Room) error {
+	return s.repo.Update(id, room)
+}
+
+// DeleteRoom: ルームを削除
+func (s *RoomService) DeleteRoom(id string) error {
+	return s.repo.Delete(id)
+}

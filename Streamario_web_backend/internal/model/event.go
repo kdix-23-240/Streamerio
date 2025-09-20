@@ -5,12 +5,12 @@ import "time"
 type EventType string
 
 const (
-	HELP_SPEED    EventType = "help_speed"
-	HELP_JUMP     EventType = "help_jump"
-	HELP_HEAL     EventType = "help_heal"
-	HINDER_SLOW   EventType = "hinder_slow"
-	HINDER_SLIP   EventType = "hinder_slip"
-	HINDER_DAMAGE EventType = "hinder_damage"
+	SKILL1    EventType = "skill1"
+	SKILL2     EventType = "skill2"
+	SKILL3     EventType = "skill3"
+	ENEMY1   EventType = "enemy1"
+	ENEMY2   EventType = "enemy2"
+	ENEMY3   EventType = "enemy3"
 )
 
 type Event struct {

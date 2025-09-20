@@ -12,6 +12,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/oklog/ulid/v2"
+	"streamerrio-backend/internal/model"
 	"streamerrio-backend/internal/service"
 
 )
@@ -42,20 +43,11 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 			defer ws.Close()
 
 			// 接続登録
-			id := h.register(ws)
-			defer h.unregister(id)
+			id := h.register(ws, c)
+			defer h.unregister(id, c)
 
 			// 接続直後に必ずログを出す
 			c.Logger().Infof("Client connected: %s id=%s", c.Request().RemoteAddr, id)
-
-			// ここで DB 登録 (存在しなければ)
-			if h.roomService != nil {
-				if err := h.roomService.CreateIfNotExists(id, "unity"); err != nil {
-					c.Logger().Errorf("room db create failed id=%s err=%v", id, err)
-				} else {
-					c.Logger().Infof("room db created id=%s", id)
-				}
-			}
 
 			payload := map[string]interface{}{
 				"type":    "room_created",
@@ -124,9 +116,18 @@ func (h *WebSocketHandler) RelayActionToUnity(c echo.Context) error {
 // SetRoomService: 後から RoomService を注入
 func (h *WebSocketHandler) SetRoomService(rs *service.RoomService) { h.roomService = rs }
 
-func (h *WebSocketHandler) register(ws *websocket.Conn) string {
+func (h *WebSocketHandler) register(ws *websocket.Conn, c echo.Context) string {
 	// ULIDで一意IDを生成（時系列順にソート可能）
 	id := ulid.MustNew(ulid.Timestamp(time.Now()), h.ulidEntropy).String()
+
+	// ここで DB 登録 (存在しなければ)
+	if h.roomService != nil {
+		if err := h.roomService.CreateIfNotExists(id, "unity"); err != nil {
+			c.Logger().Errorf("room db create failed id=%s err=%v", id, err)
+		} else {
+			c.Logger().Infof("room db created id=%s", id)
+		}
+	}
 
 	// 排他制御
 	h.mu.Lock()
@@ -135,13 +136,18 @@ func (h *WebSocketHandler) register(ws *websocket.Conn) string {
 	return id
 }
 
-func (h *WebSocketHandler) unregister(id string) {
+func (h *WebSocketHandler) unregister(id string, c echo.Context) {
 	// 排他制御
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	// 接続IDを削除
 	delete(h.connections, id)
+
+	// ルームのstatusをarchiveに更新
+	if err := h.roomService.UpdateRoom(id, &model.Room{Status: "archive"}); err != nil {
+		c.Logger().Errorf("room db update failed id=%s err=%v", id, err)
+	}
 }
 
 func (h *WebSocketHandler) SendEventToUnity(roomID string, payload interface{}) error {
