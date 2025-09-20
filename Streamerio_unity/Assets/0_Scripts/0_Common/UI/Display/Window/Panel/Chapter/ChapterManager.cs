@@ -12,11 +12,11 @@ namespace Common.UI.Display.Window.Panel
         [SerializeField, LabelText("最初に開く章")]
         private ChapterType _firstChapterType = ChapterType.Menu;
         [SerializeField, LabelText("章パネル")]
-        private　SerializeDictionary<ChapterType, ChapterPanelPresenter> _chapterDict;
+        private　SerializeDictionary<ChapterType, ChapterPanelPresenterBase> _chapterDict;
         [SerializeField, LabelText("章パネルの親")]
         private Transform _chapterParent;
         
-        private Dictionary<ChapterType, ChapterPanelPresenter> _existingChapterDict;
+        private Dictionary<ChapterType, ChapterPanelPresenterBase> _existingChapterDict;
         
         private Stack<ChapterType> _chapterStack;
 
@@ -28,7 +28,7 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="bookWindowAnimation"></param>
         public void Initialize(BookWindowAnimation bookWindowAnimation)
         {
-            _existingChapterDict = new Dictionary<ChapterType, ChapterPanelPresenter>();
+            _existingChapterDict = new Dictionary<ChapterType, ChapterPanelPresenterBase>();
             
             _bookWindowAnimation = bookWindowAnimation;
             
@@ -138,7 +138,7 @@ namespace Common.UI.Display.Window.Panel
         /// </summary>
         /// <param name="chapterType"></param>
         /// <returns></returns>
-        private ChapterPanelPresenter GetChapter(ChapterType chapterType)
+        private ChapterPanelPresenterBase GetChapter(ChapterType chapterType)
         {
             if (_existingChapterDict.TryGetValue(chapterType, out var chapter))
             {
@@ -155,7 +155,7 @@ namespace Common.UI.Display.Window.Panel
         /// 新しいチャプターパネルを作成
         /// </summary>
         /// <param name="chapterType"></param>
-        private ChapterPanelPresenter CreateChapter(ChapterType chapterType)
+        private ChapterPanelPresenterBase CreateChapter(ChapterType chapterType)
         {
             var newChapter = Instantiate(_chapterDict[chapterType], _chapterParent);
             newChapter.Initialize(_bookWindowAnimation);

@@ -10,8 +10,8 @@ namespace Common.UI.Display.Window.Panel
     /// <summary>
     /// 章のパネルの繋ぎ役
     /// </summary>
-    [RequireComponent(typeof(ChapterPanelView))]
-    public class ChapterPanelPresenter: DisplayPresenterBase<ChapterPanelView>
+    [RequireComponent(typeof(CommonChapterPanelView))]
+    public abstract class ChapterPanelPresenterBase: DisplayPresenterBase<CommonChapterPanelView>
     {
         private ReactiveProperty<int> _currentIndexProp;
         private int _currentIndex => _currentIndexProp.Value;
@@ -45,7 +45,7 @@ namespace Common.UI.Display.Window.Panel
                 var  isAllClose = await ChapterManager.Instance.CloseChapterAsync(destroyCancellationToken);
                 if (isAllClose)
                 {
-                    TitleManager.Instance.ShowTitleAsync(destroyCancellationToken).Forget();
+                    AllCloseEvent();
                 }
             });
         }
@@ -59,6 +59,11 @@ namespace Common.UI.Display.Window.Panel
                     View.NextButton.gameObject.SetActive(_currentIndex < View.LastPageIndex);
                 }).RegisterTo(destroyCancellationToken);
         }
+
+        /// <summary>
+        /// すべての章が閉じられたときのイベント
+        /// </summary>
+        protected abstract void AllCloseEvent();
         
         public override async UniTask ShowAsync(CancellationToken ct)
         {

@@ -9,7 +9,7 @@ namespace Common.UI.Display.Window.Panel
     /// <summary>
     /// 章のパネルの見た目
     /// </summary>
-    public class ChapterPanelView: DisplayViewBase
+    public class CommonChapterPanelView: DisplayViewBase
     {
         [SerializeField, LabelText("ページ")]
         private PagePanelPresenter[] _pages;

@@ -20,5 +20,10 @@ namespace InGame.UI.Display.Dialog.QRCode
         {
             View.SetQRCodeSprite(sprite);
         }
+
+        protected override void CloseEvent()
+        {
+            InGameManager.Instance.StartGame();
+        }
     }
 }
