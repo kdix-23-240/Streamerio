@@ -17,9 +17,24 @@ public class UltBullet : MonoBehaviour
     private bool _isMainBullet = true;
     private Dictionary<GameObject, int> _enemyDamageCounters = new Dictionary<GameObject, int>();
     private int _damageIntervalFrames;
+    private GameObject _player;
+
+    void Awake()
+    {
+        _player = GameObject.FindWithTag("Player");
+        if (_player == null)
+        {
+            Debug.LogError("Player object not found in the scene.");
+        }
+    }
 
     void Start()
     {
+        if (_player != null)
+        {
+            //playerのy座標から8マス右側に生成
+            transform.position = new Vector2(_player.transform.position.x, _player.transform.position.y);
+        }
         if (_isMainBullet)
         {
             CreateBulletSpread();

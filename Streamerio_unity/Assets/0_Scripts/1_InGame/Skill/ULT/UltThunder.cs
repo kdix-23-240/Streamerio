@@ -18,9 +18,24 @@ public class UltThunder : MonoBehaviour
     private List<GameObject> _hitEnemies = new List<GameObject>();
     private Dictionary<GameObject, int> _enemyDamageCounters = new Dictionary<GameObject, int>();
     private int _damageIntervalFrames;
+    private GameObject _player;
 
+    void Awake()
+    {
+        _player = GameObject.FindWithTag("Player");
+        if (_player == null)
+        {
+            Debug.LogError("Player object not found in the scene.");
+        }
+
+    }
     void Start()
     {
+        if (_player != null)
+        {
+            //playerのy座標から8マス右側に生成
+            transform.position = new Vector2(_player.transform.position.x + 8f, _player.transform.position.y);
+        }
         // フレームベースでインターバルを計算
         _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
         

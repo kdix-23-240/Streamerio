@@ -19,9 +19,24 @@ public class UltChargeBeam : MonoBehaviour
     private float _chargeTimer = 0f;
     private Dictionary<GameObject, int> _enemyDamageCounters = new Dictionary<GameObject, int>();
     private int _damageIntervalFrames;
+    private GameObject _player;
+
+    void Awake()
+    {
+        _player = GameObject.FindWithTag("Player");
+        if (_player == null)
+        {
+            Debug.LogError("Player object not found in the scene.");
+        }
+    }
 
     void Start()
     {
+        if (_player != null)
+        {
+            //playerのy座標から8マス右側に生成
+            transform.position = new Vector2(_player.transform.position.x, _player.transform.position.y);
+        }
         _currentSpeed = _speed * 0.3f; // 最初は遅い
         _currentDamage = _damage;
         
