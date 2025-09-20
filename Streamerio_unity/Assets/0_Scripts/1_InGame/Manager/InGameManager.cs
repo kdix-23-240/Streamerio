@@ -16,7 +16,6 @@ namespace InGame
 {
     public class InGameManager: SingletonBase<InGameManager>
     {
-        [SerializeField] private string _url = "";
         [SerializeField]private float _timeLimit = 180f;
         [SerializeField, LabelText("プレイヤー")]
         private Transform _playerTransform;
@@ -49,11 +48,12 @@ namespace InGame
             _clearOverlay.Hide();
             
             var qrGenerator = new QRCodeSpriteGenerater();
-            
-            _inGameScreen.Initialize(qrGenerator.Generate(_url), _timeLimit);
+
+            var url = await WebsocketManager.Instance.GetFrontUrlAsync();
+            _inGameScreen.Initialize(qrGenerator.Generate(url), _timeLimit);
             
             _qrCodeDialog.Initialize();
-            _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(_url));
+            _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(url));
             _qrCodeDialog.Hide();
             
             _inGameMaskView.Hide();

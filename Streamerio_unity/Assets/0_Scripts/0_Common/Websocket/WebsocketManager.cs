@@ -12,10 +12,10 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   private WebSocket _websocket;
 
   [SerializeField]
-  private string _websocketId;
+  private string _websocketId = string.Empty;
   public string WebsocketId => _websocketId;
   
-  private string _url;
+  private string _url = string.Empty;
   
   private string _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
 
