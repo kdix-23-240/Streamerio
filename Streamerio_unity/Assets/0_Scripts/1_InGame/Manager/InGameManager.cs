@@ -1,12 +1,14 @@
 using Alchemy.Inspector;
 using Common;
 using Common.Save;
+using Common.Scene;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
+using InGame.UI.Display.Overlay.GameOver;
 using InGame.UI.Display.Screen;
 using InGame.UI.QRCode;
 using UnityEngine;
@@ -21,8 +23,12 @@ namespace InGame
         private Transform _playerTransform;
         [SerializeField, LabelText("遊び方ウィンドウ")]
         private WindowPresenter _howToPlayWindow;
+        
         [SerializeField, LabelText("クリアUI")]
         private ClearOverlayPresenter _clearOverlay;
+        [SerializeField, LabelText("ゲームオーバーUI")]
+        private GameOverOverlayPresenter _gameOverOverlay;
+        
         [SerializeField, LabelText("QRコードダイアログ")]
         private QRCodeDialogPresenter _qrCodeDialog;
         [SerializeField, LabelText("ゲーム画面")]
@@ -36,6 +42,9 @@ namespace InGame
             
             _howToPlayWindow.Initialize();
             _howToPlayWindow.Hide();
+            
+            _gameOverOverlay.Initialize();
+            _gameOverOverlay.Hide();
             
             _clearOverlay.Initialize();
             _clearOverlay.Hide();
@@ -58,9 +67,13 @@ namespace InGame
                 await _howToPlayWindow.ShowAsync(destroyCancellationToken);
                 SaveManager.Instance.SavePlayed();
             }
-            else
+            else if(!SceneManager.Instance.IsReloaded)
             {
                 OpenQRCodeDialog();   
+            }
+            else
+            {
+                StartGame();
             }
         }
 
@@ -78,12 +91,16 @@ namespace InGame
         /// </summary>
         public async void StartGame()
         {
-            await _qrCodeDialog.HideAsync(destroyCancellationToken);
+            if (!SceneManager.Instance.IsReloaded)
+            {
+                await _qrCodeDialog.HideAsync(destroyCancellationToken);
+            }
+            
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
 
-            // await UniTask.WaitForSeconds(3f);
-            // GameClear();
+            await UniTask.WaitForSeconds(3f);
+            GameOver();
         }
 
         /// <summary>
@@ -92,6 +109,8 @@ namespace InGame
         public async void GameOver()
         {
             await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
+            await _gameOverOverlay.ShowAsync(destroyCancellationToken);
+            Debug.Log("ゲームオーバー");
         }
         
         /// <summary>
