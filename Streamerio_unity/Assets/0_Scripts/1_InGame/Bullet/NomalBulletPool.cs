@@ -3,38 +3,42 @@ using UnityEngine;
 
 public class BulletPool : MonoBehaviour
 {
-    public NomalBullet bulletPrefab;
-    public int poolSize = 10;
-    private Queue<NomalBullet> pool = new Queue<NomalBullet>();
+    [SerializeField] private NormalBullet _bulletPrefab;
+    [SerializeField] private GameObject _parentObject;
+    private Queue<NormalBullet> _pool = new Queue<NormalBullet>();
+
+    [SerializeField] private BulletScriptableObject _bulletScriptableObject;
+    private int _poolSize;
 
     void Start()
     {
-        for (int i = 0; i < poolSize; i++)
+        _poolSize = _bulletScriptableObject.PoolSize;
+        for (int i = 0; i < _poolSize; i++)
         {
-            NomalBullet bullet = Instantiate(bulletPrefab, transform);
+            NormalBullet bullet = Instantiate(_bulletPrefab, _parentObject.transform);
             bullet.OnDespawn();
-            pool.Enqueue(bullet);
+            _pool.Enqueue(bullet);
         }
     }
 
-    public NomalBullet GetBullet()
+    public NormalBullet GetBullet()
     {
-        if (pool.Count > 0)
+        if (_pool.Count > 0)
         {
-            NomalBullet bullet = pool.Dequeue();
+            NormalBullet bullet = _pool.Dequeue();
             bullet.OnSpawn();
             return bullet;
         }
         else
         {
-            NomalBullet bullet = Instantiate(bulletPrefab, transform);
+            NormalBullet bullet = Instantiate(_bulletPrefab, _parentObject.transform);
             return bullet;
         }
     }
 
-    public void ReturnBullet(NomalBullet bullet)
+    public void ReturnBullet(NormalBullet bullet)
     {
         bullet.OnDespawn();
-        pool.Enqueue(bullet);
+        _pool.Enqueue(bullet);
     }
 }
