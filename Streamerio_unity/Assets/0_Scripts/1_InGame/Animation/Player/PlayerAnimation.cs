@@ -45,7 +45,7 @@ public class PlayerAnimation : MonoBehaviour
 
     private void CancelMove()
     {
-        _cts = new CancellationTokenSource();
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
         _isCancelMoving = false;
         
         float time = 0f;
