@@ -41,4 +41,17 @@ public class NormalBullet : MonoBehaviour
     {
         transform.Translate(Vector2.right * _speed * Time.deltaTime);
     }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            var enemy = collision.gameObject.GetComponent<WeakEnemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage((int)_damage);
+                OnDespawn();
+            }
+        }
+    }
 }

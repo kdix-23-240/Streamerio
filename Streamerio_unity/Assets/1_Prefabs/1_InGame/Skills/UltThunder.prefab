@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1431443607047841761}
   - component: {fileID: 2885192273417006679}
   - component: {fileID: 7676842971110226589}
+  - component: {fileID: 2156599442745627322}
   m_Layer: 0
   m_Name: UltThunder
   m_TagString: Untagged
@@ -26,13 +27,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3868573432194011127}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 10, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!212 &2885192273417006679
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -110,3 +111,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2156599442745627322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3868573432194011127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d31442358a0584f37b551af6b70198e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 25
+  _damage: 10
+  _lifetime: 3
+  _strikeCount: 3
+  _strikeInterval: 0.5
+  _strikeRange: 3
+  _continuousDamageInterval: 0.4
+  _continuousDamage: 30
