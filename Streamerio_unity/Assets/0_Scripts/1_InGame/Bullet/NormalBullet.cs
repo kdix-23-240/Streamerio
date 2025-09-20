@@ -11,7 +11,7 @@ public class NormalBullet : MonoBehaviour
     }
     void Update()
     {
-        transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+        Move();
     }
     async void OnEnable()
     {
@@ -32,5 +32,9 @@ public class NormalBullet : MonoBehaviour
     {
         await UniTask.Delay(System.TimeSpan.FromSeconds(_bulletScriptableObject.Lifetime));
         OnDespawn();
+    }
+    private void Move()
+    {
+        transform.Translate(Vector2.right * _speed * Time.deltaTime);
     }
 }
