@@ -47,8 +47,10 @@ MonoBehaviour:
   stagePrefabs:
   - {fileID: 4473003693697665092, guid: 5dd0b506028d04a2b8418fefce302c80, type: 3}
   - {fileID: 96720387030220786, guid: 52d07d55e988f4446a8f5cb9c323251c, type: 3}
-  goalPrefab: {fileID: 3635631882634262614, guid: 457ba2ec09b06404d9820e05700949b5, type: 3}
-  stageCountToGoal: 10
+  - {fileID: 3635631882634262614, guid: 457ba2ec09b06404d9820e05700949b5, type: 3}
+  - {fileID: 3635631882634262614, guid: 7c820a19756c949ccb6d04abd4b609e8, type: 3}
+  goalPrefab: {fileID: 3635631882634262614, guid: 7dd35c4b5464c416891415c9c12698aa, type: 3}
+  stageCountToGoal: 1
   startStage: {fileID: 0}
   player: {fileID: 0}
   generateDistance: 20
