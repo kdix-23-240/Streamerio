@@ -25,7 +25,6 @@ namespace InGame.UI.Display.Overlay
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             await base.ShowAsync(ct);
-            Background.SetInteractable(true);
             _clickText.PlayStartTextAnimation();
         }
         
@@ -44,7 +43,6 @@ namespace InGame.UI.Display.Overlay
         public override void Hide()
         {
             base.Hide();
-            Background.Hide();
             _clickText.StopStartTextAnimation();
         }
     }

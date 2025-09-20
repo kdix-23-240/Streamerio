@@ -1,10 +1,15 @@
 using Alchemy.Inspector;
 using Common;
 using Common.Save;
+using Common.Scene;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
+using Cysharp.Threading.Tasks;
+using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
+using InGame.UI.Display.Overlay.GameOver;
+using InGame.UI.Display.Screen;
 using InGame.UI.QRCode;
 using UnityEngine;
 
@@ -13,12 +18,23 @@ namespace InGame
     public class InGameManager: SingletonBase<InGameManager>
     {
         [SerializeField] private string _url = "";
+        [SerializeField]private float _timeLimit = 180f;
+        [SerializeField, LabelText("プレイヤー")]
+        private Transform _playerTransform;
         [SerializeField, LabelText("遊び方ウィンドウ")]
         private WindowPresenter _howToPlayWindow;
+        
         [SerializeField, LabelText("クリアUI")]
         private ClearOverlayPresenter _clearOverlay;
+        [SerializeField, LabelText("ゲームオーバーUI")]
+        private GameOverOverlayPresenter _gameOverOverlay;
+        
         [SerializeField, LabelText("QRコードダイアログ")]
         private QRCodeDialogPresenter _qrCodeDialog;
+        [SerializeField, LabelText("ゲーム画面")]
+        private InGameScreenPresenter _inGameScreen;
+        [SerializeField, LabelText("マスク")]
+        private InGameMaskView _inGameMaskView;
 
         private async void Start()
         {
@@ -27,15 +43,23 @@ namespace InGame
             _howToPlayWindow.Initialize();
             _howToPlayWindow.Hide();
             
+            _gameOverOverlay.Initialize();
+            _gameOverOverlay.Hide();
+            
             _clearOverlay.Initialize();
             _clearOverlay.Hide();
             
             var qrGenerator = new QRCodeSpriteGenerater();
             
+            _inGameScreen.Initialize(qrGenerator.Generate(_url), _timeLimit);
+            
             _qrCodeDialog.Initialize();
             _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(_url));
             _qrCodeDialog.Hide();
             
+            _inGameMaskView.Hide();
+            
+            // ゲーム画面表示
             await LoadingScreenPresenter.Instance.LoadingToInGameAsync();
             
             if (!isPlayed)
@@ -43,9 +67,13 @@ namespace InGame
                 await _howToPlayWindow.ShowAsync(destroyCancellationToken);
                 SaveManager.Instance.SavePlayed();
             }
-            else
+            else if(!SceneManager.Instance.IsReloaded)
             {
                 OpenQRCodeDialog();   
+            }
+            else
+            {
+                StartGame();
             }
         }
 
@@ -63,8 +91,36 @@ namespace InGame
         /// </summary>
         public async void StartGame()
         {
-            await _qrCodeDialog.HideAsync(destroyCancellationToken);
+            if (!SceneManager.Instance.IsReloaded)
+            {
+                await _qrCodeDialog.HideAsync(destroyCancellationToken);
+            }
+            
+            _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
+
+            await UniTask.WaitForSeconds(3f);
+            GameOver();
+        }
+
+        /// <summary>
+        /// ゲームオーバー
+        /// </summary>
+        public async void GameOver()
+        {
+            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
+            await _gameOverOverlay.ShowAsync(destroyCancellationToken);
+            Debug.Log("ゲームオーバー");
+        }
+        
+        /// <summary>
+        /// ゲームクリア
+        /// </summary>
+        public async void GameClear()
+        {
+            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
+            await _clearOverlay.ShowAsync(destroyCancellationToken);
+            Debug.Log("ゲームクリア");
         }
     }
 }

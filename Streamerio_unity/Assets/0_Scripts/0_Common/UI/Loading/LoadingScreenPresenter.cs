@@ -37,6 +37,15 @@ namespace Common.UI.Loading
             _view.SetInteractable(true);
             await _view.ShowAsync(destroyCancellationToken);
         }
+
+        /// <summary>
+        /// 表示
+        /// </summary>
+        public void Show()
+        {
+            _view.SetInteractable(true);
+            _view.Show();
+        }
         
         /// <summary>
         /// 非表示アニメーション
