@@ -1,5 +1,6 @@
+using Common.Save;
+using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Common.Scene
@@ -7,6 +8,13 @@ namespace Common.Scene
     public class SceneManager : SingletonBase<SceneManager>
     {
         private SceneType _currentScene = SceneType.None;
+        
+        private bool _isReloaded = false;
+        /// <summary>
+        /// リロードしたか
+        /// </summary>
+        public bool IsReloaded => _isReloaded;
+
 
         /// <summary>
         /// シーンをロードする(前のシーンがアンロード)
@@ -19,8 +27,9 @@ namespace Common.Scene
                 // 既に同じシーンがロードされている場合は何もしない
                 return;
             }
-
-            //await StateManager.Instance.ChangeStateAsync(LoadingState.Instance);
+            
+            _isReloaded=false;
+            LoadingScreenPresenter.Instance.Show();
 
             if(_currentScene != SceneType.None)
             {
@@ -41,7 +50,8 @@ namespace Common.Scene
         /// </summary>
         public async UniTask ReloadSceneAsync()
         {
-            //await StateManager.Instance.ChangeStateAsync(LoadingState.Instance);
+            _isReloaded=true;
+            LoadingScreenPresenter.Instance.Show();
 
             await UnityEngine.SceneManagement.SceneManager
                 .UnloadSceneAsync(_currentScene.ToString())
