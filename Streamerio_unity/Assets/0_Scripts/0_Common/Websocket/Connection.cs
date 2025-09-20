@@ -1,32 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-
 using NativeWebSocket;
-using System.Threading.Tasks;
-
-  // JSONの型定義
-  class BaseMessage
-  {
-    public string type;
-  }
-
-  class RoomCreatedNotification
-  {
-    public string type;
-    public string room_id;
-    public string qr_code;
-    public string web_url;
-  }
-
-  class GameEventNotification
-  {
-    public string type;
-    public string event_type;
-    public int trigger_count;
-  }
 
 public class Connection : MonoBehaviour
 {
@@ -34,15 +8,7 @@ public class Connection : MonoBehaviour
   WebSocket websocket;
 
   [SerializeField]
-  private MockBuddyActions mockBuddyActions;
-
-  [SerializeField]
   public static string id;
-
-  private async void Start()
-  {
-    // connectWebSocket();
-  }
 
   private void Update()
   {
@@ -149,11 +115,11 @@ public class Connection : MonoBehaviour
         {
           if (gameEvent.event_type == "help")
           {
-            mockBuddyActions.Defend();
+            // Helpアクションを実行
           }
           else if (gameEvent.event_type == "attack")
           {
-            mockBuddyActions.Attack();
+            // Attackアクションを実行
           }
           return;
         }
@@ -206,5 +172,26 @@ public class Connection : MonoBehaviour
   private async void OnApplicationQuit()
   {
     await websocket.Close();
+  }
+  
+  // JSONの型定義
+  private class BaseMessage
+  {
+    public string type;
+  }
+
+  private class RoomCreatedNotification
+  {
+    public string type;
+    public string room_id;
+    public string qr_code;
+    public string web_url;
+  }
+
+  private class GameEventNotification
+  {
+    public string type;
+    public string event_type;
+    public int trigger_count;
   }
 }
