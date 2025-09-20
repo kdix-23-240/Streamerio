@@ -41,26 +41,7 @@ public class WeakEnemy : MonoBehaviour
             //Debug.Log("Player detected!");
             Attack();
         }
-            if (collision.gameObject.CompareTag(bulletTag))
-            {
-                //Debug.Log("Enemy hit by bullet!");
-                // 弾に当たったらダメージを受ける
-                var bullet = collision.gameObject.GetComponent<NormalBullet>();
-                if (bullet != null)
-                {
-                TakeDamage((int)bullet.Damage);
-                // オブジェクトプールを使用している場合はDestroyではなくプールに戻す
-                var bulletPool = FindObjectOfType<BulletPool>();
-                if (bulletPool != null)
-                {
-                    bulletPool.ReturnBullet(bullet);
-                }
-                else
-                {
-                    Destroy(collision.gameObject);
-                }
-            }
-        }
+        
     }
 
 
