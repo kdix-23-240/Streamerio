@@ -1,6 +1,5 @@
 using Common.Scene;
 using Common.UI.Display.Overlay;
-using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using R3;
 
@@ -12,10 +11,10 @@ namespace InGame.UI.Display.Overlay
         {
             base.SetEvent();
             
-            View.Background.OnClickAsObservable
-                .Subscribe( async _ =>
+            OnClickAsObservable
+                .SubscribeAwait( async (_, ct )=>
                 {
-                    await LoadingScreenPresenter.Instance.ShowAsync();
+                    await HideAsync(ct);
                     SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
                 }).RegisterTo(destroyCancellationToken);
                 
