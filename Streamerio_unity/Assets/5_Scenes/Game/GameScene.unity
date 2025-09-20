@@ -3066,13 +3066,13 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
-      propertyPath: _url
-      value: https://58hackathon.connpass.com/event/362805/
-      objectReference: {fileID: 0}
-    - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
       propertyPath: _clearOverlay
       value: 
       objectReference: {fileID: 7260203380963558027}
+    - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
+      propertyPath: _inGameScreen
+      value: 
+      objectReference: {fileID: 7752630308737482845}
     - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
       propertyPath: _qrCodeDialog
       value: 
@@ -3573,6 +3573,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d075c21bf6b42466bb602705be117d46, type: 3}
+--- !u!114 &7752630308737482845 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1020440240811246664, guid: d075c21bf6b42466bb602705be117d46, type: 3}
+  m_PrefabInstance: {fileID: 7752630308737482844}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf0101cd944464b9d22237491703fa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
