@@ -1,0 +1,12 @@
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "BulletScriptableObject", menuName = "BulletScriptableObject")]
+public class BulletScriptableObject : ScriptableObject
+{
+    public GameObject BulletPrefab;
+    public float Speed = 0.1f;
+    public float Damage = 10f;
+    public float SizeRate = 1.0f;
+    public float Lifetime = 5f;
+    public float Span = 0.5f;
+}

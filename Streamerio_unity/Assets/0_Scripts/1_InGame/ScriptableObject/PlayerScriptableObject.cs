@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PlayerScriptableObject", menuName = "PlayerScriptableObject")]
+[CreateAssetMenu(fileName = "PlayerScriptableObject", menuName = "SO/InGame/Player/PlayerScriptableObject")]
 public class PlayerScriptableObject : ScriptableObject
 {
     [Header("Player Initial Setting")]
