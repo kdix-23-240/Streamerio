@@ -10,10 +10,6 @@ namespace Common.UI.Display.Overlay
 {
     public abstract class OverlayViewBase: DisplayViewBase
     {
-        [SerializeField, LabelText("背景")]
-        private DisplayBackgroundPresenter _background;
-        public DisplayBackgroundPresenter Background => _background;
-
         [SerializeField, LabelText("アニメーションさせるオブジェクト")]
         private CanvasGroup[] _uiParts;
         
@@ -43,8 +39,6 @@ namespace Common.UI.Display.Overlay
         {
             base.Initialize();
             
-            _background.Initialize();
-            
             _showAnimations = new FadeAnimationComponent[_uiParts.Length];
             for (int i = 0; i < _uiParts.Length; i++)
             {
@@ -56,8 +50,7 @@ namespace Common.UI.Display.Overlay
         
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            await _background.ShowAsync(ct);
-            
+            CanvasGroup.alpha = _showFadeAnimationParam.Alpha;
             for (int i = 0; i < _uiParts.Length; i++)
             {
                 await _showAnimations[i].PlayAsync(ct);
@@ -68,7 +61,6 @@ namespace Common.UI.Display.Overlay
         public override void Show()
         {
             CanvasGroup.alpha = _showFadeAnimationParam.Alpha;
-            _background.Show();
             SetAlphaParts(_showFadeAnimationParam.Alpha);
         }
         
@@ -76,13 +68,11 @@ namespace Common.UI.Display.Overlay
         {
             await _hideAnimation.PlayAsync(ct);
             SetAlphaParts(_hideFadeAnimationParam.Alpha);
-            await _background.HideAsync(ct);
         }
 
         public override void Hide()
         {
             CanvasGroup.alpha = _hideFadeAnimationParam.Alpha;
-            _background.Hide();
             SetAlphaParts(_hideFadeAnimationParam.Alpha);
         }
         

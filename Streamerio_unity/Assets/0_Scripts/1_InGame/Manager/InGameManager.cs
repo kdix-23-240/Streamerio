@@ -3,6 +3,8 @@ using Common;
 using Common.Save;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
+using Cysharp.Threading.Tasks;
+using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
 using InGame.UI.Display.Screen;
@@ -15,6 +17,8 @@ namespace InGame
     {
         [SerializeField] private string _url = "";
         [SerializeField]private float _timeLimit = 180f;
+        [SerializeField, LabelText("プレイヤー")]
+        private Transform _playerTransform;
         [SerializeField, LabelText("遊び方ウィンドウ")]
         private WindowPresenter _howToPlayWindow;
         [SerializeField, LabelText("クリアUI")]
@@ -23,6 +27,8 @@ namespace InGame
         private QRCodeDialogPresenter _qrCodeDialog;
         [SerializeField, LabelText("ゲーム画面")]
         private InGameScreenPresenter _inGameScreen;
+        [SerializeField, LabelText("マスク")]
+        private InGameMaskView _inGameMaskView;
 
         private async void Start()
         {
@@ -42,6 +48,9 @@ namespace InGame
             _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(_url));
             _qrCodeDialog.Hide();
             
+            _inGameMaskView.Hide();
+            
+            // ゲーム画面表示
             await LoadingScreenPresenter.Instance.LoadingToInGameAsync();
             
             if (!isPlayed)
@@ -72,6 +81,27 @@ namespace InGame
             await _qrCodeDialog.HideAsync(destroyCancellationToken);
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
+
+            // await UniTask.WaitForSeconds(3f);
+            // GameClear();
+        }
+
+        /// <summary>
+        /// ゲームオーバー
+        /// </summary>
+        public async void GameOver()
+        {
+            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
+        }
+        
+        /// <summary>
+        /// ゲームクリア
+        /// </summary>
+        public async void GameClear()
+        {
+            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
+            await _clearOverlay.ShowAsync(destroyCancellationToken);
+            Debug.Log("ゲームクリア");
         }
     }
 }

@@ -21,6 +21,8 @@ namespace InGame.UI.Display.Screen
         /// <param name="timeLimit"></param>
         public void Initialize(Sprite qrCodeSprite, float timeLimit)
         {
+            SetInteractable(false);
+
             _qrCodeImage.sprite = qrCodeSprite;
             _timer.Initialize(timeLimit);
         }
@@ -31,6 +33,7 @@ namespace InGame.UI.Display.Screen
         /// <param name="timerCt"></param>
         public void StartGame(CancellationToken timerCt)
         {
+            SetInteractable(true);
             _timer.StartCountdownTimer(timerCt);
         }
     }
