@@ -10,9 +10,7 @@ public class SkillRandomActivator : MonoBehaviour
 
     void Start()
     {
-        ActivateStrongSkill();
-        ActivateMiddleSkill();
-        ActivateWeakSkill();
+        // Bind();
     }
 
     private void Bind()
