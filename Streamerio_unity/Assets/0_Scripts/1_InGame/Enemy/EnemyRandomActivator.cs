@@ -10,7 +10,7 @@ public class EnemyRandomActivator : MonoBehaviour
 
     void Start()
     {
-        Bind();
+        // Bind();
     }
     
     private void Bind()
