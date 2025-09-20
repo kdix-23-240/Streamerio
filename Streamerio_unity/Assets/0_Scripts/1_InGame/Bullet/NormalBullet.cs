@@ -1,4 +1,5 @@
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class NormalBullet : MonoBehaviour
 {
@@ -7,6 +8,10 @@ public class NormalBullet : MonoBehaviour
     void Awake()
     {
         _speed = _bulletScriptableObject.Speed;
+    }
+    async void Start()
+    {
+        await AutoDespawn();
     }
     void Update()
     {
@@ -21,5 +26,11 @@ public class NormalBullet : MonoBehaviour
     public void OnDespawn()
     {
         gameObject.SetActive(false);
+    }
+
+    private async UniTask AutoDespawn()
+    {
+        await UniTask.Delay(System.TimeSpan.FromSeconds(_bulletScriptableObject.Lifetime));
+        OnDespawn();
     }
 }
