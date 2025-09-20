@@ -48,18 +48,24 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 			// 接続直後に必ずログを出す
 			c.Logger().Infof("Client connected: %s id=%s", c.Request().RemoteAddr, id)
 
-			// IDを通知（JSON を送信）
-			if err := h.SendEventToUnity(id, map[string]interface{}{
-				// TODO: 本番環境のURLに変更する
+			// ここで DB 登録 (存在しなければ)
+			if h.roomService != nil {
+				if err := h.roomService.CreateIfNotExists(id, "unity"); err != nil {
+					c.Logger().Errorf("room db create failed id=%s err=%v", id, err)
+				} else {
+					c.Logger().Infof("room db created id=%s", id)
+				}
+			}
+
+			payload := map[string]interface{}{
 				"type":    "room_created",
 				"room_id": id,
 				"qr_code": "data:image/png;base64,...",
 				"web_url": "https://example.com",
-			}); err != nil {
+			}
+			if err := h.SendEventToUnity(id, payload); err != nil {
 				c.Logger().Errorf("initial send failed: %v", err)
 				return
-			} else {
-				c.Logger().Info("initial send success")
 			}
 
 			for {
