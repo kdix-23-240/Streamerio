@@ -5,7 +5,7 @@ public class BulletPool : MonoBehaviour
 {
     [SerializeField] private NormalBullet _bulletPrefab;
     [SerializeField] private GameObject _parentObject;
-    private Queue<NormalBullet> _pool = new Queue<NormalBullet>();
+    private List<NormalBullet> _pool = new List<NormalBullet>();
 
     [SerializeField] private BulletScriptableObject _bulletScriptableObject;
     private int _poolSize;
@@ -17,28 +17,27 @@ public class BulletPool : MonoBehaviour
         {
             NormalBullet bullet = Instantiate(_bulletPrefab, _parentObject.transform);
             bullet.OnDespawn();
-            _pool.Enqueue(bullet);
+            _pool.Add(bullet);
         }
     }
 
     public NormalBullet GetBullet()
     {
-        if (_pool.Count > 0)
+        foreach (var bullet in _pool)
         {
-            NormalBullet bullet = _pool.Dequeue();
-            bullet.OnSpawn();
-            return bullet;
+            if (!bullet.gameObject.activeInHierarchy)
+            {
+                bullet.OnSpawn();
+                return bullet;
+            }
         }
-        else
-        {
-            NormalBullet bullet = Instantiate(_bulletPrefab, _parentObject.transform);
-            return bullet;
-        }
+        // すべて使用中ならnull
+        return null;
     }
 
     public void ReturnBullet(NormalBullet bullet)
     {
         bullet.OnDespawn();
-        _pool.Enqueue(bullet);
+        // Listなので再追加不要
     }
 }

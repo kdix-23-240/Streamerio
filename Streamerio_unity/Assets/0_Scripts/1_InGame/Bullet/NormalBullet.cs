@@ -9,13 +9,13 @@ public class NormalBullet : MonoBehaviour
     {
         _speed = _bulletScriptableObject.Speed;
     }
-    async void Start()
-    {
-        await AutoDespawn();
-    }
     void Update()
     {
         transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+    }
+    async void OnEnable()
+    {
+        await AutoDespawn();
     }
 
     public void OnSpawn()
