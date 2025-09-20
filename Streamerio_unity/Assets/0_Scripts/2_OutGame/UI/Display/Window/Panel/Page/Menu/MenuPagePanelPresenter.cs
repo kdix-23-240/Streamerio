@@ -1,4 +1,5 @@
 using Alchemy.Inspector;
+using Common.Scene;
 using Common.UI.Display.Window.Panel;
 using Common.UI.Loading;
 using Common.UI.Part.Button;
@@ -33,9 +34,10 @@ namespace OutGame.UI.Display.Window.Panel.Page.Menu
         {
             base.Bind();
 
-            _menuPanelView.StartButton.SetClickEvent(() =>
+            _menuPanelView.StartButton.SetClickEvent(async () =>
             {
-                TitleManager.Instance.LoadTitleAsync().Forget();
+                await TitleManager.Instance.LoadTitleAsync();
+                SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
             });
 
             BindChapterButton(_menuPanelView.HowToPlayButton, ChapterType.HowToPlay);

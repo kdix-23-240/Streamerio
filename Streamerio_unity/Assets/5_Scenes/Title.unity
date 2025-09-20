@@ -1106,6 +1106,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 409849902}
     m_Modifications:
+    - target: {fileID: 1733000211055546222, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
+      propertyPath: _flashAnimationParam.Duration
+      value: 0.75
+      objectReference: {fileID: 0}
     - target: {fileID: 3485820543372737917, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
       propertyPath: _flashAnimationParam.Duration
       value: 0.5

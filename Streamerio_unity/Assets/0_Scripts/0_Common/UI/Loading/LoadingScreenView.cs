@@ -25,11 +25,16 @@ namespace Common.UI.Loading
         
         [SerializeField, LabelText("タイトルからローディングへのアニメーション")]
         private IrisAnimationComponentParam _titleToLoadingAnimationParam;
+        
+        [SerializeField, LabelText("ローディングからインゲームへのアニメーション")]
+        private IrisAnimationComponentParam _loadingToInGameAnimationParam;
 
         private IrisInAnimationComponent _loadingInAnimation;
         private IrisOutAnimationComponent _loadingOutAnimation;
         
         private IrisInAnimationComponent _titleToLoadingAnimation;
+        
+        private IrisOutAnimationComponent _loadingToInGameAnimation;
         
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -48,6 +53,7 @@ namespace Common.UI.Loading
             _loadingOutAnimation = new IrisOutAnimationComponent(_irisOutMaterial, _loadingOutAnimationParam);
             
             _titleToLoadingAnimation = new IrisInAnimationComponent(_irisOutMaterial, _titleToLoadingAnimationParam);
+            _loadingToInGameAnimation = new IrisOutAnimationComponent(_irisOutMaterial, _loadingToInGameAnimationParam);
         }
         
         /// <summary>
@@ -73,6 +79,15 @@ namespace Common.UI.Loading
         public async UniTask TitleToLoadingAsync(CancellationToken ct)
         {
             await _titleToLoadingAnimation.PlayAsync(ct);
+        }
+        
+        /// <summary>
+        /// ローディングからインゲームへのアニメーション
+        /// </summary>
+        /// <param name="ct"></param>
+        public async UniTask LoadingToInGameAsync(CancellationToken ct)
+        {
+            await _loadingToInGameAnimation.PlayAsync(ct);
         }
     }
 }
