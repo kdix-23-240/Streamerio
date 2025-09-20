@@ -15,6 +15,7 @@ public class PlayerPresenter : MonoBehaviour
     {
         _view = GetComponent<PlayerView>();
         _model = new PlayerModel(_view.gameObject.transform.position.x, _view.gameObject.transform.position.y);
+
     }
 
     void Start()
