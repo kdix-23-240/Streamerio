@@ -4,7 +4,6 @@ using Common.Save;
 using Common.Scene;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
-using Cysharp.Threading.Tasks;
 using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
@@ -99,8 +98,6 @@ namespace InGame
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
 
-            await UniTask.WaitForSeconds(3f);
-            GameOver();
         }
 
         /// <summary>
