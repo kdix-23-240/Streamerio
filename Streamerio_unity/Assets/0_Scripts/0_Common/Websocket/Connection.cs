@@ -1,8 +1,9 @@
 using System;
+using Common;
 using UnityEngine;
 using NativeWebSocket;
 
-public class Connection : MonoBehaviour
+public class Connection : SingletonBase<Connection>
 {
   private bool isConnected = false;
   WebSocket websocket;
@@ -31,6 +32,7 @@ public class Connection : MonoBehaviour
 
     // TODO: 本番環境のURLに変更する
     websocket = new WebSocket("wss://5dc66f8872d7.ngrok-free.app/ws-unity");
+    websocket = new WebSocket("wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity");
 
     if (websocket == null)
     {
