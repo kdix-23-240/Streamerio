@@ -31,8 +31,8 @@ public class PlayerView : MonoBehaviour
     public void Bind()
     {
         _groundedCollider.IsGrounded
-            .Where(x => !x)
             .DistinctUntilChanged()
+            .Where(x => x)
             .Subscribe(_ =>
             {
                 _animation.PlayJump(false);
@@ -40,11 +40,13 @@ public class PlayerView : MonoBehaviour
     }
     
     public void Move(Vector2 newPosition)
-    {
-        // Debug.Log($"PlayerView Move to {newPosition}");
-        _animation.PlayRun(newPosition.x != 0);
+    { 
+        Debug.Log($"PlayerView Move to {newPosition}");
         
-        _spriteRenderer.flipX = newPosition.x < 0;
+        _animation.PlayRun(newPosition.x);
+        
+        if(newPosition.x != 0)
+            _spriteRenderer.flipX = newPosition.x < 0;
         
         gameObject.transform.position += new Vector3(newPosition.x, newPosition.y, 0);
     }
