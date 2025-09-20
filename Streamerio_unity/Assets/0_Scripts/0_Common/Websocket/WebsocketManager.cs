@@ -183,7 +183,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
 
   // UnityからWebSocketにメッセージを送信する
   // 使わないかも
-  public async void SendWebSocketMessage(string message)
+  public async UniTask SendWebSocketMessage(string message)
   {
     if (_websocket.State == WebSocketState.Closed)
     {

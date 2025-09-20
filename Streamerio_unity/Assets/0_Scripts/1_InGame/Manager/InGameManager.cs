@@ -120,6 +120,7 @@ namespace InGame
         /// </summary>
         public async void GameClear()
         {
+            await WebsocketManager.Instance.SendWebSocketMessage( "{\"type\": \"game_end\" }" );
             await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
             await _clearOverlay.ShowAsync(destroyCancellationToken);
             AudioManager.Instance.StopBGM();
