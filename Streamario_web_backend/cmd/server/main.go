@@ -3,6 +3,8 @@ package main
 import (
 	stdlog "log"
 	"net/http"
+    "net/url"
+    "strings"
 
 	"streamerrio-backend/internal/config"
 	"streamerrio-backend/internal/handler"
@@ -31,6 +33,10 @@ func main() {
 	}
 
 	// 3. DB 接続確立
+    // 接続先の概要を安全にログ（パスワードは出力しない）
+    host, port, dbname, sslmode := extractConnInfo(cfg.DatabaseURL)
+    stdlog.Printf("DB connect info: host=%s port=%s db=%s sslmode=%s", host, port, dbname, sslmode)
+
 	db, err := sqlx.Connect("postgres", cfg.DatabaseURL)
 	if err != nil {
 		stdlog.Fatal("Failed to connect to database:", err)
@@ -96,4 +102,37 @@ type webSocketAdapter struct{ ws *handler.WebSocketHandler }
 
 func (a webSocketAdapter) SendEventToUnity(roomID string, payload map[string]interface{}) error {
 	return a.ws.SendEventToUnity(roomID, payload)
+}
+
+// extractConnInfo: DSN/URL から host/port/dbname/sslmode を抽出（ログ用途）
+func extractConnInfo(dsn string) (host, port, dbname, sslmode string) {
+    host, port, dbname, sslmode = "", "", "", ""
+    lower := strings.ToLower(dsn)
+    if strings.HasPrefix(lower, "postgres://") || strings.HasPrefix(lower, "postgresql://") {
+        if u, err := url.Parse(dsn); err == nil {
+            host = u.Hostname()
+            port = u.Port()
+            if u.Path != "" && u.Path != "/" {
+                dbname = strings.TrimPrefix(u.Path, "/")
+            }
+            if v := u.Query().Get("sslmode"); v != "" { sslmode = v }
+        }
+        return
+    }
+    // キーバリュースタイル: key=value key=value ...
+    // 例: host=... port=5432 user=... password=... dbname=... sslmode=require
+    parts := strings.Fields(dsn)
+    for _, p := range parts {
+        kv := strings.SplitN(p, "=", 2)
+        if len(kv) != 2 { continue }
+        k := strings.ToLower(strings.TrimSpace(kv[0]))
+        v := strings.TrimSpace(kv[1])
+        switch k {
+        case "host": host = v
+        case "port": port = v
+        case "dbname": dbname = v
+        case "sslmode": sslmode = v
+        }
+    }
+    return
 }
