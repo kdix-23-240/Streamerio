@@ -1,11 +1,11 @@
 using System;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Collections.Generic;
 using Common;
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using NativeWebSocket;
-
+using R3;
 public class WebsocketManager : SingletonBase<WebsocketManager>
 {
   private bool _isConnected = false;
@@ -14,6 +14,9 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   [SerializeField]
   private string _websocketId = string.Empty;
   public string WebsocketId => _websocketId;
+
+  private Dictionary<FrontKey, Subject<Unit>> _frontEventDict;
+  public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
   
   private string _url = string.Empty;
   
@@ -122,30 +125,8 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
         var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
         if (gameEvent != null)
         {
-          switch (gameEvent.event_type)
-          {
-            case "skill1":
-              // Skill1アクションを実行
-              break;
-            case "skill2":
-              // Skill2アクションを実行
-              break;
-            case "skill3":
-              // Skill3アクションを実行
-              break;
-            case "enemy1":
-              // Skill4アクションを実行
-              break;
-            case "enemy2":
-              // Skill5アクションを実行
-              break;
-            case "enemy3":
-              // Skill5アクションを実行
-              break;
-            default:
-              Debug.Log($"Unknown event_type: {gameEvent.event_type}");
-              break;
-          }
+          var keyType = (FrontKey)System.Enum.Parse(typeof(FrontKey), gameEvent.type, true);
+          _frontEventDict[keyType].OnNext(Unit.Default);
         }
       }
       catch (Exception ex)
@@ -230,4 +211,14 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public string event_type;
     public int trigger_count;
   }
+}
+
+public enum FrontKey
+{
+  skill1,
+  skill2,
+  skill3,
+  enemy1,
+  enemy2,
+  enemy3,
 }
