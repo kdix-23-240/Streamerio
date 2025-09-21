@@ -43,7 +43,7 @@ Material:
     m_Floats:
     - _AspectRatio: 1.8
     - _EnableExternalAlpha: 0
-    - _Radius: 0.0060551763
+    - _Radius: 0.07857728
     - _ZWrite: 0
     m_Colors:
     - _CenterUV: {r: 0.5, g: 0.5, b: 0, a: 0}

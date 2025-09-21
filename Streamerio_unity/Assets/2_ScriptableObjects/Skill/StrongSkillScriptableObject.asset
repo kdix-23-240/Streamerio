@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: StrongSkillScriptableObject
   m_EditorClassIdentifier: 
   Skills:
-  - {fileID: 2233804289257953648, guid: 3ab44d004d1014bc5b5c3ea22a4d49d6, type: 3}
   - {fileID: 3868573432194011127, guid: 25a2864fd88a547bc90363fddee27a8b, type: 3}
