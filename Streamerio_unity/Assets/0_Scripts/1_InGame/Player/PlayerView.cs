@@ -79,7 +79,7 @@ public class PlayerView : MonoBehaviour
         _animation.PlayAttack(num);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("触れた");
         if (collision.gameObject.CompareTag("Enemy"))
