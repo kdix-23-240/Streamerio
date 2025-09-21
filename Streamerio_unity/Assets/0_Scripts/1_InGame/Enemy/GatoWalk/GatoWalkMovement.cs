@@ -13,7 +13,7 @@ public class GatoWalkMovement : MonoBehaviour
     private float _jumpTimer = 0f;
     private EnemyAttackManager _attackManager;
     private float _lastAttackTime = -999f;
-    
+
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -21,13 +21,15 @@ public class GatoWalkMovement : MonoBehaviour
         {
             _rigidbody = gameObject.AddComponent<Rigidbody2D>();
         }
-        
+
         // 物理設定
         _rigidbody.gravityScale = 2f;
         _rigidbody.freezeRotation = true;
-        
+
         _attackManager = GetComponent<EnemyAttackManager>();
         _jumpTimer = jumpInterval;
+        
+        transform.position += new Vector3(8, 0, 0); // 少し上にずらして生成
     }
     
     void Update()
