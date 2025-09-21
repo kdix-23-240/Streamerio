@@ -28,6 +28,7 @@ public class UltThunder : MonoBehaviour
 
     private GameObject _player;
     private BoxCollider2D _box;
+    private float _damageIntervalFrames;
 
     void Awake()
     {
@@ -65,7 +66,7 @@ public class UltThunder : MonoBehaviour
         // 縦方向（上から下）への攻撃開始
         StartThunderStrike();
 
-        AudioManager.Instance.PlayAsync(SEType.UltThunder, destroyCancellationToken).Forget()
+        AudioManager.Instance.PlayAsync(SEType.UltThunder, destroyCancellationToken).Forget();
     }
 
     void Update()
