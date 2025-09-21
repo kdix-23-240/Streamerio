@@ -22,13 +22,13 @@ public class EnemyRandomActivator : MonoBehaviour
     public void ActivateStrongEnemy()
     {
         int randomIndex = Random.Range(0, _strongEnemyScriptableObject.Enemys.Length);
-        // Instantiate(_strongEnemyScriptableObject.Enemys[randomIndex], _parentObject.transform);
+        Instantiate(_strongEnemyScriptableObject.Enemys[randomIndex], _parentObject.transform);
         Debug.Log("Strong Enemy Spawned");
     }
     public void ActivateMiddleEnemy()
     {
         int randomIndex = Random.Range(0, _middleEnemyScriptableObject.Enemys.Length);
-        // Instantiate(_middleEnemyScriptableObject.Enemys[randomIndex], _parentObject.transform);
+        Instantiate(_middleEnemyScriptableObject.Enemys[randomIndex], _parentObject.transform);
         Debug.Log("Middle Enemy Spawned");
     }
     public void ActivateWeakEnemy()

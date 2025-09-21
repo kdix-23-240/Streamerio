@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BulletPrefab: {fileID: 0}
   PoolSize: 10
-  Speed: 5
+  Speed: 15
   Damage: 10
   SizeRate: 0.5
   Lifetime: 5

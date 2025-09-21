@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InitialHp: 100
   InitialPower: 10
-  InitialSpeed: 10
-  InitialJumpPower: 10
+  InitialSpeed: 8
+  InitialJumpPower: 8
   HpDiff: 8
   PowerDiff: 2
   SpeedDiff: 2
