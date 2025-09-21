@@ -35,7 +35,7 @@ public class UltChargeBeam : MonoBehaviour
         if (_player != null)
         {
             //playerのy座標から8マス右側に生成
-            transform.position = new Vector2(_player.transform.position.x, _player.transform.position.y);
+            transform.position = new Vector2(_player.transform.position.x + 2, _player.transform.position.y);
         }
         _currentSpeed = _speed * 0.3f; // 最初は遅い
         _currentDamage = _damage;

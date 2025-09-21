@@ -2,6 +2,7 @@ using System.Threading;
 using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,6 +29,15 @@ namespace Common.UI.Loading
         
         [SerializeField, LabelText("ローディングからインゲームへのアニメーション")]
         private IrisAnimationComponentParam _loadingToInGameAnimationParam;
+        
+        [SerializeField]
+        private IrisAnimationComponentParam _cheiceIrisAnimationParam = new ()
+        {
+            Duration = 1.5f,
+            Ease = Ease.Linear,
+            MinRadius = 0f,
+            MaxRadius = 2f,
+        };
 
         private IrisInAnimationComponent _loadingInAnimation;
         private IrisOutAnimationComponent _loadingOutAnimation;
@@ -62,6 +72,20 @@ namespace Common.UI.Loading
         public async UniTask ShowAsync(CancellationToken ct)
         {
             await _loadingInAnimation.PlayAsync(ct);
+        }
+        
+        /// <summary>
+        /// アニメーションで表示
+        /// </summary>
+        /// <param name="ct"></param>
+        public async UniTask ShowAsync(Vector3 centerCirclePosition, CancellationToken ct)
+        {
+            var centerCircle = Camera.main.WorldToViewportPoint(centerCirclePosition);
+            _cheiceIrisAnimationParam.Center = centerCircle;
+            
+            var irisInAnimation = new IrisInAnimationComponent(_irisOutMaterial, _cheiceIrisAnimationParam);
+            await irisInAnimation.PlayAsync(ct);
+            SetInteractable(false);
         }
         
         /// <summary>

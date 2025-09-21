@@ -1,8 +1,10 @@
+using Common.Save;
 using Common.Scene;
 using Common.UI.Display.Overlay;
+using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 
-namespace InGame.UI.Display.Overlay.GameOver
+namespace OutGame.GameOver.Overlay
 {
     public class GameOverOverlayPresenter: OverlayPresenterBase<GameOverOverlayView>
     {
@@ -11,13 +13,14 @@ namespace InGame.UI.Display.Overlay.GameOver
             base.Bind();
             View.RetryButton.SetClickEvent(async () =>
             {
-                await HideAsync(destroyCancellationToken);
-                SceneManager.Instance.ReloadSceneAsync().Forget();
+                await LoadingScreenPresenter.Instance.ShowAsync();
+                SaveManager.Instance.IsRetry = true;
+                SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
             });
             
             View.TitleButton.SetClickEvent(async () =>
             {
-                await HideAsync(destroyCancellationToken);
+                await LoadingScreenPresenter.Instance.ShowAsync();
                 SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
             });
         }

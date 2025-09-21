@@ -18,4 +18,4 @@ MonoBehaviour:
   Damage: 10
   SizeRate: 0.5
   Lifetime: 5
-  Span: 0.5
+  Span: 3

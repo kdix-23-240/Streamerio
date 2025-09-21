@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: MiddleSkillScriptableObject
   m_EditorClassIdentifier: 
   Skills:
-  - {fileID: 3102657659585312948, guid: 58282b7e1d0934b6a9d4af811aa19705, type: 3}
+  - {fileID: 2233804289257953648, guid: 3ab44d004d1014bc5b5c3ea22a4d49d6, type: 3}
