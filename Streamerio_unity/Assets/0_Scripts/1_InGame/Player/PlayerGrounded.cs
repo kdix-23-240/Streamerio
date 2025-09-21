@@ -16,6 +16,11 @@ public class PlayerGrounded : MonoBehaviour
         _isGrounded.Value = true;
     }
     
+    public void OnTriggerStay2D(Collider2D collision)
+    {
+        _isGrounded.Value = true;
+    }
+    
     public void OnTriggerExit2D(Collider2D collision)
     {
         AudioManager.Instance.PlayAsync(SEType.PlayerJump, destroyCancellationToken).Forget();
