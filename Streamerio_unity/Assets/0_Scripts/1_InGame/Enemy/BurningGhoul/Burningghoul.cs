@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 
@@ -28,6 +30,7 @@ public class BurningGhoulMovement : MonoBehaviour
 
         _attackManager = GetComponent<EnemyAttackManager>();
         
+        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
         transform.position += new Vector3(5, 0, 0); // 少し上にずらして生成
     }
     
