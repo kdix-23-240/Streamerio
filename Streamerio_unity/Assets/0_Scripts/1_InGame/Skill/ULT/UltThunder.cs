@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Common.Audio;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class UltThunder : MonoBehaviour
@@ -57,7 +58,13 @@ public class UltThunder : MonoBehaviour
             transform.position = new Vector2(_player.transform.position.x + 6f,
                                              _player.transform.position.y + 3f);
         }
-        StartThunderStrike().Forget();
+        // フレームベースでインターバルを計算
+        _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
+        
+        // 縦方向（上から下）への攻撃開始
+        StartThunderStrike();
+
+        AudioManager.Instance.PlayAsync(SEType.UltThunder, destroyCancellationToken).Forget()
     }
 
     void Update()

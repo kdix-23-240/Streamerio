@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Common.Audio;
 
 public class UltChargeBeam : MonoBehaviour
 {
@@ -45,6 +46,8 @@ public class UltChargeBeam : MonoBehaviour
         
         // チャージエフェクト（色変化など）
         StartChargingEffect();
+        
+        AudioManager.Instance.PlayAsync(SEType.魔法1, destroyCancellationToken).Forget();
     }
 
     void Update()
