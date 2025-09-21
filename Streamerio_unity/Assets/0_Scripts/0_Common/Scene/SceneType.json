@@ -4,16 +4,56 @@
     "Num": 1
   },
   {
+    "Name": "AnimaitonTest",
+    "Num": 8
+  },
+  {
+    "Name": "AnimationSetting",
+    "Num": 9
+  },
+  {
+    "Name": "ClearScene",
+    "Num": 10
+  },
+  {
+    "Name": "EnemyStatus",
+    "Num": 11
+  },
+  {
+    "Name": "GameOverScene",
+    "Num": 12
+  },
+  {
     "Name": "GameScene",
     "Num": 5
+  },
+  {
+    "Name": "GameScene_Uetani",
+    "Num": 13
+  },
+  {
+    "Name": "GameTest",
+    "Num": 14
+  },
+  {
+    "Name": "GameTest_Ult_Create",
+    "Num": 15
   },
   {
     "Name": "ManagerScene",
     "Num": 6
   },
   {
+    "Name": "PlayerAttack",
+    "Num": 16
+  },
+  {
     "Name": "SampleScene",
     "Num": 3
+  },
+  {
+    "Name": "SceneCreate",
+    "Num": 17
   },
   {
     "Name": "Title",
