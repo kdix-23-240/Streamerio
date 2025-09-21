@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: StrongEnemyScriptableObject
   m_EditorClassIdentifier: 
   Enemys:
-  - {fileID: 7788488632830182915, guid: 4706ed78f8ced4bd48b9105ba95e9536, type: 3}
+  - {fileID: 4980451966244278551, guid: 747a5fc44a5be4c11a9023d234070575, type: 3}

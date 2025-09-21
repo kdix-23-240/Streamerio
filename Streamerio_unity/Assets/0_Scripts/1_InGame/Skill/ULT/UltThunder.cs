@@ -2,6 +2,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using Common.Audio;
+using System.Linq;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class UltThunder : MonoBehaviour
@@ -116,7 +117,7 @@ public class UltThunder : MonoBehaviour
         if (_enemiesInRange.Count == 0) return;
 
         float dt = Time.deltaTime;
-        foreach (var enemyObj in _enemiesInRange)
+        foreach (var enemyObj in _enemiesInRange.ToList())
         {
             if (!_enemyTimers.ContainsKey(enemyObj))
             {
