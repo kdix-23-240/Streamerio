@@ -33,7 +33,7 @@ public class UltBullet : MonoBehaviour
         if (_player != null)
         {
             //playerのy座標から8マス右側に生成
-            transform.position = new Vector2(_player.transform.position.x, _player.transform.position.y);
+            transform.position = new Vector2(_player.transform.position.x + 2f, _player.transform.position.y);
         }
         if (_isMainBullet)
         {

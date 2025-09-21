@@ -1,5 +1,6 @@
 using System.Threading;
 using Alchemy.Inspector;
+using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -36,6 +37,12 @@ namespace Common.UI.Loading
         {
             _view.SetInteractable(true);
             await _view.ShowAsync(destroyCancellationToken);
+        }
+        
+        public async  UniTask ShowAsync(Vector3 centerCirclePosition)
+        {
+            _view.SetInteractable(true);
+            await _view.ShowAsync(centerCirclePosition, destroyCancellationToken);
         }
 
         /// <summary>

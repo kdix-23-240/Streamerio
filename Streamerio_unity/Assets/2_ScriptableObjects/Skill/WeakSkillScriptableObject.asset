@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: WeakSkillScriptableObject
   m_EditorClassIdentifier: 
   Skills:
-  - {fileID: 5063151165452527970, guid: 34730baf0f2f2435b9a56d2f10d4fc4f, type: 3}
+  - {fileID: 504868876075475975, guid: 136c2c03e56ec48bbab433b6f82443a0, type: 3}

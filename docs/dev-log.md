@@ -5,4 +5,7 @@
 - 2024-09-21 03:05 フロントエンドに終了検知とリザルトページを追加。イベント送信後に `game_over` 応答を受け取った場合は viewer サマリーをセッション保存し、`/result/[roomId]` へ遷移して集計 API の結果と組み合わせて表示するようにした。
 - 2024-09-21 03:25 視聴者端末識別用の `/get_viewer_id` エンドポイントを追加。ULID を払い出して `viewers` テーブルに保存し、Cookie に設定することで既存フロントの `fetchViewerId` が動作するようにした。
 - 2024-09-21 03:45 視聴者名を管理する `viewers` テーブル拡張と `/api/viewers/set_name` を追加。フロントのヘッダーに表示名編集フォームを用意し、サーバ側で24文字までに正規化して永続化するよう対応。
- - 2025-09-20 12:10 CORS/クッキー運用の見直し。Cloud Run(backend) と Vercel(frontend) 間で `credentials: 'include'` を使うため、Echo の CORS を allowlist（`FRONTEND_URL`）+ `AllowCredentials=true` に変更。`/get_viewer_id` の Cookie を `SameSite=None; Secure` に更新してクロスサイト送受信を許可。ローカルデフォルトの `FRONTEND_URL="*"` の場合は `AllowCredentials=false` とし、意図せずワイルドカード+資格情報が混在しないようガード。
+- 2025-09-20 12:10 CORS/クッキー運用の見直し。Cloud Run(backend) と Vercel(frontend) 間で `credentials: 'include'` を使うため、Echo の CORS を allowlist（`FRONTEND_URL`）+ `AllowCredentials=true` に変更。`/get_viewer_id` の Cookie を `SameSite=None; Secure` に更新してクロスサイト送受信を許可。ローカルデフォルトの `FRONTEND_URL="*"` の場合は `AllowCredentials=false` とし、意図せずワイルドカード+資格情報が混在しないようガード。
+- 2024-09-21 04:10 終了サマリーに視聴者名を含めるようバックエンドを拡張し、Unity への `game_end_summary` と REST レスポンス双方で表示名を送出。リザルト画面は名前を優先表示し、未設定の場合は ULID をフォールバックとして表示するよう更新。
+
+ 

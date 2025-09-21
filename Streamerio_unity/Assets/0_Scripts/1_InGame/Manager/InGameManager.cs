@@ -9,7 +9,6 @@ using Cysharp.Threading.Tasks;
 using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
-using InGame.UI.Display.Overlay.GameOver;
 using InGame.UI.Display.Screen;
 using InGame.UI.QRCode;
 using UnityEngine;
@@ -26,8 +25,6 @@ namespace InGame
         
         [SerializeField, LabelText("クリアUI")]
         private ClearOverlayPresenter _clearOverlay;
-        [SerializeField, LabelText("ゲームオーバーUI")]
-        private GameOverOverlayPresenter _gameOverOverlay;
         
         [SerializeField, LabelText("QRコードダイアログ")]
         private QRCodeDialogPresenter _qrCodeDialog;
@@ -44,9 +41,6 @@ namespace InGame
             
             _howToPlayWindow.Initialize();
             _howToPlayWindow.Hide();
-            
-            _gameOverOverlay.Initialize();
-            _gameOverOverlay.Hide();
             
             _clearOverlay.Initialize();
             _clearOverlay.Hide();
@@ -70,13 +64,14 @@ namespace InGame
                 await _howToPlayWindow.ShowAsync(destroyCancellationToken);
                 SaveManager.Instance.SavePlayed();
             }
-            else if(!SceneManager.Instance.IsReloaded)
+            else if(!SaveManager.Instance.IsRetry)
             {
                 OpenQRCodeDialog();   
             }
             else
             {
                 StartGame();
+                SaveManager.Instance.IsRetry = false;
             }
         }
 
@@ -94,7 +89,7 @@ namespace InGame
         /// </summary>
         public async void StartGame()
         {
-            if (!SceneManager.Instance.IsReloaded)
+            if (!SaveManager.Instance.IsRetry)
             {
                 await _qrCodeDialog.HideAsync(destroyCancellationToken);
             }
@@ -109,9 +104,9 @@ namespace InGame
         /// </summary>
         public async void GameOver()
         {
-            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
-            await _gameOverOverlay.ShowAsync(destroyCancellationToken);
+            await LoadingScreenPresenter.Instance.ShowAsync(_playerTransform.position);
             AudioManager.Instance.StopBGM();
+            SceneManager.Instance.LoadSceneAsync(SceneType.GameOverScene).Forget();
             Debug.Log("ゲームオーバー");
         }
         

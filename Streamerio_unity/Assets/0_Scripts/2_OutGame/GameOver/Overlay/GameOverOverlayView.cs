@@ -3,7 +3,7 @@ using Common.UI.Display.Overlay;
 using Common.UI.Part.Button;
 using UnityEngine;
 
-namespace InGame.UI.Display.Overlay.GameOver
+namespace OutGame.GameOver.Overlay
 {
     public class GameOverOverlayView: OverlayViewBase
     {
@@ -18,6 +18,7 @@ namespace InGame.UI.Display.Overlay.GameOver
         {
             base.Initialize();
             
+            Debug.Log("GameOverOverlayView Initialize");
             _retryButton.Initialize();
             _titleButton.Initialize();
         }
