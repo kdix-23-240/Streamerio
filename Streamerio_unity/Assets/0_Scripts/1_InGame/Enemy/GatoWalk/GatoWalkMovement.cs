@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GatoWalkMovement : MonoBehaviour
@@ -30,6 +32,7 @@ public class GatoWalkMovement : MonoBehaviour
         _jumpTimer = jumpInterval;
         
         transform.position += new Vector3(8, 0, 0); // 少し上にずらして生成
+        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()

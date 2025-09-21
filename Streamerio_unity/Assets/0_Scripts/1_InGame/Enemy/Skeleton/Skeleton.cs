@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class Skeleton : MonoBehaviour
@@ -36,5 +38,8 @@ public class Skeleton : MonoBehaviour
             }
         }
         transform.Translate(Vector2.left * speed * Time.deltaTime);
+        
+        
+        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
 }
