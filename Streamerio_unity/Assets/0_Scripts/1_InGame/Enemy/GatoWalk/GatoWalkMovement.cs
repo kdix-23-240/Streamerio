@@ -39,7 +39,6 @@ public class GatoWalkMovement : MonoBehaviour
         _attackManager = GetComponent<EnemyAttackManager>();
         _jumpTimer = jumpInterval;
         
-        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
         transform.position += new Vector3(_player.position.x + 10, _player.position.y + 1, 0); // 少し上にずらして生成
         AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
