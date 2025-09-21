@@ -2,19 +2,22 @@ using Common.Audio;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using Common.UI.Part.Button;
 
 public class StickInput : MonoBehaviour, IController
 {
     [SerializeField] private PlayerPresenter _player;
     [SerializeField] private BulletShooter _bulletShooter;
     [SerializeField] private Joystick _joystick;
-    [SerializeField] private Button _jumpButton;
-    [SerializeField] private Button _attackButton;
+    [SerializeField] private CommonButton _jumpButton;
+    [SerializeField] private CommonButton _attackButton;
 
     void Start()
     {
-        _jumpButton.onClick.AddListener(Jump);
-        _attackButton.onClick.AddListener(Attack);
+        _jumpButton.Initialize();
+        _attackButton.Initialize();
+        _jumpButton.SetClickEvent(Jump);
+        _attackButton.SetClickEvent(Attack);
     }
 
     void Update()

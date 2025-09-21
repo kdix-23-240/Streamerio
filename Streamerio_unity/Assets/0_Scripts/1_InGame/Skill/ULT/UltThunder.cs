@@ -34,7 +34,7 @@ public class UltThunder : MonoBehaviour
         if (_player != null)
         {
             //playerのy座標から8マス右側に生成
-            transform.position = new Vector2(_player.transform.position.x + 8f, _player.transform.position.y);
+            transform.position = new Vector2(_player.transform.position.x + 6f, _player.transform.position.y + 3);
         }
         // フレームベースでインターバルを計算
         _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
