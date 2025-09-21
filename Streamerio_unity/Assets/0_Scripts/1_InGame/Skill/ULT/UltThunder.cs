@@ -74,7 +74,7 @@ public class UltThunder : MonoBehaviour
                     _enemyDamageCounters[enemyCollider.gameObject] = 0;
                     
                     // 初期ダメージ
-                    var enemy = enemyCollider.GetComponent<WeakEnemy>();
+                    var enemy = enemyCollider.GetComponent<EnemyHpManager>();
                     if (enemy != null)
                     {
                         //Debug.Log($"UltThunder entered range: {enemyCollider.gameObject.name}");
@@ -89,7 +89,7 @@ public class UltThunder : MonoBehaviour
                     // インターバルに達したら持続ダメージを与える
                     if (_enemyDamageCounters[enemyCollider.gameObject] >= _damageIntervalFrames)
                     {
-                        var enemy = enemyCollider.GetComponent<WeakEnemy>();
+                        var enemy = enemyCollider.GetComponent<EnemyHpManager>();
                         if (enemy != null)
                         {
                             //Debug.Log($"UltThunder continuous damage: {enemyCollider.gameObject.name}");
@@ -170,7 +170,7 @@ public class UltThunder : MonoBehaviour
         {
             if (enemyCollider.CompareTag("Enemy") && !_hitEnemies.Contains(enemyCollider.gameObject))
             {
-                var enemy = enemyCollider.GetComponent<WeakEnemy>();
+                var enemy = enemyCollider.GetComponent<EnemyHpManager>();
                 if (enemy != null)
                 {
                     Debug.Log($"UltThunder struck: {enemyCollider.gameObject.name}");

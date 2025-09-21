@@ -96,7 +96,7 @@ public class UltBullet : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            var enemy = collision.gameObject.GetComponent<WeakEnemy>();
+            var enemy = collision.gameObject.GetComponent<EnemyHpManager>();
             if (enemy != null)
             {
                 //Debug.Log($"UltBullet hit: {collision.gameObject.name}");

@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 2885192273417006679}
   - component: {fileID: 7676842971110226589}
   - component: {fileID: 2156599442745627322}
+  - component: {fileID: -4985072300248894645}
   m_Layer: 0
   m_Name: UltThunder
-  m_TagString: Untagged
+  m_TagString: ULT
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -131,3 +132,30 @@ MonoBehaviour:
   _strikeRange: 3
   _continuousDamageInterval: 0.4
   _continuousDamage: 30
+--- !u!50 &-4985072300248894645
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3868573432194011127}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
