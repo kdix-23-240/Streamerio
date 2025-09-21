@@ -18,6 +18,12 @@ public class Skeleton : MonoBehaviour
         _canMove = false;   
     }
 
+    void Start()
+    {
+        float rand = Random.Range(5f, 8f);
+        transform.position += new Vector3(rand, 0, 0); // 少し上にずらして生成
+    }
+
     void Update()
     {
         if (!_canMove)

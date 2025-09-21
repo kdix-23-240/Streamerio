@@ -14,7 +14,7 @@ public class BurningGhoulMovement : MonoBehaviour
     private Transform _player;
     private EnemyAttackManager _attackManager;
     private float _lastAttackTime = -999f;
-    
+
     void Start()
     {
         // プレイヤーを探す
@@ -27,10 +27,11 @@ public class BurningGhoulMovement : MonoBehaviour
         {
             Debug.LogWarning("Player not found for BurningGhoul!");
         }
-        
+
         _attackManager = GetComponent<EnemyAttackManager>();
         
         AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
+        transform.position += new Vector3(5, 0, 0); // 少し上にずらして生成
     }
     
     void Update()
