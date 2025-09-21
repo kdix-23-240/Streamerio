@@ -1,5 +1,6 @@
 using System.Threading;
 using Alchemy.Inspector;
+using Common.Audio;
 using Common.UI.Animation;
 using Common.UI.Display;
 using Common.UI.Display.Background;
@@ -32,6 +33,7 @@ namespace Common.UI.Dialog
             View.Background.OnClickAsObservable
                 .Subscribe(_ =>
                 {
+                    AudioManager.Instance.PlayAsync(SEType.SNESRPG01, destroyCancellationToken).Forget();
                     CloseEvent();
                 }).RegisterTo(destroyCancellationToken);
         }

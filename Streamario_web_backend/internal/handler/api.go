@@ -37,14 +37,17 @@ func (h *APIHandler) GetOrCreateViewerID(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
+	// クロスサイト（フロント: vercel.app, バックエンド: Cloud Run）で
+	// Cookie を送受信できるように SameSite=None; Secure を指定する。
+	// NOTE: Secure=true は HTTPS 前提。本番環境（Cloud Run/Vercel）は HTTPS なので問題なし。
 	cookie := &http.Cookie{
 		Name:     "viewer_id",
 		Value:    viewerID,
 		Path:     "/",
 		MaxAge:   365 * 24 * 60 * 60,
-		Secure:   false,
+		Secure:   true,
 		HttpOnly: false,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 	c.SetCookie(cookie)
 	var name interface{}

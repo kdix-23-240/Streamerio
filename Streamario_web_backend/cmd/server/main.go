@@ -78,11 +78,21 @@ func main() {
 	e.Use(middleware.Logger())  // アクセスログ
 	e.Use(middleware.Recover()) // パニック回復
 
-	// 8. CORS 設定 (暫定で * を許容 / TODO: 本番は限定)
+	// 8. CORS 設定
+	// 認証付き（Cookie 同送）要求に対応するため AllowCredentials=true とし、
+	// オリジンは allowlist（環境変数 FRONTEND_URL）に限定する。
+	// 注意: AllowCredentials=true の場合、"*" は使用できない。
+	allowCredentials := true
+	allowOrigins := []string{cfg.FrontendURL}
+	if cfg.FrontendURL == "*" {
+		// デフォルト設定時は資格情報を扱わない想定
+		allowCredentials = false
+	}
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{cfg.FrontendURL, "*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
-		AllowHeaders: []string{"ngrok-skip-browser-warning", echo.HeaderContentType},
+		AllowOrigins:     allowOrigins,
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodOptions},
+		AllowHeaders:     []string{"ngrok-skip-browser-warning", echo.HeaderContentType},
+		AllowCredentials: allowCredentials,
 	}))
 
 	// 9. ルーティング定義

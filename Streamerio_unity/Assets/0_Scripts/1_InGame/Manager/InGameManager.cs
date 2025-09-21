@@ -1,5 +1,6 @@
 using Alchemy.Inspector;
 using Common;
+using Common.Audio;
 using Common.Save;
 using Common.Scene;
 using Common.UI.Display.Window;
@@ -17,7 +18,6 @@ namespace InGame
 {
     public class InGameManager: SingletonBase<InGameManager>
     {
-        [SerializeField] private string _url = "";
         [SerializeField]private float _timeLimit = 180f;
         [SerializeField, LabelText("プレイヤー")]
         private Transform _playerTransform;
@@ -38,6 +38,8 @@ namespace InGame
 
         private async void Start()
         {
+            AudioManager.Instance.PlayAsync(BGMType.sisingetunoyamingetunoyami, destroyCancellationToken).Forget();
+            
             var isPlayed = SaveManager.Instance.LoadPlayed();
             
             _howToPlayWindow.Initialize();
@@ -50,11 +52,12 @@ namespace InGame
             _clearOverlay.Hide();
             
             var qrGenerator = new QRCodeSpriteGenerater();
-            
-            _inGameScreen.Initialize(qrGenerator.Generate(_url), _timeLimit);
+
+            var url = await WebsocketManager.Instance.GetFrontUrlAsync();
+            _inGameScreen.Initialize(qrGenerator.Generate(url), _timeLimit);
             
             _qrCodeDialog.Initialize();
-            _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(_url));
+            _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(url));
             _qrCodeDialog.Hide();
             
             _inGameMaskView.Hide();
@@ -99,8 +102,6 @@ namespace InGame
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
 
-            await UniTask.WaitForSeconds(3f);
-            GameOver();
         }
 
         /// <summary>
@@ -110,6 +111,7 @@ namespace InGame
         {
             await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
             await _gameOverOverlay.ShowAsync(destroyCancellationToken);
+            AudioManager.Instance.StopBGM();
             Debug.Log("ゲームオーバー");
         }
         
@@ -118,8 +120,10 @@ namespace InGame
         /// </summary>
         public async void GameClear()
         {
+            await WebsocketManager.Instance.SendWebSocketMessage( "{\"type\": \"game_end\" }" );
             await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
             await _clearOverlay.ShowAsync(destroyCancellationToken);
+            AudioManager.Instance.StopBGM();
             Debug.Log("ゲームクリア");
         }
     }

@@ -1,5 +1,6 @@
 using System.Threading;
 using Alchemy.Inspector;
+using Common.Audio;
 using Cysharp.Threading.Tasks;
 using R3;
 using R3.Triggers;
@@ -43,6 +44,7 @@ namespace Common.UI.Display.Overlay
             _clickTrigger.OnPointerClickAsObservable()
                 .Subscribe(_ =>
                 {
+                    AudioManager.Instance.PlayAsync(SEType.SNESRPG01, _cts.Token).Forget();
                     _clickEvent.OnNext(Unit.Default);
                 })
                 .RegisterTo(_cts.Token);

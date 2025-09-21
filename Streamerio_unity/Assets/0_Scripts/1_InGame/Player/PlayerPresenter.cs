@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using R3;
 
@@ -15,12 +17,12 @@ public class PlayerPresenter : MonoBehaviour
     {
         _view = GetComponent<PlayerView>();
         _model = new PlayerModel(_view.gameObject.transform.position.x, _view.gameObject.transform.position.y);
-
     }
 
     void Start()
     {
         Bind();
+        _view.Bind();
     }
 
     private void Bind()
@@ -43,6 +45,12 @@ public class PlayerPresenter : MonoBehaviour
 
     public void Jump()
     {
+        AudioManager.Instance.PlayAsync(SEType.PlayerJump, destroyCancellationToken).Forget();
         _view.Jump(_jumpPower.Amount);
+    }
+
+    public void Attack(int num)
+    {
+        
     }
 }
