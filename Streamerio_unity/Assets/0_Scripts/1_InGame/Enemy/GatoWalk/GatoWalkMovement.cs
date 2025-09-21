@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GatoWalkMovement : MonoBehaviour
@@ -28,6 +30,8 @@ public class GatoWalkMovement : MonoBehaviour
         
         _attackManager = GetComponent<EnemyAttackManager>();
         _jumpTimer = jumpInterval;
+        
+        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()

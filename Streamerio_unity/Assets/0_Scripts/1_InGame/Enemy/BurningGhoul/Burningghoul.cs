@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 
@@ -27,6 +29,8 @@ public class BurningGhoulMovement : MonoBehaviour
         }
         
         _attackManager = GetComponent<EnemyAttackManager>();
+        
+        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()
