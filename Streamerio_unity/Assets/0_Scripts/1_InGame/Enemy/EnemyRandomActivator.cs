@@ -34,7 +34,7 @@ public class EnemyRandomActivator : MonoBehaviour
     public void ActivateWeakEnemy()
     {
         int randomIndex = Random.Range(0, _weakEnemyScriptableObject.Enemys.Length);
-        // Instantiate(_weakEnemyScriptableObject.Enemys[randomIndex], _parentObject.transform);
+        Instantiate(_weakEnemyScriptableObject.Enemys[randomIndex], _parentObject.transform);
         Debug.Log("Weak Enemy Spawned");
     }
 }
