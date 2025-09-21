@@ -56,7 +56,23 @@
     "Num": 28
   },
   {
+    "Name": "ThunderBullet",
+    "Num": 38
+  },
+  {
     "Name": "TuinURT",
     "Num": 35
+  },
+  {
+    "Name": "UltThunder",
+    "Num": 36
+  },
+  {
+    "Name": "電撃魔法2",
+    "Num": 39
+  },
+  {
+    "Name": "魔法1",
+    "Num": 37
   }
 ]

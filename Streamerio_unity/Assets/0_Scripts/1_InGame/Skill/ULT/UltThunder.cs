@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Common.Audio;
 
 public class UltThunder : MonoBehaviour
 {
@@ -41,6 +42,8 @@ public class UltThunder : MonoBehaviour
         
         // 縦方向（上から下）への攻撃開始
         StartThunderStrike();
+
+        AudioManager.Instance.PlayAsync(SEType.UltThunder, destroyCancellationToken).Forget();
     }
 
     void Update()

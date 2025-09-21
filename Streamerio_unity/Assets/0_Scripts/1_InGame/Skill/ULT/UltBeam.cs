@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Common.Audio;
 
 public class UltBeam : MonoBehaviour
 {
@@ -33,6 +34,9 @@ public class UltBeam : MonoBehaviour
         }
         // フレームベースでインターバルを計算
         _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
+        
+        Debug.Log("s");
+        AudioManager.Instance.PlayAsync(SEType.魔法1, this.GetCancellationTokenOnDestroy()).Forget();
     }
 
     void Update()
