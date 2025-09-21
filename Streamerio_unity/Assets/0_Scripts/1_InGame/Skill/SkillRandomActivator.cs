@@ -10,7 +10,7 @@ public class SkillRandomActivator : MonoBehaviour
 
     void Start()
     {
-        // Bind();
+        Bind();
     }
 
     private void Bind()
@@ -28,13 +28,13 @@ public class SkillRandomActivator : MonoBehaviour
     public void ActivateMiddleSkill()
     {
         int randomIndex = Random.Range(0, _middleSkillScriptableObject.Skills.Length);
-        // Instantiate(_middleSkillScriptableObject.Skills[randomIndex], _parentObject.transform);
+        Instantiate(_middleSkillScriptableObject.Skills[randomIndex], _parentObject.transform);
         Debug.Log("Middle Skill Spawned");
     }
     public void ActivateWeakSkill()
     {
         int randomIndex = Random.Range(0, _weakSkillScriptableObject.Skills.Length);
-        // Instantiate(_weakSkillScriptableObject.Skills[randomIndex], _parentObject.transform);
+        Instantiate(_weakSkillScriptableObject.Skills[randomIndex], _parentObject.transform);
         Debug.Log("Weak Skill Spawned");
     }
 }
