@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using Common.Audio;
 
+[RequireComponent(typeof(BoxCollider2D))]
 public class UltThunder : MonoBehaviour
 {
     [SerializeField] private float _speed = 25f;
@@ -11,15 +12,21 @@ public class UltThunder : MonoBehaviour
     [SerializeField] private int _strikeCount = 3;
     [SerializeField] private float _strikeInterval = 0.5f;
     [SerializeField] private float _strikeRange = 3f;
-    [SerializeField] private float _continuousDamageInterval = 0.4f; // 持続ダメージ間隔(秒)
-    [SerializeField] private float _continuousDamage = 30f; // 持続ダメージ量
-    
+    [SerializeField] private float _continuousDamageInterval = 0.4f;
+    [SerializeField] private float _continuousDamage = 30f;
+
     private int _currentStrikes = 0;
     private float _strikeTimer = 0f;
-    private List<GameObject> _hitEnemies = new List<GameObject>();
-    private Dictionary<GameObject, int> _enemyDamageCounters = new Dictionary<GameObject, int>();
-    private int _damageIntervalFrames;
+
+    // 侵入中の敵
+    private readonly HashSet<GameObject> _enemiesInRange = new HashSet<GameObject>();
+    // 初回ストライクで既にヒット済み（以後のストライクで重複ダメージを与えない）
+    private readonly HashSet<GameObject> _hitEnemies = new HashSet<GameObject>();
+    // 持続ダメージ用タイマー
+    private readonly Dictionary<GameObject, float> _enemyTimers = new Dictionary<GameObject, float>();
+
     private GameObject _player;
+    private BoxCollider2D _box;
 
     void Awake()
     {
@@ -29,13 +36,27 @@ public class UltThunder : MonoBehaviour
             Debug.LogError("Player object not found in the scene.");
         }
 
+        _box = GetComponent<BoxCollider2D>();
+        _box.isTrigger = true;
+        ApplyColliderSize();
     }
+
+    void OnValidate()
+    {
+        if (_box == null) _box = GetComponent<BoxCollider2D>();
+        if (_box != null)
+        {
+            _box.isTrigger = true;
+            ApplyColliderSize();
+        }
+    }
+
     void Start()
     {
         if (_player != null)
         {
-            //playerのy座標から8マス右側に生成
-            transform.position = new Vector2(_player.transform.position.x + 6f, _player.transform.position.y + 3);
+            transform.position = new Vector2(_player.transform.position.x + 6f,
+                                             _player.transform.position.y + 3f);
         }
         // フレームベースでインターバルを計算
         _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
@@ -43,157 +64,118 @@ public class UltThunder : MonoBehaviour
         // 縦方向（上から下）への攻撃開始
         StartThunderStrike();
 
-        AudioManager.Instance.PlayAsync(SEType.UltThunder, destroyCancellationToken).Forget();
+        AudioManager.Instance.PlayAsync(SEType.UltThunder, destroyCancellationToken).Forget()
     }
 
     void Update()
     {
-        HandleThunderStrike();
-        HandleContinuousDamage(); // 持続ダメージ処理を追加
-        
-        if (_lifetime <= 0)
-        {
-            DestroySkill();
-        }
+        BlinkEffect();
+        HandleContinuousDamage();
         _lifetime -= Time.deltaTime;
+        if (_lifetime <= 0f) DestroySkill();
     }
 
-    private void HandleContinuousDamage()
+    private void ApplyColliderSize()
     {
-        // 範囲内の敵に対して持続ダメージを処理
-        Collider2D[] enemies = Physics2D.OverlapBoxAll(
-            transform.position, 
-            new Vector2(1f, _strikeRange), 
-            0f
-        );
-
-        foreach (var enemyCollider in enemies)
+        if (_box != null)
         {
-            if (enemyCollider.CompareTag("Enemy"))
-            {
-                if (!_enemyDamageCounters.ContainsKey(enemyCollider.gameObject))
-                {
-                    // 新しい敵をカウンターに追加
-                    _enemyDamageCounters[enemyCollider.gameObject] = 0;
-                    
-                    // 初期ダメージ
-                    var enemy = enemyCollider.GetComponent<EnemyHpManager>();
-                    if (enemy != null)
-                    {
-                        //Debug.Log($"UltThunder entered range: {enemyCollider.gameObject.name}");
-                        enemy.TakeDamage((int)_damage);
-                    }
-                }
-                else
-                {
-                    // 既存の敵のカウンターを更新
-                    _enemyDamageCounters[enemyCollider.gameObject]++;
-                    
-                    // インターバルに達したら持続ダメージを与える
-                    if (_enemyDamageCounters[enemyCollider.gameObject] >= _damageIntervalFrames)
-                    {
-                        var enemy = enemyCollider.GetComponent<EnemyHpManager>();
-                        if (enemy != null)
-                        {
-                            //Debug.Log($"UltThunder continuous damage: {enemyCollider.gameObject.name}");
-                            enemy.TakeDamage((int)_continuousDamage);
-                        }
-                        
-                        // カウンターリセット
-                        _enemyDamageCounters[enemyCollider.gameObject] = 0;
-                    }
-                }
-            }
-        }
-
-        // 範囲から出た敵をカウンターから削除
-        List<GameObject> enemiesToRemove = new List<GameObject>();
-        foreach (var enemy in _enemyDamageCounters.Keys)
-        {
-            bool stillInRange = false;
-            foreach (var enemyCollider in enemies)
-            {
-                if (enemyCollider.gameObject == enemy)
-                {
-                    stillInRange = true;
-                    break;
-                }
-            }
-            
-            if (!stillInRange)
-            {
-                enemiesToRemove.Add(enemy);
-            }
-        }
-        
-        foreach (var enemy in enemiesToRemove)
-        {
-            _enemyDamageCounters.Remove(enemy);
-            //Debug.Log($"UltThunder exited range: {enemy.name}");
+            _box.size = new Vector2(1f, _strikeRange);
+            _box.offset = Vector2.zero;
         }
     }
 
-    private async void StartThunderStrike()
+    private async UniTaskVoid StartThunderStrike()
     {
-        // 雷は上から下への連続攻撃
         for (int i = 0; i < _strikeCount; i++)
         {
             PerformThunderStrike();
             await UniTask.Delay((int)(_strikeInterval * 1000));
-            
-            if (this == null) break; // オブジェクトが破壊された場合
-        }
-    }
-
-    private void HandleThunderStrike()
-    {
-        // 雷エフェクトの表現（点滅など）
-        _strikeTimer += Time.deltaTime;
-        if (_strikeTimer > 0.1f)
-        {
-            var renderer = GetComponent<SpriteRenderer>();
-            if (renderer != null)
-            {
-                renderer.enabled = !renderer.enabled;
-            }
-            _strikeTimer = 0f;
+            if (this == null) break;
         }
     }
 
     private void PerformThunderStrike()
     {
-        // 縦方向の攻撃範囲内の敵を検索
-        Collider2D[] enemies = Physics2D.OverlapBoxAll(
-            transform.position, 
-            new Vector2(1f, _strikeRange), 
-            0f
-        );
-
-        foreach (var enemyCollider in enemies)
+        // 侵入中の敵に対して初回ストライク判定
+        foreach (var enemyObj in _enemiesInRange)
         {
-            if (enemyCollider.CompareTag("Enemy") && !_hitEnemies.Contains(enemyCollider.gameObject))
+            if (_hitEnemies.Contains(enemyObj)) continue;
+            var hp = enemyObj.GetComponent<EnemyHpManager>();
+            if (hp != null)
             {
-                var enemy = enemyCollider.GetComponent<EnemyHpManager>();
-                if (enemy != null)
-                {
-                    Debug.Log($"UltThunder struck: {enemyCollider.gameObject.name}");
-                    enemy.TakeDamage((int)_damage);
-                    _hitEnemies.Add(enemyCollider.gameObject);
-                }
+                // Debug.Log($"UltThunder struck: {enemyObj.name}");
+                hp.TakeDamage((int)_damage);
+                _hitEnemies.Add(enemyObj);
             }
         }
-        
         _currentStrikes++;
     }
+
+    private void HandleContinuousDamage()
+    {
+        if (_enemiesInRange.Count == 0) return;
+
+        float dt = Time.deltaTime;
+        foreach (var enemyObj in _enemiesInRange)
+        {
+            if (!_enemyTimers.ContainsKey(enemyObj))
+            {
+                _enemyTimers[enemyObj] = 0f;
+                continue;
+            }
+
+            _enemyTimers[enemyObj] += dt;
+            if (_enemyTimers[enemyObj] >= _continuousDamageInterval)
+            {
+                var hp = enemyObj.GetComponent<EnemyHpManager>();
+                if (hp != null)
+                {
+                    // Debug.Log($"UltThunder continuous damage: {enemyObj.name}");
+                    hp.TakeDamage((int)_continuousDamage);
+                }
+                _enemyTimers[enemyObj] = 0f;
+            }
+        }
+    }
+
+    private void BlinkEffect()
+    {
+        _strikeTimer += Time.deltaTime;
+        if (_strikeTimer > 0.1f)
+        {
+            var renderer = GetComponent<SpriteRenderer>();
+            if (renderer != null) renderer.enabled = !renderer.enabled;
+            _strikeTimer = 0f;
+        }
+    }
+
     public void DestroySkill()
     {
         Destroy(gameObject);
     }
 
+    // Trigger 侵入
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.CompareTag("Enemy")) return;
+        var go = other.gameObject;
+        _enemiesInRange.Add(go);
+        if (!_enemyTimers.ContainsKey(go)) _enemyTimers[go] = 0f;
+    }
+
+    // Trigger 退出
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (!other.CompareTag("Enemy")) return;
+        var go = other.gameObject;
+        _enemiesInRange.Remove(go);
+        _enemyTimers.Remove(go);
+        // _hitEnemies は残す（再侵入しても初回ストライク重複させない元仕様踏襲）
+    }
+
     private void OnDrawGizmosSelected()
     {
-        // エディター上で攻撃範囲を可視化
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(transform.position, new Vector3(1f, _strikeRange, 0));
+        Gizmos.DrawWireCube(transform.position, new Vector3(1f, _strikeRange, 0f));
     }
 }
