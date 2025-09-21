@@ -30,8 +30,9 @@ public class BurningGhoulMovement : MonoBehaviour
 
         _attackManager = GetComponent<EnemyAttackManager>();
         
-        transform.position += new Vector3(5, 0, 0); // 少し上にずらして生成
         AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
+        float rand = Random.Range(6f, 10f);
+        transform.position += new Vector3(_player.position.x + rand, _player.position.y, 0); // 少し上にずらして生成
     }
     
     void Update()
