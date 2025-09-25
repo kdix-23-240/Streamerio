@@ -90,16 +90,16 @@ namespace Common.UI.Display
         
         public virtual async UniTask ShowAsync(CancellationToken ct)
         {
-            View.SetInteractable(true);
             _IsShow = true;
             await View.ShowAsync(ct);
+            View.SetInteractable(true);
         }
 
         public virtual void Show()
         {
-            View.SetInteractable(true);
             _IsShow = true;
             View.Show();
+            View.SetInteractable(true);
         }
 
         public virtual async UniTask HideAsync(CancellationToken ct)
