@@ -18,6 +18,8 @@ namespace Common.UI.Part.Button
         private UnityEngine.UI.Button _button;
         [SerializeField, LabelText("SE")]
         private SEType _seType = SEType.SNESRPG01;
+        [SerializeField, LabelText("ボタンのクリック間隔(秒)")]
+        private float _clickIntervalSec = 0.1f;
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -34,7 +36,7 @@ namespace Common.UI.Part.Button
         public void SetClickEvent(UnityAction onClick)
         {
             _button.OnClickAsObservable()
-                .ThrottleFirst(TimeSpan.FromSeconds(0.1f))
+                .ThrottleFirst(TimeSpan.FromSeconds(_clickIntervalSec))
                 .Subscribe(_ =>
                 {
                     AudioManager.Instance.PlayAsync(_seType, destroyCancellationToken).Forget();
