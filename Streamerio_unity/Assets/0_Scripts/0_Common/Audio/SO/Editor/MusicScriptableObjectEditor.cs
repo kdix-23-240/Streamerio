@@ -13,6 +13,12 @@ namespace Common.Audio.Editor
         where TKey: Enum
         where TSO: MusicScriptableObjectBase<TKey>
     {
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            IsSetNone = true;
+        }
+        
         protected override AudioClip CreateValue(AudioClip file)
         {
             return file;
