@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace Common.UI.Display
 {
@@ -60,7 +61,7 @@ namespace Common.UI.Display
         public bool IsShow => _isShow;
         
         [SerializeField, Alchemy.Inspector.ReadOnly]
-        protected TView View;
+        protected TView CommonView;
 
 #if UNITY_EDITOR
         /// <summary>
@@ -69,7 +70,7 @@ namespace Common.UI.Display
         protected override void OnValidate()
         {
             base.OnValidate();
-            View ??= GetComponent<TView>();
+            CommonView ??= GetComponent<TView>();
         }
 #endif
         
@@ -83,7 +84,7 @@ namespace Common.UI.Display
         {
             _isShow = false;
             
-            View.Initialize();
+            CommonView.Initialize();
             
             SetEvent();
             Bind();
@@ -102,29 +103,29 @@ namespace Common.UI.Display
         public virtual async UniTask ShowAsync(CancellationToken ct)
         {
             _isShow = true;
-            await View.ShowAsync(ct);
-            View.SetInteractable(true);
+            await CommonView.ShowAsync(ct);
+            CommonView.SetInteractable(true);
         }
 
         public virtual void Show()
         {
             _isShow = true;
-            View.Show();
-            View.SetInteractable(true);
+            CommonView.Show();
+            CommonView.SetInteractable(true);
         }
 
         public virtual async UniTask HideAsync(CancellationToken ct)
         {
-            View.SetInteractable(false);
+            CommonView.SetInteractable(false);
             _isShow = false;
-            await View.HideAsync(ct);
+            await CommonView.HideAsync(ct);
         }
 
         public virtual void Hide()
         {
-            View.SetInteractable(false);
+            CommonView.SetInteractable(false);
             _isShow = false;
-            View.Hide();
+            CommonView.Hide();
         }
     }
 

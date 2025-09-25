@@ -20,7 +20,7 @@ namespace Common.UI.Dialog
     {
         protected override void SetEvent()
         {
-            View.CloseButton.OnClickAsObservable
+            CommonView.CloseButton.OnClickAsObservable
                 .Subscribe(_ =>
                 {
                     CloseEvent();
@@ -30,7 +30,7 @@ namespace Common.UI.Dialog
         protected override void Bind()
         {
             base.Bind();
-            View.Background.OnClickAsObservable
+            CommonView.Background.OnClickAsObservable
                 .Subscribe(_ =>
                 {
                     CloseEvent();
