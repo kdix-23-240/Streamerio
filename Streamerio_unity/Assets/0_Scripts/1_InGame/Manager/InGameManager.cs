@@ -93,9 +93,6 @@ namespace InGame
             
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
-
-            await UniTask.Delay(1000, cancellationToken: destroyCancellationToken);
-            GameClear();
         }
 
         /// <summary>
