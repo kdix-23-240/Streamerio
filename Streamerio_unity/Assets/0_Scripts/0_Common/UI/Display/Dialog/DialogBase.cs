@@ -8,7 +8,6 @@ using Common.UI.Part.Button;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Common.UI.Dialog
 {
@@ -21,19 +20,19 @@ namespace Common.UI.Dialog
     {
         protected override void SetEvent()
         {
-            View.CloseButton.SetClickEvent(() =>
-            {
-                CloseEvent();
-            });
+            CommonView.CloseButton.OnClickAsObservable
+                .Subscribe(_ =>
+                {
+                    CloseEvent();
+                }).RegisterTo(destroyCancellationToken);
         }
         
         protected override void Bind()
         {
             base.Bind();
-            View.Background.OnClickAsObservable
+            CommonView.Background.OnClickAsObservable
                 .Subscribe(_ =>
                 {
-                    AudioManager.Instance.PlayAsync(SEType.SNESRPG01, destroyCancellationToken).Forget();
                     CloseEvent();
                 }).RegisterTo(destroyCancellationToken);
         }
@@ -46,14 +45,7 @@ namespace Common.UI.Dialog
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             await base.ShowAsync(ct);
-            View.Background.SetInteractable(true);
             await UniTask.WaitWhile(() => IsShow, cancellationToken: ct);
-        }
-        
-        public override void Show()
-        {
-            base.Show();
-            View.Background.SetInteractable(true);
         }
     }
     

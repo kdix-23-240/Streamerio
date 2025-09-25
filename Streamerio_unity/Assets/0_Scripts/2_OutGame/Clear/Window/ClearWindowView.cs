@@ -63,7 +63,7 @@ namespace OutGame.UI.Window
             await _bestVillainText.ShowAsync("魔王", ct);
             await _mostClickerText.ShowAsync("殿堂入り", ct);
             
-            _flashText.PlayStartTextAnimation();
+            _flashText.PlayTextAnimation();
         }
 
         public override void Show()
@@ -76,13 +76,13 @@ namespace OutGame.UI.Window
             RectTransform.anchoredPosition = _showAnimParam.Position;
             await _hideAnim.PlayAsync(ct);
             
-            _flashText.StopStartTextAnimation();
+            _flashText.StopTextAnimation();
         }
         
         public override void Hide()
         {
             RectTransform.anchoredPosition = _hideAnimParam.Position;
-            _flashText.StopStartTextAnimation();
+            _flashText.StopTextAnimation();
         }
     }
 }

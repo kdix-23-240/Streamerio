@@ -1,11 +1,11 @@
 using Alchemy.Inspector;
-using Common.UI.Display.Overlay;
+using Common.UI;
 using Common.UI.Part.Button;
 using UnityEngine;
 
 namespace OutGame.GameOver.Overlay
 {
-    public class GameOverOverlayView: OverlayViewBase
+    public class GameOverOverlayView: UIBehaviourBase
     {
         [SerializeField, LabelText("リトライボタン")]
         private TextButton _retryButton;

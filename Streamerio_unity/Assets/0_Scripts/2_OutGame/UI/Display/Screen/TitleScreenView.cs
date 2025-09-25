@@ -52,25 +52,25 @@ namespace OutGame.UI.Display.Screen
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             await _showAnimation.PlayAsync(ct);
-            _gameStartText.PlayStartTextAnimation();
+            _gameStartText.PlayTextAnimation();
         }
         
         public override void Show()
         {
             CanvasGroup.alpha = 1f;
-            _gameStartText.PlayStartTextAnimation();
+            _gameStartText.PlayTextAnimation();
         }
         
         public override async UniTask HideAsync(CancellationToken ct)
         {
             await _hideAnimation.PlayAsync(ct);
-            _gameStartText.StopStartTextAnimation();
+            _gameStartText.StopTextAnimation();
         }
         
         public override void Hide()
         {
             CanvasGroup.alpha = 0f;
-            _gameStartText.StopStartTextAnimation();
+            _gameStartText.StopTextAnimation();
         }
     }
 }

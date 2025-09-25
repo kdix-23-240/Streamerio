@@ -14,13 +14,13 @@ namespace Common.UI.Display.Window
         public override void Initialize()
         {
             base.Initialize();
-            ChapterManager.Instance.Initialize(View.BookWindowAnimation);
+            ChapterManager.Instance.Initialize(CommonView.BookWindowAnimation);
         }
 
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            View.SetInteractable(true);
-            await View.ShowAsync(ct);
+            CommonView.SetInteractable(true);
+            await CommonView.ShowAsync(ct);
             await ChapterManager.Instance.OpenFirstChapterAsync(ct);
         }
 
@@ -33,8 +33,8 @@ namespace Common.UI.Display.Window
         public override async UniTask HideAsync(CancellationToken ct)
         {
             await ChapterManager.Instance.CloseChapterAsync(ct);
-            await View.HideAsync(ct);
-            View.SetInteractable(false);
+            await CommonView.HideAsync(ct);
+            CommonView.SetInteractable(false);
         }
 
         public override void Hide()

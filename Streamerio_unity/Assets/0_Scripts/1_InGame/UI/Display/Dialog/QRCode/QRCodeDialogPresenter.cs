@@ -18,7 +18,7 @@ namespace InGame.UI.Display.Dialog.QRCode
         /// <param name="sprite"></param>
         public void SetQRCodeSprite(Sprite sprite)
         {
-            View.SetQRCodeSprite(sprite);
+            CommonView.SetQRCodeSprite(sprite);
         }
 
         protected override void CloseEvent()

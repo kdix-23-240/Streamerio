@@ -37,17 +37,28 @@ namespace Common.UI.Display.Window.Panel
         protected override void SetEvent()
         {
             base.SetEvent();
-            
-            View.NextButton.SetClickEvent(()=> OpenNextPage(destroyCancellationToken).Forget());
-            View.BackButton.SetClickEvent(()=> OpenPrePage(destroyCancellationToken).Forget());
-            View.CloseButton.SetClickEvent(async () =>
-            {
-                var  isAllClose = await ChapterManager.Instance.CloseChapterAsync(destroyCancellationToken);
-                if (isAllClose)
+
+            CommonView.NextButton.OnClickAsObservable
+                .Subscribe(_ =>
                 {
-                    AllCloseEvent();
-                }
-            });
+                    OpenNextPage(destroyCancellationToken).Forget();
+                }).RegisterTo(destroyCancellationToken);
+            
+            CommonView.BackButton.OnClickAsObservable
+                .Subscribe(_ =>
+                {
+                    OpenPrePage(destroyCancellationToken).Forget();
+                }).RegisterTo(destroyCancellationToken);
+            
+            CommonView.CloseButton.OnClickAsObservable
+                .SubscribeAwait(async (_, ct) =>
+                {
+                    var  isAllClose = await ChapterManager.Instance.CloseChapterAsync(ct);
+                    if (isAllClose)
+                    {
+                        AllCloseEvent();
+                    }
+                }).RegisterTo(destroyCancellationToken);
         }
         
         protected override void Bind()
@@ -55,8 +66,8 @@ namespace Common.UI.Display.Window.Panel
             _currentIndexProp
                 .Subscribe(_ =>
                 {
-                    View.BackButton.gameObject.SetActive(_currentIndex > 0);
-                    View.NextButton.gameObject.SetActive(_currentIndex < View.LastPageIndex);
+                    CommonView.BackButton.gameObject.SetActive(_currentIndex > 0);
+                    CommonView.NextButton.gameObject.SetActive(_currentIndex < CommonView.LastPageIndex);
                 }).RegisterTo(destroyCancellationToken);
         }
 
@@ -67,8 +78,8 @@ namespace Common.UI.Display.Window.Panel
         
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            View.SetInteractable(true);
-            View.Show();
+            CommonView.SetInteractable(true);
+            CommonView.Show();
             
             _currentIndexProp.Value = 0;
             await ShowPageAsync(_currentIndex, ct);
@@ -79,7 +90,7 @@ namespace Common.UI.Display.Window.Panel
             base.Show();
             
             _currentIndexProp.Value = 0;
-            View.ShowPage(_currentIndex);
+            CommonView.ShowPage(_currentIndex);
         }
         
         /// <summary>
@@ -88,7 +99,7 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         public override async UniTask HideAsync(CancellationToken ct)
         {
-            await View.HidePageAsync(_currentIndex, ct);
+            await CommonView.HidePageAsync(_currentIndex, ct);
             
             base.Hide();
         }
@@ -98,7 +109,7 @@ namespace Common.UI.Display.Window.Panel
         /// </summary>
         public override void Hide()
         {
-            View.HidePage(_currentIndex);
+            CommonView.HidePage(_currentIndex);
             
             base.Hide();
         }
@@ -109,13 +120,13 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask OpenNextPage(CancellationToken ct)
         {
-            View.SetInteractable(false);
+            CommonView.SetInteractable(false);
             
-            View.HidePageAsync(_currentIndex, ct).Forget();
+            CommonView.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnRightAsync(ct);
             await ShowPageAsync(_currentIndex + 1, ct);
             
-            View.SetInteractable(true);
+            CommonView.SetInteractable(true);
         }
 
         /// <summary>
@@ -124,13 +135,13 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask OpenPrePage(CancellationToken ct)
         {
-            View.SetInteractable(false);
+            CommonView.SetInteractable(false);
             
-            View.HidePageAsync(_currentIndex, ct).Forget();
+            CommonView.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnLeftAsync(ct);
             await ShowPageAsync(_currentIndex - 1, ct);
             
-            View.SetInteractable(true);
+            CommonView.SetInteractable(true);
         }
 
         /// <summary>
@@ -140,8 +151,8 @@ namespace Common.UI.Display.Window.Panel
         /// <param name="ct"></param>
         private async UniTask ShowPageAsync(int nextIndex, CancellationToken ct)
         {
-            _currentIndexProp.Value = Mathf.Clamp(nextIndex, 0, View.LastPageIndex);
-            await View.ShowPageAsync(_currentIndex, ct);
+            _currentIndexProp.Value = Mathf.Clamp(nextIndex, 0, CommonView.LastPageIndex);
+            await CommonView.ShowPageAsync(_currentIndex, ct);
         }
     }
 }

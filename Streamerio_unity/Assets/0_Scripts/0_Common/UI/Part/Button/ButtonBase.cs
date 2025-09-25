@@ -1,10 +1,7 @@
-using System;
 using Alchemy.Inspector;
-using Common.Audio;
-using Cysharp.Threading.Tasks;
+using Common.UI.Click;
 using R3;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace Common.UI.Part.Button
@@ -12,10 +9,18 @@ namespace Common.UI.Part.Button
     /// <summary>
     /// ボタンの基底クラス
     /// </summary>
+    [RequireComponent(typeof(UnityEngine.UI.Button), typeof(ClickEventBinder))]
     public abstract class ButtonBase: UIBehaviourBase, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField, ReadOnly]
         private UnityEngine.UI.Button _button;
+        [SerializeField, ReadOnly]
+        private ClickEventBinder _clickEventBinder;
+        
+        /// <summary>
+        /// クリックした時の処理
+        /// </summary>
+        public Observable<Unit> OnClickAsObservable => _clickEventBinder.ClickEvent; 
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -23,22 +28,27 @@ namespace Common.UI.Part.Button
             base.OnValidate();
 
             _button ??= GetComponent<UnityEngine.UI.Button>();
+            _clickEventBinder ??= GetComponent<ClickEventBinder>();
         }
 #endif
-        
-        /// <summary>
-        /// イベント設定
-        /// </summary>
-        public void SetClickEvent(UnityAction onClick)
+
+        public override void Initialize()
         {
-            _button.OnClickAsObservable()
-                .ThrottleFirst(TimeSpan.FromSeconds(0.1f))
+            _clickEventBinder.Initialize();
+            base.Initialize();
+            Bind();
+        }
+
+        private void Bind()
+        {
+            _clickEventBinder.BindClickEvent(_button.OnClickAsObservable());
+            
+            OnClickAsObservable
                 .Subscribe(_ =>
                 {
-                    AudioManager.Instance.PlayAsync(SEType.SNESRPG01, destroyCancellationToken).Forget();
-                    onClick?.Invoke();
                     ResetButtonState();
-                }).RegisterTo(destroyCancellationToken);
+                })
+                .RegisterTo(destroyCancellationToken);
         }
 
         public abstract void OnPointerDown(PointerEventData eventData);
