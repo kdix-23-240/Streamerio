@@ -28,7 +28,7 @@ namespace Common.UI.Part.Text
         /// <summary>
         /// テキストのアニメーション再生
         /// </summary>
-        public void PlayStartTextAnimation()
+        public void PlayTextAnimation()
         {
             _cts = new CancellationTokenSource();
             _flashAnimation.PlayAsync(_cts.Token).Forget();
@@ -37,7 +37,7 @@ namespace Common.UI.Part.Text
         /// <summary>
         /// テキストのアニメーションを止める
         /// </summary>
-        public void StopStartTextAnimation()
+        public void StopTextAnimation()
         {
             _cts?.Cancel();
             _cts?.Dispose();

@@ -1,18 +1,37 @@
+using Alchemy.Inspector;
 using Common.Save;
 using Common.Scene;
 using Common.UI.Display.Overlay;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using R3;
+using UnityEngine;
 
 namespace OutGame.GameOver.Overlay
 {
-    public class GameOverOverlayPresenter: OverlayPresenterBase<GameOverOverlayView>
+    public class GameOverOverlayPresenter: OverlayPresenterBase
     {
+        [SerializeField, ReadOnly]
+        private GameOverOverlayView _view;
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            _view ??= GetComponent<GameOverOverlayView>();
+        }
+#endif
+
+        public override void Initialize()
+        {
+            _view.Initialize();
+            base.Initialize();
+        }
+
         protected override void Bind()
         {
             base.Bind();
-            View.RetryButton.OnClickAsObservable
+            _view.RetryButton.OnClickAsObservable
                 .SubscribeAwait(async (_, ct) =>
                 {
                     await LoadingScreenPresenter.Instance.ShowAsync();
@@ -20,7 +39,7 @@ namespace OutGame.GameOver.Overlay
                     SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
                 }).RegisterTo(destroyCancellationToken);
             
-            View.TitleButton.OnClickAsObservable
+            _view.TitleButton.OnClickAsObservable
                 .SubscribeAwait(async (_, ct) =>
                 {
                     await LoadingScreenPresenter.Instance.ShowAsync();

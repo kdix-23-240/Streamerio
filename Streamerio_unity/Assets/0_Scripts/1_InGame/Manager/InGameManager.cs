@@ -3,6 +3,7 @@ using Common;
 using Common.Audio;
 using Common.Save;
 using Common.Scene;
+using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
@@ -23,9 +24,6 @@ namespace InGame
         [SerializeField, LabelText("遊び方ウィンドウ")]
         private WindowPresenter _howToPlayWindow;
         
-        [SerializeField, LabelText("クリアUI")]
-        private ClearOverlayPresenter _clearOverlay;
-        
         [SerializeField, LabelText("QRコードダイアログ")]
         private QRCodeDialogPresenter _qrCodeDialog;
         [SerializeField, LabelText("ゲーム画面")]
@@ -42,8 +40,7 @@ namespace InGame
             _howToPlayWindow.Initialize();
             _howToPlayWindow.Hide();
             
-            _clearOverlay.Initialize();
-            _clearOverlay.Hide();
+            OverlayManager.Instance.Initialize();
             
             var qrGenerator = new QRCodeSpriteGenerater();
 
@@ -97,6 +94,8 @@ namespace InGame
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
 
+            await UniTask.Delay(1000, cancellationToken: destroyCancellationToken);
+            GameClear();
         }
 
         /// <summary>
@@ -117,7 +116,7 @@ namespace InGame
         {
             await WebsocketManager.Instance.SendWebSocketMessage( "{\"type\": \"game_end\" }" );
             await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
-            await _clearOverlay.ShowAsync(destroyCancellationToken);
+            await OverlayManager.Instance.OpenAndWaitCloseAsync<ClearOverlayPresenter>(destroyCancellationToken);
             AudioManager.Instance.StopBGM();
             Debug.Log("ゲームクリア");
         }

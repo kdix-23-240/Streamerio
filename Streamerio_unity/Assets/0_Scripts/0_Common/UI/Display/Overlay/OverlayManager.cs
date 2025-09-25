@@ -1,20 +1,22 @@
-using System.Collections.Generic;
-using System.Linq;
-using Alchemy.Inspector;
 using UnityEngine;
 
 namespace Common.UI.Display.Overlay
 {
     /// <summary>
-    /// オーバーレイの表示/非表示の管理
+    /// Overlay 系 UI の表示/非表示を管理するマネージャ。
+    /// - DisplayManagerBase を継承してスタック制御（Open/Close）を利用可能
+    /// - OverlayService を生成して Display 生成・初期化処理を委譲
+    /// - シングルトンとしてグローバルからアクセス可能
     /// </summary>
-    public class OverlayManager: DisplayManagerBase<IOverlay, OverlayManager>
+    public class OverlayManager : DisplayManagerBase<OverlayRepositorySO, OverlayManager>
     {
-        
-    }
-    
-    public interface IOverlay: IDisplay
-    {
-        
+        /// <summary>
+        /// Overlay 用の DisplayService をインスタンス化。
+        /// リポジトリと親 Transform を受け取り、Overlay 専用のサービスを返す。
+        /// </summary>
+        protected override IDisplayService InstanceDisplayService(OverlayRepositorySO repository, Transform parent)
+        {
+            return new OverlayService(repository, parent);
+        }
     }
 }
