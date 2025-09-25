@@ -3,8 +3,9 @@ namespace Common.Audio
     
     public enum BGMType
     {
+		None = 0,
 		kuraituuro = 2,
-		sisingetunoyamingetunoyami = 3,
+		singetunoyami = 3,
 
     }
 }
