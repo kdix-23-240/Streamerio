@@ -16,6 +16,8 @@ namespace Common.UI.Part.Button
     {
         [SerializeField, ReadOnly]
         private UnityEngine.UI.Button _button;
+        [SerializeField, LabelText("SE")]
+        private SEType _seType = SEType.SNESRPG01;
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -35,7 +37,7 @@ namespace Common.UI.Part.Button
                 .ThrottleFirst(TimeSpan.FromSeconds(0.1f))
                 .Subscribe(_ =>
                 {
-                    AudioManager.Instance.PlayAsync(SEType.SNESRPG01, destroyCancellationToken).Forget();
+                    AudioManager.Instance.PlayAsync(_seType, destroyCancellationToken).Forget();
                     onClick?.Invoke();
                     ResetButtonState();
                 }).RegisterTo(destroyCancellationToken);
