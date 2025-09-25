@@ -35,7 +35,7 @@ namespace InGame
 
         private async void Start()
         {
-            AudioManager.Instance.PlayAsync(BGMType.sisingetunoyamingetunoyami, destroyCancellationToken).Forget();
+            AudioManager.Instance.PlayAsync(BGMType.singetunoyami, destroyCancellationToken).Forget();
             
             var isPlayed = SaveManager.Instance.LoadPlayed();
             

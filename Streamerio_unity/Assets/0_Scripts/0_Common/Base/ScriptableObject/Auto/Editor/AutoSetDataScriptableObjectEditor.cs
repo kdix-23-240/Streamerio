@@ -15,7 +15,10 @@ namespace Common.Editor
     {
         private TSO _target;
 
-        private void OnEnable()
+        private const string NoneParam = "None";
+        protected bool IsSetNone = false;
+
+        protected virtual void OnEnable()
         {
             _target = target as TSO;
         }
@@ -127,8 +130,18 @@ namespace Common.Editor
         private void LoadFiles(string[] paths, out string[] enumParams, out TFile[] files)
         {
             int fileCount = paths.Length;
-            
-            enumParams = new string [fileCount];
+            int offset = 0;
+
+            if (IsSetNone)
+            {
+                enumParams = new string[fileCount + 1];
+                enumParams[0] = NoneParam;
+                offset = 1;
+            }
+            else
+            {
+                enumParams = new string [fileCount];
+            }
             files = new TFile[fileCount];
 
             for (int i = 0; i < fileCount; i++)
@@ -138,7 +151,7 @@ namespace Common.Editor
                 // ファイル名取得
                 var fileName = Path.GetFileNameWithoutExtension(path);
                 // ファイル名に/や空白があれば取り除く
-                enumParams[i] = fileName.Replace(" ", string.Empty).Replace("/", string.Empty);
+                enumParams[i+offset] = fileName.Replace(" ", string.Empty).Replace("/", string.Empty);
                 
                 // ファイル取得
                 files[i] = AssetDatabase.LoadAssetAtPath<TFile>(path);
@@ -163,10 +176,11 @@ namespace Common.Editor
         {
             int length = files.Length;
             var dictionary = new SerializeDictionary<TKey, TValue>();
+            int offset = IsSetNone ? 1 : 0;
             
             for(int i=0; i<length; i++)
             {
-                var key = (TKey)Enum.Parse(typeof(TKey), enumParams[i]);
+                var key = (TKey)Enum.Parse(typeof(TKey), enumParams[i+offset]);
                 var value = CreateValue(files[i]);
                 
                 dictionary[key] = value;
