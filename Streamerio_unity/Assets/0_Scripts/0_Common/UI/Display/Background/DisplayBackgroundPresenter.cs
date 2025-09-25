@@ -1,13 +1,10 @@
-using System;
 using System.Threading;
 using Alchemy.Inspector;
-using Common.Audio;
 using Common.UI.Click;
 using Cysharp.Threading.Tasks;
 using R3;
 using R3.Triggers;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Common.UI.Display.Background
 {
@@ -51,15 +48,13 @@ namespace Common.UI.Display.Background
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             _clickEventBinder.BindClickEvent(_clickTrigger.OnPointerClickAsObservable());
-            _IsShow = true;
-            await View.ShowAsync(ct);
+            await base.ShowAsync(ct);
         }
         
         public override void Show()
         {
             _clickEventBinder.BindClickEvent(_clickTrigger.OnPointerClickAsObservable());
-            _IsShow = true;
-            View.Show();
+            base.Show();
         }
         
         public override async UniTask HideAsync(CancellationToken ct)
@@ -72,15 +67,6 @@ namespace Common.UI.Display.Background
         {
             base.Hide();
             _clickEventBinder.Dispose();
-        }
-
-        /// <summary>
-        /// 背景の有効/無効を設定
-        /// </summary>
-        /// <param name="interactable"></param>
-        public void SetInteractable(bool interactable)
-        {
-            View.SetInteractable(interactable);
         }
     }
 }

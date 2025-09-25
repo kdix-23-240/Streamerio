@@ -78,7 +78,6 @@ namespace Common.UI.Dialog
             
             _background.ShowAsync(ct).Forget();
             await dialog.ShowAsync(ct);
-            _background.SetInteractable(true);
             await UniTask.WaitWhile(() => dialog.IsShow, cancellationToken: ct);
         }
         
