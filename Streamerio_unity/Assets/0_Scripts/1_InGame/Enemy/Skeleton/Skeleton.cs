@@ -12,6 +12,8 @@ public class Skeleton : MonoBehaviour
     private float _spawnTime;
     private bool _canMove = false;
 
+    private Transform _player;
+
     void Awake()
     {
         _spawnTime = Time.time;              // 追加: 出現時間記録
@@ -20,8 +22,15 @@ public class Skeleton : MonoBehaviour
 
     void Start()
     {
+        // プレイヤーを探す
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            _player = playerObj.transform;
+        }
+        
         float rand = Random.Range(5f, 8f);
-        transform.position += new Vector3(rand, 0, 0); // 少し上にずらして生成
+        transform.position += new Vector3(_player.position.x + rand, _player.position.y, 0); // 少し上にずらして生成
     }
 
     void Update()
