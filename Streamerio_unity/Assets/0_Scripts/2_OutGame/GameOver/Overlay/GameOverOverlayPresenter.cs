@@ -3,6 +3,7 @@ using Common.Scene;
 using Common.UI.Display.Overlay;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
+using R3;
 
 namespace OutGame.GameOver.Overlay
 {
@@ -11,18 +12,20 @@ namespace OutGame.GameOver.Overlay
         protected override void Bind()
         {
             base.Bind();
-            View.RetryButton.SetClickEvent(async () =>
-            {
-                await LoadingScreenPresenter.Instance.ShowAsync();
-                SaveManager.Instance.IsRetry = true;
-                SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
-            });
+            View.RetryButton.OnClickAsObservable
+                .SubscribeAwait(async (_, ct) =>
+                {
+                    await LoadingScreenPresenter.Instance.ShowAsync();
+                    SaveManager.Instance.IsRetry = true;
+                    SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
+                }).RegisterTo(destroyCancellationToken);
             
-            View.TitleButton.SetClickEvent(async () =>
-            {
-                await LoadingScreenPresenter.Instance.ShowAsync();
-                SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
-            });
+            View.TitleButton.OnClickAsObservable
+                .SubscribeAwait(async (_, ct) =>
+                {
+                    await LoadingScreenPresenter.Instance.ShowAsync();
+                    SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
+                }).RegisterTo(destroyCancellationToken);
         }
     }
 }

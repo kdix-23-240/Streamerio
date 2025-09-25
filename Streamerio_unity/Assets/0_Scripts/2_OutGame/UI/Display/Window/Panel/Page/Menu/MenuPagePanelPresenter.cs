@@ -5,6 +5,7 @@ using Common.UI.Loading;
 using Common.UI.Part.Button;
 using Cysharp.Threading.Tasks;
 using OutGame.Title;
+using R3;
 using UnityEngine;
 
 namespace OutGame.UI.Display.Window.Panel.Page.Menu
@@ -34,18 +35,23 @@ namespace OutGame.UI.Display.Window.Panel.Page.Menu
         {
             base.Bind();
 
-            _menuPanelView.StartButton.SetClickEvent(async () =>
-            {
-                await TitleManager.Instance.LoadTitleAsync();
-                WebsocketManager.Instance.ConnectWebSocket();
-                SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
-            });
+            _menuPanelView.StartButton.OnClickAsObservable
+                .SubscribeAwait(async (_, ct) =>
+                {
+                    await TitleManager.Instance.LoadTitleAsync();
+                    WebsocketManager.Instance.ConnectWebSocket();
+                    SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
+                }).RegisterTo(destroyCancellationToken);
 
             BindChapterButton(_menuPanelView.HowToPlayButton, ChapterType.HowToPlay);
             BindChapterButton(_menuPanelView.OptionButton, ChapterType.Option);
             BindChapterButton(_menuPanelView.CreditButton, ChapterType.Credit);
 
-            _menuPanelView.ExitButton.SetClickEvent(() => TitleManager.Instance.ShowTitleAsync(destroyCancellationToken).Forget());
+            _menuPanelView.ExitButton.OnClickAsObservable
+                .Subscribe(_ =>
+                {
+                    TitleManager.Instance.ShowTitleAsync(destroyCancellationToken).Forget();
+                }).RegisterTo(destroyCancellationToken);
         }
 
         /// <summary>
@@ -55,7 +61,11 @@ namespace OutGame.UI.Display.Window.Panel.Page.Menu
         /// <param name="type"></param>
         private void BindChapterButton(ButtonBase button, ChapterType type)
         {
-            button.SetClickEvent(()=>ChapterManager.Instance.OpenChapterAsync(type, destroyCancellationToken).Forget());
+            button.OnClickAsObservable
+                .Subscribe(_=>
+                {
+                    ChapterManager.Instance.OpenChapterAsync(type, destroyCancellationToken).Forget();
+                }).RegisterTo(destroyCancellationToken);
         }
     }
 }

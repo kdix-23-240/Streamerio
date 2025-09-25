@@ -37,17 +37,28 @@ namespace Common.UI.Display.Window.Panel
         protected override void SetEvent()
         {
             base.SetEvent();
-            
-            View.NextButton.SetClickEvent(()=> OpenNextPage(destroyCancellationToken).Forget());
-            View.BackButton.SetClickEvent(()=> OpenPrePage(destroyCancellationToken).Forget());
-            View.CloseButton.SetClickEvent(async () =>
-            {
-                var  isAllClose = await ChapterManager.Instance.CloseChapterAsync(destroyCancellationToken);
-                if (isAllClose)
+
+            View.NextButton.OnClickAsObservable
+                .Subscribe(_ =>
                 {
-                    AllCloseEvent();
-                }
-            });
+                    OpenNextPage(destroyCancellationToken).Forget();
+                }).RegisterTo(destroyCancellationToken);
+            
+            View.BackButton.OnClickAsObservable
+                .Subscribe(_ =>
+                {
+                    OpenPrePage(destroyCancellationToken).Forget();
+                }).RegisterTo(destroyCancellationToken);
+            
+            View.CloseButton.OnClickAsObservable
+                .SubscribeAwait(async (_, ct) =>
+                {
+                    var  isAllClose = await ChapterManager.Instance.CloseChapterAsync(ct);
+                    if (isAllClose)
+                    {
+                        AllCloseEvent();
+                    }
+                }).RegisterTo(destroyCancellationToken);
         }
         
         protected override void Bind()
