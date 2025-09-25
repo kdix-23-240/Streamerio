@@ -18,7 +18,6 @@ namespace OutGame.GameOver.Overlay
         {
             base.Initialize();
             
-            Debug.Log("GameOverOverlayView Initialize");
             _retryButton.Initialize();
             _titleButton.Initialize();
         }

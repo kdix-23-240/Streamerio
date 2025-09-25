@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace OutGame.GameOver.Overlay
 {
+    [RequireComponent(typeof(GameOverOverlayView))]
     public class GameOverOverlayPresenter: OverlayPresenterBase
     {
         [SerializeField, ReadOnly]

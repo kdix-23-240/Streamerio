@@ -3,8 +3,8 @@ using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System.Threading;
+using Common.UI.Display.Background;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Common.UI.Display.Overlay
 {
@@ -16,6 +16,9 @@ namespace Common.UI.Display.Overlay
     /// </summary>
     public class CommonOverlayView : DisplayViewBase
     {
+        [SerializeField, ReadOnly]
+        private DisplayBackgroundPresenter _background;
+        public DisplayBackgroundPresenter Background => _background;
         [SerializeField, LabelText("アニメーションさせるオブジェクト")]
         private CanvasGroup[] _uiParts;
         
@@ -42,6 +45,14 @@ namespace Common.UI.Display.Overlay
         private FadeAnimationComponent[] _showAnimations;
         private FadeAnimationComponent _hideAnimation;
 
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            _background ??= GetComponentInChildren<DisplayBackgroundPresenter>();
+        }
+#endif
+        
         /// <summary>
         /// 初期化処理。
         /// - 各パーツに対応する表示用フェードアニメーションを構築
@@ -50,6 +61,8 @@ namespace Common.UI.Display.Overlay
         public override void Initialize()
         {
             base.Initialize();
+            
+            _background.Initialize();
             
             _showAnimations = new FadeAnimationComponent[_uiParts.Length];
             for (int i = 0; i < _uiParts.Length; i++)
@@ -68,6 +81,9 @@ namespace Common.UI.Display.Overlay
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             CanvasGroup.alpha = _showFadeAnimationParam.Alpha;
+
+            await _background.ShowAsync(ct);
+            
             foreach (var anim in _showAnimations)
             {
                 await anim.PlayAsync(ct);
@@ -83,6 +99,9 @@ namespace Common.UI.Display.Overlay
         public override void Show()
         {
             CanvasGroup.alpha = _showFadeAnimationParam.Alpha;
+            
+            _background.Show();
+            
             SetAlphaParts(_showFadeAnimationParam.Alpha);
         }
         
@@ -94,6 +113,8 @@ namespace Common.UI.Display.Overlay
         public override async UniTask HideAsync(CancellationToken ct)
         {
             await _hideAnimation.PlayAsync(ct);
+            
+            _background.Hide();
             SetAlphaParts(_hideFadeAnimationParam.Alpha);
         }
 
@@ -105,6 +126,8 @@ namespace Common.UI.Display.Overlay
         public override void Hide()
         {
             CanvasGroup.alpha = _hideFadeAnimationParam.Alpha;
+            
+            _background.Hide();
             SetAlphaParts(_hideFadeAnimationParam.Alpha);
         }
         
