@@ -166,3 +166,5 @@ crashlytics-build.properties
 /db
 
 .serena
+
+.gocache

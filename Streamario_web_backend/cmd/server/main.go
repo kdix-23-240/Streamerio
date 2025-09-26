@@ -1,9 +1,11 @@
 package main
 
 import (
-	stdlog "log"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"streamerrio-backend/internal/config"
@@ -11,6 +13,7 @@ import (
 	"streamerrio-backend/internal/repository"
 	"streamerrio-backend/internal/service"
 	"streamerrio-backend/pkg/counter"
+	"streamerrio-backend/pkg/logger"
 
 	// PostgreSQLドライバー
 	"github.com/jmoiron/sqlx"
@@ -29,56 +32,71 @@ func main() {
 	// 2. 設定ロード
 	cfg, err := config.Load()
 	if err != nil {
-		stdlog.Fatal("Failed to load config:", err)
+		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
+		os.Exit(1)
 	}
 
-	// 3. DB 接続確立
+	// 3. ロガー初期化
+	logCfg := logger.Config{Level: cfg.LogLevel, Format: cfg.LogFormat, AddSource: cfg.LogAddSource}
+	appLogger, err := logger.Init(logCfg)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to init logger: %v\n", err)
+		os.Exit(1)
+	}
+	log := appLogger.With(slog.String("component", "bootstrap"))
+
+	// 4. DB 接続確立
 	// 接続先の概要を安全にログ（パスワードは出力しない）
 	host, port, dbname, sslmode := extractConnInfo(cfg.DatabaseURL)
-	stdlog.Printf("DB connect info: host=%s port=%s db=%s sslmode=%s", host, port, dbname, sslmode)
+	log.Info("connecting to database", slog.String("host", host), slog.String("port", port), slog.String("db", dbname), slog.String("sslmode", sslmode))
 
 	db, err := sqlx.Connect("postgres", cfg.DatabaseURL)
 	if err != nil {
-		stdlog.Fatal("Failed to connect to database:", err)
+		log.Error("failed to connect to database", slog.Any("error", err))
+		os.Exit(1)
 	}
 	defer db.Close()
 
-	// 4. Redis 初期化 & カウンタ (イベント数 / 視聴者アクティビティ)
+	// 5. Redis 初期化 & カウンタ (イベント数 / 視聴者アクティビティ)
 	var rdb *redis.Client
 	if strings.HasPrefix(cfg.RedisURL, "redis://") || strings.HasPrefix(cfg.RedisURL, "rediss://") {
 		opt, err := redis.ParseURL(cfg.RedisURL)
 		if err != nil {
-			stdlog.Fatal("Invalid REDIS_URL:", err)
+			log.Error("invalid redis url", slog.String("redis_url", cfg.RedisURL), slog.Any("error", err))
+			os.Exit(1)
 		}
 		rdb = redis.NewClient(opt)
 	} else {
 		rdb = redis.NewClient(&redis.Options{Addr: cfg.RedisURL})
 	}
-	redisCounter := counter.NewRedisCounter(rdb)
+	redisCounter := counter.NewRedisCounter(rdb, appLogger.With(slog.String("component", "redis_counter")))
 
-	// 5. リポジトリ (永続層) 準備
-	eventRepo := repository.NewEventRepository(db)
-	roomRepo := repository.NewRoomRepository(db)
-	viewerRepo := repository.NewViewerRepository(db)
+	// 6. リポジトリ (永続層) 準備
+	repoLogger := appLogger.With(slog.String("component", "repository"))
+	eventRepo := repository.NewEventRepository(db, repoLogger.With(slog.String("repository", "event")))
+	roomRepo := repository.NewRoomRepository(db, repoLogger.With(slog.String("repository", "room")))
+	viewerRepo := repository.NewViewerRepository(db, repoLogger.With(slog.String("repository", "viewer")))
 
-	// 6. サービス層生成
+	// 7. サービス層生成
 	roomService := service.NewRoomService(roomRepo, cfg)
 	wsHandler := handler.NewWebSocketHandler()
 	wsHandler.SetRoomService(roomService)
 	sender := webSocketAdapter{ws: wsHandler}
-	eventService := service.NewEventService(redisCounter, eventRepo, sender)
-	sessionService := service.NewGameSessionService(roomService, eventRepo, viewerRepo, redisCounter, sender)
+	eventLogger := appLogger.With(slog.String("component", "event_service"))
+	sessionLogger := appLogger.With(slog.String("component", "session_service"))
+	eventService := service.NewEventService(redisCounter, eventRepo, sender, eventLogger)
+	sessionService := service.NewGameSessionService(roomService, eventRepo, viewerRepo, redisCounter, sender, sessionLogger)
 	viewerService := service.NewViewerService(viewerRepo)
 	wsHandler.SetGameSessionService(sessionService)
 	apiHandler := handler.NewAPIHandler(roomService, eventService, sessionService, viewerService)
 
-	// 7. Echo フレームワーク初期化 & ミドルウェア
+	// 8. Echo フレームワーク初期化 & ミドルウェア
 	e := echo.New()
 	e.Logger.SetLevel(elog.DEBUG)
 	e.Use(middleware.Logger())  // アクセスログ
 	e.Use(middleware.Recover()) // パニック回復
 
-	// 8. CORS 設定
+	// 9. CORS 設定
 	// 認証付き（Cookie 同送）要求に対応するため AllowCredentials=true とし、
 	// オリジンは allowlist（環境変数 FRONTEND_URL）に限定する。
 	// 注意: AllowCredentials=true の場合、"*" は使用できない。
@@ -95,7 +113,7 @@ func main() {
 		AllowCredentials: allowCredentials,
 	}))
 
-	// 9. ルーティング定義
+	// 10. ルーティング定義
 	e.GET("/", healthCheck)
 	e.GET("/get_viewer_id", apiHandler.GetOrCreateViewerID)
 	// WebSocket
@@ -109,9 +127,12 @@ func main() {
 	api.GET("/rooms/:id/results", apiHandler.GetRoomResult)
 	api.POST("/viewers/set_name", apiHandler.SetViewerName)
 
-	// 10. サーバ起動
-	stdlog.Printf("🚀 Streamerrio Server starting on port %s", cfg.Port)
-	e.Logger.Fatal(e.Start(":" + cfg.Port))
+	// 11. サーバ起動
+	log.Info("starting http server", slog.String("port", cfg.Port))
+	if err := e.Start(":" + cfg.Port); err != nil {
+		log.Error("server stopped", slog.Any("error", err))
+		os.Exit(1)
+	}
 }
 
 func healthCheck(c echo.Context) error {
