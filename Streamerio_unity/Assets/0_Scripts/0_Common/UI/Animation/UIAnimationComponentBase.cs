@@ -3,7 +3,6 @@ using DG.Tweening;
 using System;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Common.UI.Animation
 {
@@ -31,10 +30,9 @@ namespace Common.UI.Animation
     [Serializable]
     public class UIAnimationComponentParam
     {
-        [FormerlySerializedAs("Duration")]
         [Header("アニメーションの時間(秒)")]
         [SerializeField, Min(0.01f)]
-        public float DurationSec;
+        public float DurationSec = 0.5f;
 
         [Header("イージング種類")]
         [SerializeField]

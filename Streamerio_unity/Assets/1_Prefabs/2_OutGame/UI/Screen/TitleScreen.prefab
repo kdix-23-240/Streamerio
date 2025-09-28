@@ -68,11 +68,11 @@ MonoBehaviour:
   _canvasGroup: {fileID: 7295010252067547802}
   _gameStartText: {fileID: 1733000211055546222}
   _showFadeAnimationParam:
-    Duration: 0.1
+    DurationSec: 0.1
     Ease: 2
     Alpha: 1
   _hideFadeAnimationParam:
-    Duration: 0.1
+    DurationSec: 0.1
     Ease: 3
     Alpha: 0
 --- !u!114 &5468571624533860983
@@ -87,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a7444d105d43c09995d72913531d3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  View: {fileID: 3485820543372737917}
+  CommonView: {fileID: 3485820543372737917}
 --- !u!1 &6673816667159443334
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,7 +253,7 @@ MonoBehaviour:
   _rectTransform: {fileID: 1974740286193260758}
   _canvasGroup: {fileID: 6919198803706085132}
   _flashAnimationParam:
-    Duration: 1
+    DurationSec: 1
     Ease: 1
     MinAlpha: 0
     MaxAlpha: 1

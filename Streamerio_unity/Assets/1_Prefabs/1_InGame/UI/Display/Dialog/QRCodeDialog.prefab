@@ -420,7 +420,7 @@ MonoBehaviour:
   _moveRectTransform: {fileID: 6918244042516798048}
   _closeButton: {fileID: 459216351357127988}
   _showAnimationParam:
-    Duration: 1
+    DurationSec: 0.5
     Ease: 1
     Path:
     - {x: 1200, y: 1080, z: 0}
@@ -428,11 +428,11 @@ MonoBehaviour:
     - {x: 0, y: 0, z: 0}
     PathType: 1
   _hideAnimationParam:
-    Duration: 1
+    DurationSec: 0.5
     Ease: 1
     Path:
     - {x: 0, y: 0, z: 0}
-    - {x: -780, y: -240, z: 0}
+    - {x: -240, y: -780, z: 0}
     - {x: -1200, y: -1080, z: 0}
     PathType: 1
 --- !u!114 &694169764207606357
