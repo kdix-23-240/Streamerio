@@ -26,7 +26,7 @@ namespace Common.UI.Part.Button
         private ScaleAnimationComponentParam _pushDownAnimParam = new()
         {
             Scale = 0.75f, 
-            Duration = 0.1f,
+            DurationSec = 0.1f,
             Ease = Ease.InSine,
         };
 
@@ -34,7 +34,7 @@ namespace Common.UI.Part.Button
         private ScaleAnimationComponentParam _pushUpAnimParam = new()
         {
             Scale = 1f, 
-            Duration = 0.1f,
+            DurationSec = 0.1f,
             Ease = Ease.OutSine,
         };
         

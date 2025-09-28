@@ -3,33 +3,40 @@ using DG.Tweening;
 using System;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Common.UI.Animation
 {
     /// <summary>
-    /// UIのアニメーションの基底クラス
+    /// UI アニメーションの基底インターフェース。
+    /// - 各種 UI アニメーションコンポーネントが実装する
+    /// - 非同期でアニメーションを実行し、キャンセル対応も可能
     /// </summary>
     public interface IUIAnimationComponent
     {
         /// <summary>
-        /// アニメーションを再生
+        /// アニメーションを再生する。
+        /// - UniTask を返すので await 可能
+        /// - CancellationToken による中断に対応
         /// </summary>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         UniTask PlayAsync(CancellationToken ct);
     }
 
     /// <summary>
-    /// UIアニメーションの共通パラメータ
+    /// UI アニメーションの共通パラメータ。
+    /// - 再生時間
+    /// - イージング
+    /// などの基本的な設定を保持
     /// </summary>
     [Serializable]
     public class UIAnimationComponentParam
     {
-        [Header("アニメーションの時間")]
+        [FormerlySerializedAs("Duration")]
+        [Header("アニメーションの時間(秒)")]
         [SerializeField, Min(0.01f)]
-        public float Duration;
+        public float DurationSec;
 
-        [Header("イージング")]
+        [Header("イージング種類")]
         [SerializeField]
         public Ease Ease = Ease.Linear;
     }

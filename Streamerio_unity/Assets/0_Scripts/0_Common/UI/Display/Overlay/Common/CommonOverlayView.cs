@@ -27,7 +27,7 @@ namespace Common.UI.Display.Overlay
         private FadeAnimationComponentParam _showFadeAnimationParam = new ()
         {
             Alpha = 1f,
-            Duration = 0.1f,
+            DurationSec = 0.1f,
             Ease = Ease.InSine,
         };
 
@@ -38,7 +38,7 @@ namespace Common.UI.Display.Overlay
         private FadeAnimationComponentParam _hideFadeAnimationParam = new ()
         {
             Alpha = 0f,
-            Duration = 0.1f,
+            DurationSec = 0.1f,
             Ease = Ease.OutSine,
         };
         

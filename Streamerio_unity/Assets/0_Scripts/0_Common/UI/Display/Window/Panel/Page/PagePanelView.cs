@@ -19,7 +19,7 @@ namespace Common.UI.Display.Window.Panel
         private FadeAnimationComponentParam _showContentAnimParam = new()
         {
             Alpha = 1f,
-            Duration = 0.1f,
+            DurationSec = 0.1f,
             Ease = Ease.InSine,
         };
         
@@ -30,7 +30,7 @@ namespace Common.UI.Display.Window.Panel
         private FadeAnimationComponentParam _hideAnimParam = new()
         {
             Alpha = 0f,
-            Duration = 0.2f,
+            DurationSec = 0.2f,
             Ease = Ease.OutSine,
         };
         

@@ -25,15 +25,15 @@ namespace Common.UI.Display.Window
         [SerializeField, LabelText("表示アニメーション")]
         private MoveAnimationComponentParam _showAnimParam = new()
         {
-            Position = Vector2.zero,
-            Duration = 0.2f,
+            AnchoredPosition = Vector2.zero,
+            DurationSec = 0.2f,
             Ease = Ease.InSine,
         };
         [SerializeField, LabelText("非表示アニメーション")]
         private MoveAnimationComponentParam _hideAnimParam = new()
         {
-            Position = Vector2.zero,
-            Duration = 0.2f,
+            AnchoredPosition = Vector2.zero,
+            DurationSec = 0.2f,
             Ease = Ease.OutSine,
         };
         
@@ -72,7 +72,7 @@ namespace Common.UI.Display.Window
         public override void Show()
         {
             backgroundPresenter.Show();
-            RectTransform.anchoredPosition = _showAnimParam.Position;
+            RectTransform.anchoredPosition = _showAnimParam.AnchoredPosition;
         }
 
         public override async UniTask HideAsync(CancellationToken ct)
@@ -84,7 +84,7 @@ namespace Common.UI.Display.Window
 
         public override void Hide()
         {
-            RectTransform.anchoredPosition = _hideAnimParam.Position;
+            RectTransform.anchoredPosition = _hideAnimParam.AnchoredPosition;
             
             backgroundPresenter.Hide();
         }
