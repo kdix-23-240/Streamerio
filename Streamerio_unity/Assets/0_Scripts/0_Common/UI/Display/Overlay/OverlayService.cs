@@ -1,12 +1,11 @@
-using InGame.UI.Display.Overlay;
-using OutGame.GameOver.Overlay;
 using UnityEngine;
 
 namespace Common.UI.Display.Overlay
 {
     /// <summary>
     /// Overlay 系の Display を生成・初期化するサービス。
-    /// DisplayServiceBase を継承し、Overlay 専用の初期化処理を追加する。
+    /// - DisplayServiceBase を継承
+    /// - 共通の初期化処理に加え、型ごとにカスタム初期化を追加可能
     /// </summary>
     public class OverlayService : DisplayServiceBase
     {
@@ -17,24 +16,16 @@ namespace Common.UI.Display.Overlay
 
         /// <summary>
         /// Overlay の初期化処理。
-        /// - 型ごとに初期化を行う
+        /// - 共通初期化を実行
+        /// - 型ごとの追加初期化があれば switch-case で分岐
         /// </summary>
         protected override TDisplay InitializeDisplay<TDisplay>(TDisplay display)
         {
-            // 型ごとの初期化を switch 式で整理
             switch (display)
             {
-                case CommonOverlayPresenter overlay:
-                    overlay.Initialize();
-                    break;
-                case GameOverOverlayPresenter overlay:
-                    overlay.Initialize();
-                    break;
-                case ClearOverlayPresenter overlay:
-                    overlay.Initialize();
-                    break;
                 default:
-                    Debug.LogError("オーバーレイの初期化に失敗しました。");
+                    display.Initialize();
+                    Debug.Log($"[OverlayService] {typeof(TDisplay).Name} を初期化しました");
                     break;
             }
 
