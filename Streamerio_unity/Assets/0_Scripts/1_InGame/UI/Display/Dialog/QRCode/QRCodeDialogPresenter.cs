@@ -1,29 +1,44 @@
-using System;
+using Alchemy.Inspector;
 using Common.UI.Dialog;
-using Common.UI.Display;
+using InGame.UI.QRCode;
 using UnityEngine;
 
 namespace InGame.UI.Display.Dialog.QRCode
 {
     /// <summary>
-    /// QRコードを表示するダイアログのつなぎ役
+    /// QRコード表示用ダイアログの Presenter。
+    /// - View の初期化
+    /// - QRコード画像の生成・セット
+    /// - 共通ダイアログのイベント購読処理は基底クラスに委譲
     /// </summary>
     [RequireComponent(typeof(QRCodeDialogView))]
-    [Serializable]
-    public class QRCodeDialogPresenter: DialogPresenterBase<QRCodeDialogView>
+    public class QRCodeDialogPresenter : DialogPresenterBase
     {
-        /// <summary>
-        /// QRコードの画像を設定
-        /// </summary>
-        /// <param name="sprite"></param>
-        public void SetQRCodeSprite(Sprite sprite)
-        {
-            CommonView.SetQRCodeSprite(sprite);
-        }
+        [SerializeField, ReadOnly]
+        private QRCodeDialogView _view;
 
-        protected override void CloseEvent()
+#if UNITY_EDITOR
+        /// <summary>
+        /// エディタ上でコンポーネント参照を自動補完
+        /// </summary>
+        protected override void OnValidate()
         {
-            InGameManager.Instance.StartGame();
+            base.OnValidate();
+            _view ??= GetComponent<QRCodeDialogView>();
+        }
+#endif
+
+        /// <summary>
+        /// 初期化処理。
+        /// - View の初期化
+        /// - QRコード画像を生成してセット
+        /// - 基底クラスの初期化でイベント購読を設定
+        /// </summary>
+        public override void Initialize()
+        {
+            _view.Initialize();
+            _view.SetQRCodeSprite(QRCodeSpriteGenerater.GetQRCodeSprite());
+            base.Initialize();
         }
     }
 }

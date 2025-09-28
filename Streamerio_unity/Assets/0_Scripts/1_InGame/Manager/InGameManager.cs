@@ -3,6 +3,7 @@ using Common;
 using Common.Audio;
 using Common.Save;
 using Common.Scene;
+using Common.UI.Dialog;
 using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
@@ -24,8 +25,6 @@ namespace InGame
         [SerializeField, LabelText("遊び方ウィンドウ")]
         private WindowPresenter _howToPlayWindow;
         
-        [SerializeField, LabelText("QRコードダイアログ")]
-        private QRCodeDialogPresenter _qrCodeDialog;
         [SerializeField, LabelText("ゲーム画面")]
         private InGameScreenPresenter _inGameScreen;
         [SerializeField, LabelText("マスク")]
@@ -37,19 +36,17 @@ namespace InGame
             
             var isPlayed = SaveManager.Instance.LoadPlayed();
             
+            var url = await WebsocketManager.Instance.GetFrontUrlAsync();
+            await QRCodeSpriteGenerater.InitializeSprite(url);
+            
             _howToPlayWindow.Initialize();
             _howToPlayWindow.Hide();
             
+            _inGameScreen.Initialize(QRCodeSpriteGenerater.GetQRCodeSprite(), _timeLimit);
+            
             OverlayManager.Instance.Initialize();
             
-            var qrGenerator = new QRCodeSpriteGenerater();
-
-            var url = await WebsocketManager.Instance.GetFrontUrlAsync();
-            _inGameScreen.Initialize(qrGenerator.Generate(url), _timeLimit);
-            
-            _qrCodeDialog.Initialize();
-            _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(url));
-            _qrCodeDialog.Hide();
+            DialogManager.Instance.Initialize();
             
             _inGameMaskView.Hide();
             
@@ -78,19 +75,15 @@ namespace InGame
         public async void OpenQRCodeDialog()
         {
             await _howToPlayWindow.HideAsync(destroyCancellationToken);
-            await _qrCodeDialog.ShowAsync(destroyCancellationToken);
+            await DialogManager.Instance.OpenAndWaitCloseAsync<QRCodeDialogPresenter>(destroyCancellationToken);
+            StartGame();
         }
 
         /// <summary>
         /// ゲーム開始
         /// </summary>
-        public async void StartGame()
+        public void StartGame()
         {
-            if (!SaveManager.Instance.IsRetry)
-            {
-                await _qrCodeDialog.HideAsync(destroyCancellationToken);
-            }
-            
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
         }

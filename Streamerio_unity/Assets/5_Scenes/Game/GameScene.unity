@@ -669,17 +669,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyRandomActivator: {fileID: 1409739954}
---- !u!114 &798208534 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4179072019655278926, guid: 2d96a5648216f4406bf044904a79fb4c, type: 3}
-  m_PrefabInstance: {fileID: 5223681545385189829}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41f6c476e65d45398b9a45a6d41cf9ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &807291876 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4325006575370108173, guid: e4ee1d08e8ff4dc49ab0a28fb67ae9bd, type: 3}
@@ -724,11 +713,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 491e46ce67a753747918e14e711ae5f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1019183137 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2075294167266760751, guid: 118a651d24cdf484c815c1e93532ec7b, type: 3}
-  m_PrefabInstance: {fileID: 7260203380963558026}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1153838236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2420,7 +2404,7 @@ PrefabInstance:
     - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
       propertyPath: _clearOverlay
       value: 
-      objectReference: {fileID: 7260203380963558032}
+      objectReference: {fileID: 0}
     - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
       propertyPath: _inGameScreen
       value: 
@@ -2428,7 +2412,7 @@ PrefabInstance:
     - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
       propertyPath: _qrCodeDialog
       value: 
-      objectReference: {fileID: 798208534}
+      objectReference: {fileID: 0}
     - target: {fileID: 5022073408084662194, guid: dd82c6fc768414efda9912b4412932c0, type: 3}
       propertyPath: _inGameMaskView
       value: 
@@ -2460,7 +2444,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2230566928488180189, guid: 2d96a5648216f4406bf044904a79fb4c, type: 3}
       propertyPath: m_Name
-      value: InGameDialogCanvas
+      value: DialogCanvas
       objectReference: {fileID: 0}
     - target: {fileID: 2230566928488180189, guid: 2d96a5648216f4406bf044904a79fb4c, type: 3}
       propertyPath: m_IsActive
@@ -2551,7 +2535,8 @@ PrefabInstance:
       value: 40
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4856683556641141646, guid: 2d96a5648216f4406bf044904a79fb4c, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2d96a5648216f4406bf044904a79fb4c, type: 3}
@@ -2850,52 +2835,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2075294167266760751, guid: 118a651d24cdf484c815c1e93532ec7b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7260203380963558034}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 118a651d24cdf484c815c1e93532ec7b, type: 3}
---- !u!114 &7260203380963558032 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3336120732668630094, guid: 118a651d24cdf484c815c1e93532ec7b, type: 3}
-  m_PrefabInstance: {fileID: 7260203380963558026}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1019183137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6660b46b3dc4c158092f85011180f0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &7260203380963558034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1019183137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!1001 &7752630308737482844
 PrefabInstance:
   m_ObjectHideFlags: 0
