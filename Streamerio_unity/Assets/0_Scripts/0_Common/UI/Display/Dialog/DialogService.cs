@@ -25,6 +25,7 @@ namespace Common.UI.Dialog
                 default:
                     // 共通初期化
                     display.Initialize();
+                    display.Hide();
                     Debug.Log($"[DialogService] {typeof(TDisplay).Name} を初期化しました");
                     break;
             }

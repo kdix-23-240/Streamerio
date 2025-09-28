@@ -8,7 +8,6 @@ using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
-using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
 using InGame.UI.Display.Screen;
@@ -27,8 +26,6 @@ namespace InGame
         
         [SerializeField, LabelText("ゲーム画面")]
         private InGameScreenPresenter _inGameScreen;
-        [SerializeField, LabelText("マスク")]
-        private InGameMaskView _inGameMaskView;
 
         private async void Start()
         {
@@ -47,8 +44,6 @@ namespace InGame
             OverlayManager.Instance.Initialize();
             
             DialogManager.Instance.Initialize();
-            
-            _inGameMaskView.Hide();
             
             // ゲーム画面表示
             await LoadingScreenPresenter.Instance.LoadingToInGameAsync();
@@ -105,7 +100,6 @@ namespace InGame
         public async void GameClear()
         {
             await WebsocketManager.Instance.SendWebSocketMessage( "{\"type\": \"game_end\" }" );
-            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
             await OverlayManager.Instance.OpenAndWaitCloseAsync<ClearOverlayPresenter>(destroyCancellationToken);
             AudioManager.Instance.StopBGM();
             Debug.Log("ゲームクリア");

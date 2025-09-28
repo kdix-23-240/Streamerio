@@ -25,6 +25,7 @@ namespace Common.UI.Display.Overlay
             {
                 default:
                     display.Initialize();
+                    display.Hide();
                     Debug.Log($"[OverlayService] {typeof(TDisplay).Name} を初期化しました");
                     break;
             }
