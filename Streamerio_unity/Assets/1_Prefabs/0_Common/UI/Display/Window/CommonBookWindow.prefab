@@ -210,7 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20126270dbaea4fb39ff681653c2282c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  View: {fileID: 4564600478829257381}
+  CommonView: {fileID: 4564600478829257381}
 --- !u!114 &4564600478829257381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -225,16 +225,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 2786838231688197781}
   _canvasGroup: {fileID: 84501704387346200}
-  _background: {fileID: 1360818626539178886}
+  backgroundPresenter: {fileID: 2351420737450003676}
   _bookWindowAnimation: {fileID: 7248069436254290330}
   _showAnimParam:
-    Duration: 0.2
+    DurationSec: 0.2
     Ease: 2
-    Position: {x: 0, y: 0}
+    AnchoredPosition: {x: 0, y: 0}
   _hideAnimParam:
-    Duration: 0.2
+    DurationSec: 0.2
     Ease: 3
-    Position: {x: 0, y: -1080}
+    AnchoredPosition: {x: 0, y: -1080}
 --- !u!1 &4692654194847596547
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,15 +367,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bff8377074bb84c508ad7b476786ea05, type: 3}
---- !u!114 &1360818626539178886 stripped
+--- !u!114 &2351420737450003676 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6955803070776486661, guid: bff8377074bb84c508ad7b476786ea05, type: 3}
+  m_CorrespondingSourceObject: {fileID: 5964050056270031967, guid: bff8377074bb84c508ad7b476786ea05, type: 3}
   m_PrefabInstance: {fileID: 8243103951297077379}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26445a93a4a64079b58182cd2954e341, type: 3}
+  m_Script: {fileID: 11500000, guid: 3a07e10c55e324631a16ad3c24e90f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &4417198736753747963 stripped
