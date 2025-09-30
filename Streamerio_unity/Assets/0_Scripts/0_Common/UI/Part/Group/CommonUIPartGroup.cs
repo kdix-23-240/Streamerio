@@ -57,7 +57,6 @@ namespace Common.UI.Part.Group
         /// </summary>
         public async UniTask ShowAsync(CancellationToken ct)
         {
-            Debug.Log($"CommonUIPartGroup ShowAsync");
             await _showAnimations.PlayAsync(ct);
         }
 

@@ -76,7 +76,6 @@ namespace Common.UI.Display
 
             var display = _displayService.GetDisplay<TDisplay>();
             _displayStack.Push(display);
-            Debug.Log($"[DisplayManager] Open {typeof(TDisplay).Name}, StackCount: {_displayStack.Count}");
 
             await display.ShowAsync(ct);
             return display;
@@ -120,7 +119,6 @@ namespace Common.UI.Display
             if (!TryPop(out var current))
                 return;
 
-            Debug.Log($"[DisplayManager] Close {current.GetType().Name}, StackCount: {_displayStack.Count}");
             await current.HideAsync(ct);
             await ShowTopAsync(ct);
         }
@@ -168,7 +166,6 @@ namespace Common.UI.Display
                 return;
             }
 
-            Debug.Log($"[DisplayManager] Show {next.GetType().Name}, StackCount: {_displayStack.Count}");
             await next.ShowAsync(ct);
         }
 

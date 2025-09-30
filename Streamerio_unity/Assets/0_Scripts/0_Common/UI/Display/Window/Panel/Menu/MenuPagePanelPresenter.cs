@@ -7,18 +7,18 @@ using UnityEngine;
 
 namespace Common.UI.Display.Window.Panel
 {
-    [RequireComponent(typeof(MenuPanelView))]
+    [RequireComponent(typeof(MenuPagePanelView))]
     public class MenuPagePanelPresenter: PagePanelPresenter
     {
         [SerializeField, ReadOnly]
-        private MenuPanelView _view;
+        private MenuPagePanelView _view;
 
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
             base.OnValidate();
 
-            _view ??= GetComponent<MenuPanelView>();
+            _view ??= GetComponent<MenuPagePanelView>();
         }
 #endif
         

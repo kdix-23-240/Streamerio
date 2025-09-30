@@ -9,11 +9,15 @@ using UnityEngine.EventSystems;
 namespace Common.UI.Display.Window.Panel
 {
     /// <summary>
-    /// 章のパネルのプレゼンター基底クラス。
-    /// - ChapterPanelView と連携してページを表示/非表示する
-    /// - ボタン入力（次/前/閉じる）を購読し、遷移アニメーションを制御する
-    /// - IDisplay を実装し、外部から開閉を統一的に扱える
-    /// - BookWindowAnimation を用いて「本をめくる」演出を付与
+    /// 章（Chapter）パネルの Presenter 基底クラス。
+    /// 役割:
+    /// - ChapterPanelView と連携してページの表示/非表示を制御
+    /// - 次/前/閉じるボタンの入力を購読し、ページ遷移と演出（BookWindowAnimation）を行う
+    /// - IDisplay を実装して外部から統一的な開閉操作を受け付ける
+    ///
+    /// 注意:
+    /// - 遷移中は View を非インタラクティブにし、完了後に戻す
+    /// - ページ番号は常に Clamp して範囲外アクセスを防止
     /// </summary>
     [RequireComponent(typeof(ChapterPanelView))]
     public abstract class ChapterPanelPresenterBase : UIBehaviour, IDisplay
@@ -25,7 +29,7 @@ namespace Common.UI.Display.Window.Panel
         /// <summary>現在表示中かどうか</summary>
         public bool IsShow => _isShow;
         
-        private int _currentIndex; // 現在のページ番号
+        private int _currentIndex;                       // 現在のページ番号（0 始まり）
         private BookWindowAnimation _bookWindowAnimation; // ページめくり演出
 
 #if UNITY_EDITOR
@@ -37,16 +41,17 @@ namespace Common.UI.Display.Window.Panel
 #endif
 
         /// <summary>
-        /// 今回は使用しない
+        /// IDisplay の規約上のメソッドだが、本系では未使用。
         /// </summary>
         public void Initialize() { }
 
         /// <summary>
-        /// 初期化処理。
-        /// - BookWindowAnimation を受け取り保持
-        /// - ページ番号をリセット
-        /// - View の初期化
-        /// - ボタンイベントの購読をセット
+        /// 初期化。
+        /// 手順:
+        /// 1) BookWindowAnimation を受け取って保持
+        /// 2) 現在ページを 0 にリセット
+        /// 3) View を初期化
+        /// 4) ボタン入力を購読
         /// </summary>
         public void Initialize(BookWindowAnimation bookWindowAnimation)
         {
@@ -58,32 +63,30 @@ namespace Common.UI.Display.Window.Panel
         }
         
         /// <summary>
-        /// ボタンイベントを購読し、ページ遷移や閉じる処理を登録。
+        /// ボタン入力を購読し、ページ遷移/クローズを登録。
+        /// - 次へ: OpenNextPage
+        /// - 前へ: OpenPrePage
+        /// - 閉じる: ChapterManager.CloseTopAsync
         /// </summary>
         private void Bind()
         {
-            // 次のページ
             _view.NextButton.OnClickAsObservable
-                .Subscribe(_ => { OpenNextPage(destroyCancellationToken).Forget(); })
+                .SubscribeAwait(async (_, ct) => { await OpenNextPage(ct); })
                 .RegisterTo(destroyCancellationToken);
             
-            // 前のページ
             _view.BackButton.OnClickAsObservable
-                .Subscribe(_ => { OpenPrePage(destroyCancellationToken).Forget(); })
+                .SubscribeAwait(async (_, ct) => { await OpenPrePage(ct); })
                 .RegisterTo(destroyCancellationToken);
             
-            // 閉じる
             _view.CloseButton.OnClickAsObservable
-                .SubscribeAwait(async (_, ct) =>
-                {
-                    await ChapterManager.Instance.CloseTopAsync(ct);
-                })
+                .SubscribeAwait(async (_, ct) => { await ChapterManager.Instance.CloseTopAsync(ct); })
                 .RegisterTo(destroyCancellationToken);
         }
         
         /// <summary>
-        /// 表示（アニメーション付き）
-        /// - ページ番号をリセットして最初のページを表示
+        /// 表示（アニメーションあり）。
+        /// - 最初のページから表示を開始
+        /// - 遷移中は操作禁止
         /// </summary>
         public async UniTask ShowAsync(CancellationToken ct)
         {
@@ -96,8 +99,8 @@ namespace Common.UI.Display.Window.Panel
         }
 
         /// <summary>
-        /// 即時表示
-        /// - ページ番号をリセットして最初のページを表示
+        /// 即時表示。
+        /// - 最初のページから表示を開始
         /// </summary>
         public void Show()
         {
@@ -110,60 +113,69 @@ namespace Common.UI.Display.Window.Panel
         }
         
         /// <summary>
-        /// 現在表示中のページをアニメーションで非表示
+        /// 非表示（アニメーションあり）。
+        /// - 現在ページを閉じてから全体を隠す
+        /// - 遷移中は操作禁止
         /// </summary>
         public async UniTask HideAsync(CancellationToken ct)
         {
             _view.SetInteractable(false);
-            
             await _view.HidePageAsync(_currentIndex, ct);
-            
             _view.Hide();
             _isShow = false;
         }
 
         /// <summary>
-        /// 現在表示中のページを即時非表示
+        /// 即時非表示。
+        /// - 現在ページを閉じてから全体を隠す
         /// </summary>
         public void Hide()
         {
             _view.SetInteractable(false);
-            
             _view.HidePage(_currentIndex);
-            
             _view.Hide();
             _isShow = false;
         }
         
         /// <summary>
-        /// 次のページを開く。
-        /// - 現在のページを閉じる
-        /// - ページめくり演出（右めくり）
-        /// - 次のページを表示
+        /// 次のページへ。
+        /// 流れ:
+        /// 1) 現ページを非表示（非同期）
+        /// 2) 右めくり演出
+        /// 3) 次ページを表示
+        /// 4) 操作再開
         /// </summary>
         private async UniTask OpenNextPage(CancellationToken ct)
         {
+            _view.SetInteractable(false);
             _view.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnRightAsync(ct);
             await ShowPageAsync(_currentIndex + 1, ct);
+            _view.SetInteractable(true);
         }
 
         /// <summary>
-        /// 前のページを開く。
-        /// - 現在のページを閉じる
-        /// - ページめくり演出（左めくり）
-        /// - 前のページを表示
+        /// 前のページへ。
+        /// 流れ:
+        /// 1) 現ページを非表示（非同期）
+        /// 2) 左めくり演出
+        /// 3) 前ページを表示
+        /// 4) 操作再開
         /// </summary>
         private async UniTask OpenPrePage(CancellationToken ct)
         {
+            _view.SetInteractable(false);
             _view.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnLeftAsync(ct);
             await ShowPageAsync(_currentIndex - 1, ct);
+            _view.SetInteractable(true);
         }
 
         /// <summary>
-        /// 指定ページを表示。
-        /// - Index を範囲内にClampして安全に遷移
+        /// 指定ページを表示する共通処理。
+        /// - nextIndex を 0..Last で Clamp
+        /// - ページ位置に応じて「前へ/次へ」ボタンの表示を切り替え
+        /// - 目的ページをアニメーションで表示
         /// </summary>
         private async UniTask ShowPageAsync(int nextIndex, CancellationToken ct)
         {
