@@ -25,15 +25,15 @@ namespace OutGame.UI.Window
         [SerializeField]
         private MoveAnimationComponentParam _showAnimParam = new()
         {
-            Position = Vector2.zero,
-            Duration = 0.2f,
+            AnchoredPosition = Vector2.zero,
+            DurationSec = 0.2f,
             Ease = DG.Tweening.Ease.InSine,
         };
         [SerializeField]
         private MoveAnimationComponentParam _hideAnimParam = new()
         {
-            Position = Vector2.zero,
-            Duration = 0.2f,
+            AnchoredPosition = Vector2.zero,
+            DurationSec = 0.2f,
             Ease = DG.Tweening.Ease.OutSine,
         };
         
@@ -68,12 +68,12 @@ namespace OutGame.UI.Window
 
         public override void Show()
         {
-            RectTransform.anchoredPosition = _showAnimParam.Position;
+            RectTransform.anchoredPosition = _showAnimParam.AnchoredPosition;
         }
         
         public override async UniTask HideAsync(CancellationToken ct)
         {
-            RectTransform.anchoredPosition = _showAnimParam.Position;
+            RectTransform.anchoredPosition = _showAnimParam.AnchoredPosition;
             await _hideAnim.PlayAsync(ct);
             
             _flashText.StopTextAnimation();
@@ -81,7 +81,7 @@ namespace OutGame.UI.Window
         
         public override void Hide()
         {
-            RectTransform.anchoredPosition = _hideAnimParam.Position;
+            RectTransform.anchoredPosition = _hideAnimParam.AnchoredPosition;
             _flashText.StopTextAnimation();
         }
     }

@@ -314,7 +314,7 @@ MonoBehaviour:
   _rectTransform: {fileID: 5757939489602200717}
   _canvasGroup: {fileID: 7233499481792082679}
   _flashAnimationParam:
-    Duration: 0.75
+    DurationSec: 1
     Ease: 1
     MinAlpha: 0
     MaxAlpha: 1
@@ -333,7 +333,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5154736010488207302, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6877069330589355082, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
       propertyPath: m_Pivot.x
@@ -440,7 +440,21 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3460231581399234153, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5943606495615738861}
+    - targetCorrespondingSourceObject: {fileID: 3460231581399234153, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3338513617600135202}
   m_SourcePrefab: {fileID: 100100000, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
+--- !u!114 &1351255190829688256 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4186663888847411428, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
+  m_PrefabInstance: {fileID: 2943836623340240164}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a07e10c55e324631a16ad3c24e90f01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1792341966061128525 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3460231581399234153, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
@@ -499,16 +513,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 8622943929894564206}
   _canvasGroup: {fileID: 7814813054086243897}
-  _uiParts:
-  - {fileID: 4253036928401029269}
-  - {fileID: 7233499481792082679}
-  _showFadeAnimationParam:
-    Duration: 0.1
-    Ease: 2
-    Alpha: 1
-  _showDelaySec: 0.1
+  _background: {fileID: 1351255190829688256}
+  _partsGroup: {fileID: 3338513617600135202}
+  _showAlpha: 1
   _hideFadeAnimationParam:
-    Duration: 0.1
+    DurationSec: 0.1
     Ease: 3
     Alpha: 0
 --- !u!114 &5943606495615738861
@@ -524,8 +533,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CommonView: {fileID: 3749467465908442148}
-  _clickTrigger: {fileID: 4183189572249465428}
   _view: {fileID: 146824153724017971}
+--- !u!114 &3338513617600135202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792341966061128525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 508f4b030fa84666a71486b6227f8ff9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uiParts:
+  - {fileID: 4253036928401029269}
+  - {fileID: 7233499481792082679}
+  _showFadeAnimationParam:
+    DurationSec: 0.15
+    Ease: 2
+    Alpha: 1
+    ShowDelaySec: 0.1
+  _hideFadeAnimationParam:
+    DurationSec: 0.1
+    Ease: 3
+    Alpha: 0
+    ShowDelaySec: 0.05
 --- !u!224 &8622943929894564206 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6877069330589355082, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}

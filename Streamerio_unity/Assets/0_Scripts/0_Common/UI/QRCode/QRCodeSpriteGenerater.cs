@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using QRCoder;
 using UnityEngine;
 
@@ -6,14 +7,25 @@ namespace InGame.UI.QRCode
     /// <summary>
     /// QRコードのSprite生成
     /// </summary>
-    public class QRCodeSpriteGenerater
+    public static class QRCodeSpriteGenerater
     {
+        private static Sprite _qrCodeSprite;
+        
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        /// <param name="qrText"></param>
+        public static async UniTask InitializeSprite(string qrText)
+        {
+            _qrCodeSprite = Generate(qrText);
+        }
+        
         /// <summary>
         /// QRコードの画像生成
         /// </summary>
         /// <param name="qrText"></param>
         /// <returns></returns>
-        public Sprite Generate(string qrText)
+        private static Sprite Generate(string qrText)
         {
             var qrGenerator = new QRCodeGenerator();
             var qrCodeData = qrGenerator.CreateQrCode(qrText, QRCodeGenerator.ECCLevel.Q);
@@ -30,6 +42,11 @@ namespace InGame.UI.QRCode
                 new Rect(0, 0, texture.width, texture.height),
                 new Vector2(0.5f, 0.5f)
             );
+        }
+
+        public static Sprite GetQRCodeSprite()
+        {
+            return _qrCodeSprite;
         }
     }
 }

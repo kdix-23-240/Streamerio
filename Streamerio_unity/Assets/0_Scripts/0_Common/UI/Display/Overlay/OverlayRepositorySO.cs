@@ -2,6 +2,6 @@ using UnityEngine;
 
 namespace Common.UI.Display.Overlay
 {
-    [CreateAssetMenu(fileName = "OverlayRepository", menuName = "SO/UI/Display/OverlayRepository")]
+    [CreateAssetMenu(fileName = "OverlayRepository", menuName = "SO/UI/OverlayRepository")]
     public class OverlayRepositorySO: DisplayRepositorySOBase<OverlayPresenterBase> { }
 }

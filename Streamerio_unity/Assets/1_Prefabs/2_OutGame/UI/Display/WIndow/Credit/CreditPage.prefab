@@ -152,6 +152,14 @@ PrefabInstance:
       propertyPath: m_text
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8390169706113518534, guid: 012ed8f3db5a3483eb8937f229a24c53, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
+    - target: {fileID: 8390169706113518534, guid: 012ed8f3db5a3483eb8937f229a24c53, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 968898699081592503, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
     m_RemovedComponents:
     - {fileID: 4864016704535693245, guid: 012ed8f3db5a3483eb8937f229a24c53, type: 3}
     m_RemovedGameObjects: []
@@ -375,6 +383,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8317097911988549691, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
+      propertyPath: _uiParts.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8317097911988549691, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
+      propertyPath: '_uiParts.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4392665472433711861}
+    - target: {fileID: 8317097911988549691, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
+      propertyPath: '_uiParts.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2992433343588090912}
     - target: {fileID: 8875090064194179525, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -614,6 +634,14 @@ PrefabInstance:
       propertyPath: m_text
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8390169706113518534, guid: 012ed8f3db5a3483eb8937f229a24c53, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
+    - target: {fileID: 8390169706113518534, guid: 012ed8f3db5a3483eb8937f229a24c53, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 968898699081592503, guid: 3d62bf0d7d992b841bbaae3de5b16e62, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

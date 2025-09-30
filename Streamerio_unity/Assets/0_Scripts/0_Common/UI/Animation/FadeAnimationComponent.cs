@@ -6,30 +6,43 @@ using UnityEngine;
 
 namespace Common.UI.Animation
 {
-    
     /// <summary>
-    /// UIのフェードアニメーション
+    /// UI のフェードアニメーションコンポーネント。
+    /// - CanvasGroup の alpha を補間して透明度を変更
+    /// - DOTween を利用して非同期でアニメーションを実行
     /// </summary>
-    public class FadeAnimationComponent: IUIAnimationComponent
+    public class FadeAnimationComponent : IUIAnimationComponent
     {
         private readonly CanvasGroup _canvasGroup;
-
         private readonly FadeAnimationComponentParam _param;
+
         public FadeAnimationComponent(CanvasGroup canvasGroup, FadeAnimationComponentParam param)
         {
             _canvasGroup = canvasGroup;
             _param = param;
         }
         
+        /// <summary>
+        /// フェードアニメーションを再生。
+        /// - 指定の Alpha 値まで補間
+        /// - Duration と Ease はパラメータで制御
+        /// - CancellationToken により中断可能
+        /// </summary>
         public async UniTask PlayAsync(CancellationToken ct)
         {
             await _canvasGroup
-                .DOFade(_param.Alpha, _param.Duration)
+                .DOFade(_param.Alpha, _param.DurationSec)
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
         }
     }
 
+    /// <summary>
+    /// フェードアニメーションの設定パラメータ。
+    /// - Alpha: 目標の透明度
+    /// - DurationSec: アニメーション時間
+    /// - Ease: イージング
+    /// </summary>
     [Serializable]
     public class FadeAnimationComponentParam : UIAnimationComponentParam
     {

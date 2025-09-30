@@ -11,25 +11,30 @@ using IDisposable = System.IDisposable;
 namespace Common.UI.Click
 {
     /// <summary>
-    /// クリック時のイベント焼き付けを行う
+    /// クリックイベントの仲介クラス。
+    /// - 任意の Observable を購読し、クリックイベントとして配信
+    /// - 一定間隔の連打防止 (ThrottleFirst)
+    /// - クリック時に SE を再生
     /// </summary>
-    public class ClickEventBinder: UIBehaviour, IDisposable
+    public class ClickEventBinder : UIBehaviour, IDisposable
     {
         [SerializeField, LabelText("SE")]
         private SEType _seType = SEType.SNESRPG01;
+
         [SerializeField, LabelText("ボタンのクリック間隔(秒)")]
-        private float _clickIntervalSec = 0.1f;
+        private float _clickIntervalSec = 0.5f;
         
         private Subject<Unit> _clickEvent;
         /// <summary>
-        /// クリックした時のイベント
+        /// 外部から購読可能なクリックイベント
         /// </summary>
         public Observable<Unit> ClickEvent => _clickEvent;
         
         private CancellationTokenSource _cts;
 
         /// <summary>
-        /// 初期化
+        /// 初期化処理。
+        /// - 内部イベントストリームを生成
         /// </summary>
         public void Initialize()
         {
@@ -37,21 +42,30 @@ namespace Common.UI.Click
         }
         
         /// <summary>
-        /// クリック時のイベントを登録
+        /// 指定されたクリック系 Observable を購読し、ClickEvent を発火させる。
+        /// - 連打防止のため一定時間内の複数クリックを間引く
+        /// - SE を再生
         /// </summary>
+        /// <param name="clickObservable">UI のクリックイベントなどの Observable</param>
         public void BindClickEvent<T>(Observable<T> clickObservable)
         {
             _cts = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
             
             clickObservable
-                .ThrottleFirst(TimeSpan.FromSeconds(_clickIntervalSec))
+                .ThrottleFirst(TimeSpan.FromSeconds(_clickIntervalSec)) // 連打防止
                 .Subscribe(_ =>
                 {
                     AudioManager.Instance.PlayAsync(_seType, destroyCancellationToken).Forget();
                     _clickEvent.OnNext(Unit.Default);
-                }).RegisterTo(destroyCancellationToken);
+                })
+                .RegisterTo(destroyCancellationToken);
         }
 
+        /// <summary>
+        /// リソース破棄処理。
+        /// - 購読解除
+        /// - CancellationTokenSource を破棄
+        /// </summary>
         public void Dispose()
         {
             _cts?.Cancel();

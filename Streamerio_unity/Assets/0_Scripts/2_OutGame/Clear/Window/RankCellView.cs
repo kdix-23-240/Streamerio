@@ -16,7 +16,7 @@ namespace OutGame.UI.Window
         private FadeAnimationComponentParam _showAnimParam = new()
         {
             Alpha = 1f,
-            Duration = 0.1f,
+            DurationSec = 0.1f,
             Ease = DG.Tweening.Ease.InSine,
         };
         
