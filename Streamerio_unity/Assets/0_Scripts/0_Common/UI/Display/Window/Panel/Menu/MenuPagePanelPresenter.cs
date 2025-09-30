@@ -35,7 +35,7 @@ namespace Common.UI.Display.Window.Panel
             _view.StartButton.OnClickAsObservable
                 .SubscribeAwait(async (_, ct) =>
                 {
-                    await TitleManager.Instance.LoadTitleAsync();
+                    await TitleManager.Instance.BeginTitleTransitionAsync();
                     WebsocketManager.Instance.ConnectWebSocket();
                     SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
                 }).RegisterTo(destroyCancellationToken);

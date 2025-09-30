@@ -18,7 +18,7 @@ namespace OutGame.UI.Display.Screen
         {
             AudioManager.Instance.PlayAsync(SEType.NESRPG0112, destroyCancellationToken).Forget();
             Hide();
-            TitleManager.Instance.OpenTitleWindowAsync(destroyCancellationToken).Forget();
+            TitleManager.Instance.OpenMainMenuAsync(destroyCancellationToken).Forget();
         }
     }
 }
