@@ -1,7 +1,5 @@
 using System;
-using System.Threading;
 using Alchemy.Inspector;
-using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
@@ -12,15 +10,13 @@ namespace Common.UI.Animation
     /// - DOTween の Sequence を使って順番にアニメーションを構築
     /// - 各パーツ間にディレイを挿入可能
     /// </summary>
-    public class FadePartsAnimationComponent : IUIAnimationComponent
+    public class FadePartsAnimationComponent : SequenceAnimationComponentBase
     {
-        private Sequence _sequence;
-
         /// <summary>
         /// コンストラクタ。
         /// - 指定された CanvasGroup 配列とパラメータで Sequence を構築
         /// </summary>
-        public FadePartsAnimationComponent(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParam param)
+        public FadePartsAnimationComponent(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParam param): base()
         {
             SetSequence(canvasGroups, param);
         }
@@ -32,30 +28,13 @@ namespace Common.UI.Animation
         /// </summary>
         private void SetSequence(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParam param)
         {
-            _sequence = DOTween.Sequence()
-                .SetAutoKill(false)
-                .Pause();
-
             foreach (var canvasGroup in canvasGroups)
             {
-                _sequence.Join(canvasGroup
+                Sequence.Join(canvasGroup
                     .DOFade(param.Alpha, param.DurationSec)
                     .SetEase(param.Ease));
-                _sequence.AppendInterval(param.ShowDelaySec);
+                Sequence.AppendInterval(param.ShowDelaySec);
             }
-        }
-
-        /// <summary>
-        /// アニメーションを再生（async 対応）。
-        /// - Restart で最初から再生
-        /// - キャンセルが来たら途中で停止可能
-        /// </summary>
-        public async UniTask PlayAsync(CancellationToken ct)
-        {
-            _sequence.Restart();
-
-            await UniTask.WaitUntil(() => !_sequence.IsActive() || !_sequence.IsPlaying(), cancellationToken: ct);
-
         }
     }
 

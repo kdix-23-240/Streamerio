@@ -375,7 +375,7 @@ GameObject:
   - component: {fileID: 609424945}
   - component: {fileID: 609424946}
   m_Layer: 0
-  m_Name: TitleManager
+  m_Name: TitleBooster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -408,7 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff062c741a6e43d684a4b139f56587d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _titleScreen: {fileID: 0}
+  _titleScreen: {fileID: 1992900965}
 --- !u!1 &1479045038
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,6 +551,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8177999816988538307, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
   m_PrefabInstance: {fileID: 6841607293659894833}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1992900965 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5468571624533860983, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
+  m_PrefabInstance: {fileID: 6841607293659894833}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a7444d105d43c09995d72913531d3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4576140279803416498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -660,18 +671,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 409849902}
     m_Modifications:
-    - target: {fileID: 1733000211055546222, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
-      propertyPath: _flashAnimationParam.Duration
-      value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 3485820543372737917, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
-      propertyPath: _flashAnimationParam.Duration
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3485820543372737917, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
-      propertyPath: _flashAnimationParam.FlashCount
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 5212615559076393812, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
       propertyPath: m_Name
       value: TitleScreen

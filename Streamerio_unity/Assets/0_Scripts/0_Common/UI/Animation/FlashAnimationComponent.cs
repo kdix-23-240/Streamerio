@@ -12,39 +12,30 @@ namespace Common.UI.Animation
     /// - CanvasGroup の alpha を補間してフェードイン/フェードアウトを繰り返す
     /// - DOTween のシーケンスで制御
     /// </summary>
-    public class FlashAnimationComponent : IUIAnimationComponent
+    public class FlashAnimationComponent : SequenceAnimationComponentBase
     {
-        private readonly CanvasGroup _canvasGroup;
-        private readonly FlashAnimationComponentParam _param;
-        
-        public FlashAnimationComponent(CanvasGroup canvasGroup, FlashAnimationComponentParam param)
+        public FlashAnimationComponent(CanvasGroup canvasGroup, FlashAnimationComponentParam param): base()
         {
-            _canvasGroup = canvasGroup;
-            _param = param;
+            SetSequence(canvasGroup, param);
         }
-        
+
         /// <summary>
-        /// 点滅アニメーションを再生。
-        /// - MinAlpha → MaxAlpha を交互に補間
-        /// - FlashCount に応じて繰り返し回数を制御（-1 なら無限）
-        /// - CancellationToken で途中停止可能
+        /// DOTween の Sequence を構築。
+        /// - 各 CanvasGroup に対してフェードを追加
+        /// - パーツ間にインターバルを挿入して「順番に」アニメーションする
         /// </summary>
-        public async UniTask PlayAsync(CancellationToken ct)
+        private void SetSequence(CanvasGroup canvasGroup, FlashAnimationComponentParam param)
         {
-            var sequence = DOTween.Sequence();
+            Sequence.Append(canvasGroup
+                .DOFade(param.MinAlpha, param.DurationSec)
+                .SetEase(param.Ease));
             
-            sequence.Append(_canvasGroup
-                .DOFade(_param.MinAlpha, _param.DurationSec)
-                .SetEase(_param.Ease));
-            
-            sequence.Append(_canvasGroup
-                .DOFade(_param.MaxAlpha, _param.DurationSec)
-                .SetEase(_param.Ease));
+            Sequence.Append(canvasGroup
+                .DOFade(param.MaxAlpha, param.DurationSec)
+                .SetEase(param.Ease));
             
             // FlashCount: 1回 = フェードアウト+フェードイン
-            sequence.SetLoops(_param.FlashCount == -1 ? -1 : _param.FlashCount * 2, LoopType.Restart);
-            
-            await sequence.Play().ToUniTask(cancellationToken: ct);
+            Sequence.SetLoops(param.FlashCount == -1 ? -1 : param.FlashCount * 2, LoopType.Restart);
         }
     }
     

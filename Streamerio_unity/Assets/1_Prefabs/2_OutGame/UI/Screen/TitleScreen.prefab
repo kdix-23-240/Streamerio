@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 7295010252067547802}
   - component: {fileID: 3485820543372737917}
   - component: {fileID: 5468571624533860983}
+  - component: {fileID: 3273398674527772965}
+  - component: {fileID: 4422389086595066420}
   m_Layer: 5
   m_Name: TitleScreen
   m_TagString: Untagged
@@ -88,6 +90,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CommonView: {fileID: 3485820543372737917}
+  _clickTrigger: {fileID: 3273398674527772965}
+  _clickEventBinder: {fileID: 4422389086595066420}
+--- !u!114 &3273398674527772965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5212615559076393812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd253e17d14ec9346b4e8ec0b1ecf277, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4422389086595066420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5212615559076393812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6e6b224c514f7f80ac73d911b5974e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _seType: 29
+  _clickIntervalSec: 0.5
 --- !u!1 &6673816667159443334
 GameObject:
   m_ObjectHideFlags: 0

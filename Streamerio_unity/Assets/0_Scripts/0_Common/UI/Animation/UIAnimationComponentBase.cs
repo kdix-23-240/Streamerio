@@ -20,6 +20,46 @@ namespace Common.UI.Animation
         /// </summary>
         UniTask PlayAsync(CancellationToken ct);
     }
+    
+    /// <summary>
+    /// DOTween Sequence を使ったアニメーションの基底クラス。
+    /// - コンストラクタで Sequence を生成し、AutoKill を無効化して使い回し可能に設定
+    /// - 派生クラスはコンストラクタ内で Sequence にアニメーションを組み立てる
+    /// - PlayAsync で Restart して最初から再生し、完了まで待機できる
+    /// </summary>
+    public abstract class SequenceAnimationComponentBase : IUIAnimationComponent
+    {
+        /// <summary>
+        /// 管理対象の DOTween Sequence。
+        /// - SetAutoKill(false) により一度完了しても破棄されず、再利用可能
+        /// - Pause() により生成直後は停止状態
+        /// </summary>
+        protected Sequence Sequence;
+        
+        protected SequenceAnimationComponentBase()
+        {
+            Sequence = DOTween.Sequence()
+                .SetAutoKill(false) // 完了しても破棄されず再利用可能
+                .Pause();           // 初期状態は停止
+        }
+        
+        /// <summary>
+        /// アニメーションを再生（async 対応）。
+        /// - Sequence.Restart() により最初から再生
+        /// - UniTask.WaitUntil で再生完了まで待機
+        /// - キャンセルが来たら途中で停止可能
+        /// </summary>
+        public async UniTask PlayAsync(CancellationToken ct)
+        {
+            Sequence.Restart();
+
+            // IsActive=false または IsPlaying=false になったら完了
+            await UniTask.WaitUntil(
+                () => !Sequence.IsActive() || !Sequence.IsPlaying(),
+                cancellationToken: ct
+            );
+        }
+    }
 
     /// <summary>
     /// UI アニメーションの共通パラメータ。
