@@ -1299,6 +1299,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7750090005652430143, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+    - {fileID: 119322963868913983, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 7661014822890471030, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
@@ -1316,8 +1317,40 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7661014822890471030, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9106308260514566646}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1601084803911639077, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4342363772210003348}
   m_SourcePrefab: {fileID: 100100000, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+--- !u!1 &1489506748816678205 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1601084803911639077, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+  m_PrefabInstance: {fileID: 185765077191638296}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4342363772210003348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1489506748816678205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a84d4b40a74460790a3341f73428037, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _view: {fileID: 4536107793086265904}
+--- !u!114 &4536107793086265904 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4350624966923224872, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+  m_PrefabInstance: {fileID: 185765077191638296}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1489506748816678205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5eb5f3935f194bc5b8a03d1a96209991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!225 &7361470876663009908 stripped
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 7258336503884935020, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}

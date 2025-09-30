@@ -120,10 +120,14 @@ PrefabInstance:
       propertyPath: _preChapter
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 119322963868913983, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1601084803911639077, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7594195426530333376}
     - targetCorrespondingSourceObject: {fileID: 7097632441674823643, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 475097234512655894}
@@ -133,15 +137,42 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7097632441674823643, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5068917147217437329}
+    - targetCorrespondingSourceObject: {fileID: 7097632441674823643, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4293213034434970025}
   m_SourcePrefab: {fileID: 100100000, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+--- !u!1 &2057859978994248697 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1601084803911639077, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+  m_PrefabInstance: {fileID: 772031547046628316}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7594195426530333376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057859978994248697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4f847dbee0d42d7825e7b5c38dea9dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _view: {fileID: 3951425718398455028}
+--- !u!114 &3951425718398455028 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4350624966923224872, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
+  m_PrefabInstance: {fileID: 772031547046628316}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057859978994248697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5eb5f3935f194bc5b8a03d1a96209991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &6982737756308862378 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7661014822890471030, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
-  m_PrefabInstance: {fileID: 772031547046628316}
-  m_PrefabAsset: {fileID: 0}
---- !u!225 &7386525862936574836 stripped
-CanvasGroup:
-  m_CorrespondingSourceObject: {fileID: 7797130328565215400, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
   m_PrefabInstance: {fileID: 772031547046628316}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &7550589906226838535 stripped
@@ -175,18 +206,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 6982737756308862378}
   _canvasGroup: {fileID: 475097234512655894}
-  _contentParts:
-  - {fileID: 7386525862936574836}
-  - {fileID: 7929717450719093936}
-  _showContentAnimParam:
-    Duration: 0.1
-    Ease: 2
-    Alpha: 1
-  _contentAnimInterval: 0.05
-  _hideAnimParam:
-    Duration: 0.2
-    Ease: 3
-    Alpha: 0
+  _partGroup: {fileID: 4293213034434970025}
+  _showAlpha: 1
+  _hideAlpha: 0
 --- !u!114 &5068917147217437329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,9 +221,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11afdbbd6d9b4c61ba7fbb6315d1b582, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  View: {fileID: 7151308233614114926}
---- !u!225 &7929717450719093936 stripped
-CanvasGroup:
-  m_CorrespondingSourceObject: {fileID: 7258336503884935020, guid: da0353bcb1b07458a8ce5529850853e2, type: 3}
-  m_PrefabInstance: {fileID: 772031547046628316}
+  CommonView: {fileID: 7151308233614114926}
+--- !u!114 &4293213034434970025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7550589906226838535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 508f4b030fa84666a71486b6227f8ff9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uiParts: []
+  _showFadeAnimationParam:
+    DurationSec: 0.15
+    Ease: 2
+    Alpha: 1
+    ShowDelaySec: 0.1
+  _hideFadeAnimationParam:
+    DurationSec: 0.1
+    Ease: 3
+    Alpha: 0
+    ShowDelaySec: 0.05

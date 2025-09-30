@@ -15,7 +15,7 @@ namespace Common.UI.Display.Overlay
     /// - 非表示は CanvasGroup をまとめてフェード
     /// - 即時表示/非表示も可能
     /// </summary>
-    [RequireComponent(typeof(CommonUIPartsGroup))]
+    [RequireComponent(typeof(CommonUIPartGroup))]
     public class CommonOverlayView : DisplayViewBase
     {
         [SerializeField, ReadOnly]
@@ -23,7 +23,7 @@ namespace Common.UI.Display.Overlay
         public DisplayBackgroundPresenter Background => _background;
         
         [SerializeField, ReadOnly]
-        private CommonUIPartsGroup _partsGroup;
+        private CommonUIPartGroup _partGroup;
         
         [SerializeField]
         private float _showAlpha = 1f;
@@ -43,7 +43,7 @@ namespace Common.UI.Display.Overlay
         protected override void OnValidate()
         {
             base.OnValidate();
-            _partsGroup ??= GetComponent<CommonUIPartsGroup>();
+            _partGroup ??= GetComponent<CommonUIPartGroup>();
             _background ??= GetComponentInChildren<DisplayBackgroundPresenter>();
         }
 #endif
@@ -57,7 +57,7 @@ namespace Common.UI.Display.Overlay
         {
             base.Initialize();
             
-            _partsGroup.Initialize();
+            _partGroup.Initialize();
             _background.Initialize();
             
             _hideAnimation = new (CanvasGroup, _hideFadeAnimationParam);
@@ -74,7 +74,7 @@ namespace Common.UI.Display.Overlay
 
             await _background.ShowAsync(ct);
             
-            await _partsGroup.ShowAsync(ct);
+            await _partGroup.ShowAsync(ct);
         }
         
         /// <summary>
@@ -88,7 +88,7 @@ namespace Common.UI.Display.Overlay
             
             _background.Show();
             
-            _partsGroup.Show();
+            _partGroup.Show();
         }
         
         /// <summary>
@@ -101,7 +101,7 @@ namespace Common.UI.Display.Overlay
             await _hideAnimation.PlayAsync(ct);
             
             _background.Hide();
-            _partsGroup.Hide();
+            _partGroup.Hide();
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Common.UI.Display.Overlay
             CanvasGroup.alpha = _hideFadeAnimationParam.Alpha;
             
             _background.Hide();
-            _partsGroup.Hide();
+            _partGroup.Hide();
         }
     }
 }

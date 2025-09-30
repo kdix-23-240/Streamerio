@@ -42,7 +42,7 @@ namespace Common.UI.Animation
                 .SetEase(_param.Ease));
             
             // FlashCount: 1回 = フェードアウト+フェードイン
-            sequence.SetLoops(_param.FlashCount == -1 ? -1 : _param.FlashCount * 2);
+            sequence.SetLoops(_param.FlashCount == -1 ? -1 : _param.FlashCount * 2, LoopType.Restart);
             
             await sequence.Play().ToUniTask(cancellationToken: ct);
         }

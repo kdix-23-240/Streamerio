@@ -1,158 +1,178 @@
 using System.Threading;
-using Common.UI.Display.Window.Animation;
+using Alchemy.Inspector;
+using Common.UI.Display.Window.Book;
 using Cysharp.Threading.Tasks;
-using OutGame.Title;
 using R3;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Common.UI.Display.Window.Panel
 {
     /// <summary>
-    /// 章のパネルの繋ぎ役
+    /// 章のパネルのプレゼンター基底クラス。
+    /// - ChapterPanelView と連携してページを表示/非表示する
+    /// - ボタン入力（次/前/閉じる）を購読し、遷移アニメーションを制御する
+    /// - IDisplay を実装し、外部から開閉を統一的に扱える
+    /// - BookWindowAnimation を用いて「本をめくる」演出を付与
     /// </summary>
-    [RequireComponent(typeof(CommonChapterPanelView))]
-    public abstract class ChapterPanelPresenterBase: DisplayPresenterBase<CommonChapterPanelView>
+    [RequireComponent(typeof(ChapterPanelView))]
+    public abstract class ChapterPanelPresenterBase : UIBehaviour, IDisplay
     {
-        private ReactiveProperty<int> _currentIndexProp;
-        private int _currentIndex => _currentIndexProp.Value;
+        [SerializeField, ReadOnly]
+        protected ChapterPanelView _view;
 
-        private BookWindowAnimation _bookWindowAnimation;
+        private bool _isShow;
+        /// <summary>現在表示中かどうか</summary>
+        public bool IsShow => _isShow;
+        
+        private int _currentIndex; // 現在のページ番号
+        private BookWindowAnimation _bookWindowAnimation; // ページめくり演出
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            _view ??= GetComponent<ChapterPanelView>();
+        }
+#endif
 
         /// <summary>
-        /// 初期化
+        /// 今回は使用しない
         /// </summary>
-        /// <param name="bookWindowAnimation"></param>
+        public void Initialize() { }
+
+        /// <summary>
+        /// 初期化処理。
+        /// - BookWindowAnimation を受け取り保持
+        /// - ページ番号をリセット
+        /// - View の初期化
+        /// - ボタンイベントの購読をセット
+        /// </summary>
         public void Initialize(BookWindowAnimation bookWindowAnimation)
         {
-            _currentIndexProp = new ReactiveProperty<int>();
-
             _bookWindowAnimation = bookWindowAnimation;
+            _currentIndex = 0;
 
-            base.Initialize();
+            _view.Initialize();
+            Bind();
         }
-
+        
         /// <summary>
-        /// イベント設定
+        /// ボタンイベントを購読し、ページ遷移や閉じる処理を登録。
         /// </summary>
-        protected override void SetEvent()
+        private void Bind()
         {
-            base.SetEvent();
-
-            CommonView.NextButton.OnClickAsObservable
-                .Subscribe(_ =>
-                {
-                    OpenNextPage(destroyCancellationToken).Forget();
-                }).RegisterTo(destroyCancellationToken);
+            // 次のページ
+            _view.NextButton.OnClickAsObservable
+                .Subscribe(_ => { OpenNextPage(destroyCancellationToken).Forget(); })
+                .RegisterTo(destroyCancellationToken);
             
-            CommonView.BackButton.OnClickAsObservable
-                .Subscribe(_ =>
-                {
-                    OpenPrePage(destroyCancellationToken).Forget();
-                }).RegisterTo(destroyCancellationToken);
+            // 前のページ
+            _view.BackButton.OnClickAsObservable
+                .Subscribe(_ => { OpenPrePage(destroyCancellationToken).Forget(); })
+                .RegisterTo(destroyCancellationToken);
             
-            CommonView.CloseButton.OnClickAsObservable
+            // 閉じる
+            _view.CloseButton.OnClickAsObservable
                 .SubscribeAwait(async (_, ct) =>
                 {
-                    var  isAllClose = await ChapterManager.Instance.CloseChapterAsync(ct);
-                    if (isAllClose)
-                    {
-                        AllCloseEvent();
-                    }
-                }).RegisterTo(destroyCancellationToken);
+                    await ChapterManager.Instance.CloseTopAsync(ct);
+                })
+                .RegisterTo(destroyCancellationToken);
         }
         
-        protected override void Bind()
-        {
-            _currentIndexProp
-                .Subscribe(_ =>
-                {
-                    CommonView.BackButton.gameObject.SetActive(_currentIndex > 0);
-                    CommonView.NextButton.gameObject.SetActive(_currentIndex < CommonView.LastPageIndex);
-                }).RegisterTo(destroyCancellationToken);
-        }
-
         /// <summary>
-        /// すべての章が閉じられたときのイベント
+        /// 表示（アニメーション付き）
+        /// - ページ番号をリセットして最初のページを表示
         /// </summary>
-        protected abstract void AllCloseEvent();
-        
-        public override async UniTask ShowAsync(CancellationToken ct)
+        public async UniTask ShowAsync(CancellationToken ct)
         {
-            CommonView.SetInteractable(true);
-            CommonView.Show();
+            _view.SetInteractable(true);
+            _isShow = true;
+            _view.Show();
             
-            _currentIndexProp.Value = 0;
+            _currentIndex = 0;
             await ShowPageAsync(_currentIndex, ct);
         }
 
-        public override void Show()
+        /// <summary>
+        /// 即時表示
+        /// - ページ番号をリセットして最初のページを表示
+        /// </summary>
+        public void Show()
         {
-            base.Show();
+            _view.SetInteractable(true);
+            _isShow = true;
+            _view.Show();
             
-            _currentIndexProp.Value = 0;
-            CommonView.ShowPage(_currentIndex);
+            _currentIndex = 0;
+            _view.ShowPage(_currentIndex);
         }
         
         /// <summary>
-        /// 開いているページをアニメーションで閉じる
+        /// 現在表示中のページをアニメーションで非表示
         /// </summary>
-        /// <param name="ct"></param>
-        public override async UniTask HideAsync(CancellationToken ct)
+        public async UniTask HideAsync(CancellationToken ct)
         {
-            await CommonView.HidePageAsync(_currentIndex, ct);
+            _view.SetInteractable(false);
             
-            base.Hide();
+            await _view.HidePageAsync(_currentIndex, ct);
+            
+            _view.Hide();
+            _isShow = false;
         }
 
         /// <summary>
-        /// 開いているページを閉じる
+        /// 現在表示中のページを即時非表示
         /// </summary>
-        public override void Hide()
+        public void Hide()
         {
-            CommonView.HidePage(_currentIndex);
+            _view.SetInteractable(false);
             
-            base.Hide();
+            _view.HidePage(_currentIndex);
+            
+            _view.Hide();
+            _isShow = false;
         }
         
         /// <summary>
-        /// 次のページを開く
+        /// 次のページを開く。
+        /// - 現在のページを閉じる
+        /// - ページめくり演出（右めくり）
+        /// - 次のページを表示
         /// </summary>
-        /// <param name="ct"></param>
         private async UniTask OpenNextPage(CancellationToken ct)
         {
-            CommonView.SetInteractable(false);
-            
-            CommonView.HidePageAsync(_currentIndex, ct).Forget();
+            _view.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnRightAsync(ct);
             await ShowPageAsync(_currentIndex + 1, ct);
-            
-            CommonView.SetInteractable(true);
         }
 
         /// <summary>
-        /// 前のページを開く
+        /// 前のページを開く。
+        /// - 現在のページを閉じる
+        /// - ページめくり演出（左めくり）
+        /// - 前のページを表示
         /// </summary>
-        /// <param name="ct"></param>
         private async UniTask OpenPrePage(CancellationToken ct)
         {
-            CommonView.SetInteractable(false);
-            
-            CommonView.HidePageAsync(_currentIndex, ct).Forget();
+            _view.HidePageAsync(_currentIndex, ct).Forget();
             await _bookWindowAnimation.PlayTurnLeftAsync(ct);
             await ShowPageAsync(_currentIndex - 1, ct);
-            
-            CommonView.SetInteractable(true);
         }
 
         /// <summary>
-        /// ページを表示する
+        /// 指定ページを表示。
+        /// - Index を範囲内にClampして安全に遷移
         /// </summary>
-        /// <param name="nextIndex"></param>
-        /// <param name="ct"></param>
         private async UniTask ShowPageAsync(int nextIndex, CancellationToken ct)
         {
-            _currentIndexProp.Value = Mathf.Clamp(nextIndex, 0, CommonView.LastPageIndex);
-            await CommonView.ShowPageAsync(_currentIndex, ct);
+            _currentIndex = Mathf.Clamp(nextIndex, 0, _view.LastPageIndex);
+
+            _view.BackButton.SetActive(_currentIndex != 0);
+            _view.NextButton.SetActive(_currentIndex != _view.LastPageIndex);
+            
+            await _view.ShowPageAsync(_currentIndex, ct);
         }
     }
 }

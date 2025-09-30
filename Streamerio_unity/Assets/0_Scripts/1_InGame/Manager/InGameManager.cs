@@ -12,7 +12,9 @@ using InGame.UI.Display.Dialog.QRCode;
 using InGame.UI.Display.Overlay;
 using InGame.UI.Display.Screen;
 using InGame.UI.QRCode;
+using InGame.UI.Window;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace InGame
 {
@@ -22,7 +24,7 @@ namespace InGame
         [SerializeField, LabelText("プレイヤー")]
         private Transform _playerTransform;
         [SerializeField, LabelText("遊び方ウィンドウ")]
-        private WindowPresenter _howToPlayWindow;
+        private InGameBookWindowPresenter _inGameWindow;
         
         [SerializeField, LabelText("ゲーム画面")]
         private InGameScreenPresenter _inGameScreen;
@@ -36,8 +38,8 @@ namespace InGame
             var url = await WebsocketManager.Instance.GetFrontUrlAsync();
             await QRCodeSpriteGenerater.InitializeSprite(url);
             
-            _howToPlayWindow.Initialize();
-            _howToPlayWindow.Hide();
+            _inGameWindow.Initialize();
+            _inGameWindow.Hide();
             
             _inGameScreen.Initialize(QRCodeSpriteGenerater.GetQRCodeSprite(), _timeLimit);
             
@@ -50,8 +52,9 @@ namespace InGame
             
             if (!isPlayed)
             {
-                await _howToPlayWindow.ShowAsync(destroyCancellationToken);
+                await _inGameWindow.ShowAsync(destroyCancellationToken);
                 SaveManager.Instance.SavePlayed();
+                OpenQRCodeDialog();
             }
             else if(!SaveManager.Instance.IsRetry)
             {
@@ -69,7 +72,7 @@ namespace InGame
         /// </summary>
         public async void OpenQRCodeDialog()
         {
-            await _howToPlayWindow.HideAsync(destroyCancellationToken);
+            await _inGameWindow.HideAsync(destroyCancellationToken);
             await DialogManager.Instance.OpenAndWaitCloseAsync<QRCodeDialogPresenter>(destroyCancellationToken);
             StartGame();
         }

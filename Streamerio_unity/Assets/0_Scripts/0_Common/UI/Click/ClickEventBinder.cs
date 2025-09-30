@@ -22,7 +22,7 @@ namespace Common.UI.Click
         private SEType _seType = SEType.SNESRPG01;
 
         [SerializeField, LabelText("ボタンのクリック間隔(秒)")]
-        private float _clickIntervalSec = 0.1f;
+        private float _clickIntervalSec = 0.5f;
         
         private Subject<Unit> _clickEvent;
         /// <summary>

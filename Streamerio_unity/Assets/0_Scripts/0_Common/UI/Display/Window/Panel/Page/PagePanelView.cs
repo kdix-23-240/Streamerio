@@ -1,96 +1,89 @@
 using System.Threading;
 using Alchemy.Inspector;
-using Common.UI.Animation;
+using Common.UI.Part.Group;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
 
 namespace Common.UI.Display.Window.Panel
 {
     /// <summary>
-    /// ページの見た目
+    /// ページの見た目（View）を管理するクラス。
+    /// - 内部の UI パーツグループ（CommonUIPartGroup）を使って表示/非表示を制御
+    /// - CanvasGroup の透明度を直接制御して、全体の表示状態を管理
+    /// - アニメーションと即時表示/非表示の両方に対応
     /// </summary>
-    public class PagePanelView: DisplayViewBase
+    [RequireComponent(typeof(CommonUIPartGroup))]
+    public class PagePanelView : DisplayViewBase
     {
-        [SerializeField, LabelText("全パーツ(表示順)")]
-        private CanvasGroup[] _contentParts;
-        
-        [SerializeField, LabelText("1個のパーツの表示アニメーション")]
-        private FadeAnimationComponentParam _showContentAnimParam = new()
-        {
-            Alpha = 1f,
-            DurationSec = 0.1f,
-            Ease = Ease.InSine,
-        };
-        
-        [SerializeField, LabelText("パーツの表示アニメーション再生間隔")]
-        private float _contentAnimInterval = 0.05f;
+        [SerializeField, ReadOnly]
+        private CommonUIPartGroup _partGroup;
 
-        [SerializeField, LabelText("非表示アニメーション")]
-        private FadeAnimationComponentParam _hideAnimParam = new()
-        {
-            Alpha = 0f,
-            DurationSec = 0.2f,
-            Ease = Ease.OutSine,
-        };
-        
-        private FadeAnimationComponent[] _contentShowAnims;
-        private FadeAnimationComponent _contentHideAnim;
+        [SerializeField, LabelText("表示の透明度")]
+        private float _showAlpha = 1f;
 
+        [SerializeField, LabelText("非表示の透明度")]
+        private float _hideAlpha = 0f;
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            _partGroup ??= GetComponent<CommonUIPartGroup>();
+        }
+#endif
+
+        /// <summary>
+        /// 初期化処理。
+        /// - 内部のパーツグループを初期化する
+        /// </summary>
         public override void Initialize()
         {
             base.Initialize();
-            
-            int length = _contentParts.Length;
-            _contentShowAnims = new FadeAnimationComponent[length];
-            
-            for(int i = 0; i < length; i++)
-            {
-                _contentShowAnims[i] = new FadeAnimationComponent(_contentParts[i], _showContentAnimParam);
-            }
-            
-            _contentHideAnim = new FadeAnimationComponent(CanvasGroup, _hideAnimParam);
+            _partGroup.Initialize();
         }
 
+        /// <summary>
+        /// アニメーションで表示。
+        /// - 全体の CanvasGroup の透明度を設定
+        /// - 内部のパーツを順次表示アニメーション
+        /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            CanvasGroup.alpha = _showContentAnimParam.Alpha;
-            
-            foreach (var anim in _contentShowAnims)
-            {
-                anim.PlayAsync(ct).Forget();
-                await UniTask.WaitForSeconds(_contentAnimInterval, cancellationToken: ct);
-            }
+            CanvasGroup.alpha = _showAlpha;
+            await _partGroup.ShowAsync(ct);
         }
-        
+
+        /// <summary>
+        /// 即時表示。
+        /// - CanvasGroup を即時透明度変更
+        /// - 内部のパーツを即時表示
+        /// </summary>
         public override void Show()
         {
-            SetContentAlpha(_showContentAnimParam.Alpha);
+            CanvasGroup.alpha = _showAlpha;
+            _partGroup.Show();
         }
 
+        /// <summary>
+        /// アニメーションで非表示。
+        /// - 内部のパーツを順次非表示アニメーション
+        /// - 完了後に CanvasGroup を非表示状態にする
+        /// </summary>
         public override async UniTask HideAsync(CancellationToken ct)
         {
-            await _contentHideAnim.PlayAsync(ct);
-            SetContentAlpha(_hideAnimParam.Alpha);
+            await _partGroup.HideAsync(ct);
+            CanvasGroup.alpha = _hideAlpha;
         }
 
+        /// <summary>
+        /// 即時非表示。
+        /// - 内部のパーツを即時非表示
+        /// - CanvasGroup を非表示状態にする
+        /// </summary>
         public override void Hide()
         {
-            SetContentAlpha(_hideAnimParam.Alpha);
-        }
-        
-        /// <summary>
-        /// UIの透明度を全て変える
-        /// </summary>
-        /// <param name="alpha"></param>
-        private void SetContentAlpha(float alpha)
-        {
-            CanvasGroup.alpha = alpha;
-            
-            foreach (var part in _contentParts)
-            {
-                part.alpha = alpha;
-            }
+            _partGroup.Hide();
+            CanvasGroup.alpha = _hideAlpha;
         }
     }
 }

@@ -8,10 +8,10 @@ namespace Common.UI.Part.Button
 {
     /// <summary>
     /// カスタムボタンの基底クラス。
-    /// - UnityEngine.UI.Button を内包
+    /// - UnityEngine.UI.Button を内包し、標準ボタンの機能を拡張
     /// - ClickEventBinder を利用してクリックイベントを購読可能にする
-    /// - 押下/離上/ホバーなどのイベントを抽象メソッドで提供
-    /// - 状態リセットや操作可能切替の共通処理を実装
+    /// - 押下/解放/ホバー開始/ホバー終了を抽象メソッドで提供（サブクラスで実装必須）
+    /// - 状態リセットや表示/非表示切り替えを共通実装
     /// </summary>
     [RequireComponent(typeof(UnityEngine.UI.Button), typeof(ClickEventBinder))]
     public abstract class ButtonBase : UIBehaviourBase,
@@ -19,6 +19,9 @@ namespace Common.UI.Part.Button
     {
         [SerializeField, ReadOnly]
         private UnityEngine.UI.Button _button;
+
+        [SerializeField, ReadOnly]
+        private GameObject _gameObject;
         
         [SerializeField, ReadOnly]
         private ClickEventBinder _clickEventBinder;
@@ -30,21 +33,22 @@ namespace Common.UI.Part.Button
 
 #if UNITY_EDITOR
         /// <summary>
-        /// エディタ上で参照を自動補完
+        /// エディタ上で参照を自動設定
         /// </summary>
         protected override void OnValidate()
         {
             base.OnValidate();
 
             _button ??= GetComponent<UnityEngine.UI.Button>();
+            _gameObject = gameObject;
             _clickEventBinder ??= GetComponent<ClickEventBinder>();
         }
 #endif
 
         /// <summary>
         /// 初期化処理。
-        /// - ClickEventBinder の初期化
-        /// - 購読処理のセットアップ
+        /// - ClickEventBinder を初期化
+        /// - 共通購読処理をバインド
         /// </summary>
         public override void Initialize()
         {
@@ -56,7 +60,7 @@ namespace Common.UI.Part.Button
         /// <summary>
         /// ボタンイベントの購読設定。
         /// - Unity Button の OnClick を ClickEventBinder にバインド
-        /// - クリック後に ResetButtonState を呼び出す
+        /// - クリック完了後に ResetButtonState を呼び出す
         /// </summary>
         private void Bind()
         {
@@ -70,24 +74,16 @@ namespace Common.UI.Part.Button
                 .RegisterTo(destroyCancellationToken);
         }
 
-        /// <summary>
-        /// ボタン押下時の処理（必須実装）
-        /// </summary>
+        /// <summary>ボタン押下時の処理（必須実装）</summary>
         public abstract void OnPointerDown(PointerEventData eventData);
 
-        /// <summary>
-        /// ボタン解放時の処理（必須実装）
-        /// </summary>
+        /// <summary>ボタン解放時の処理（必須実装）</summary>
         public abstract void OnPointerUp(PointerEventData eventData);
 
-        /// <summary>
-        /// ホバー開始時の処理（必須実装）
-        /// </summary>
+        /// <summary>ホバー開始時の処理（必須実装）</summary>
         public abstract void OnPointerEnter(PointerEventData eventData);
 
-        /// <summary>
-        /// ホバー終了時の処理（必須実装）
-        /// </summary>
+        /// <summary>ホバー終了時の処理（必須実装）</summary>
         public abstract void OnPointerExit(PointerEventData eventData);
         
         /// <summary>
@@ -96,12 +92,11 @@ namespace Common.UI.Part.Button
         protected abstract void ResetButtonState();
         
         /// <summary>
-        /// ボタンの操作可否を切り替える
+        /// ボタンの表示/非表示を切り替える
         /// </summary>
-        /// <param name="isInteractable">true: 押下可能, false: 押下不可</param>
-        public void SetInteractable(bool isInteractable)
+        public void SetActive(bool isActive)
         {
-            _button.interactable = isInteractable;
+            _gameObject.SetActive(isActive);
         }
     }
 }

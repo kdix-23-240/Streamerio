@@ -32,7 +32,9 @@ namespace Common.UI.Animation
         /// </summary>
         private void SetSequence(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParam param)
         {
-            _sequence = DOTween.Sequence().Pause();
+            _sequence = DOTween.Sequence()
+                .SetAutoKill(false)
+                .Pause();
 
             foreach (var canvasGroup in canvasGroups)
             {
@@ -52,8 +54,8 @@ namespace Common.UI.Animation
         {
             _sequence.Restart();
 
-            await _sequence.Play()
-                .ToUniTask(cancellationToken: ct);
+            await UniTask.WaitUntil(() => !_sequence.IsActive() || !_sequence.IsPlaying(), cancellationToken: ct);
+
         }
     }
 

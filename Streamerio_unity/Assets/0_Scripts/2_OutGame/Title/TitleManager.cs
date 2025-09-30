@@ -5,6 +5,7 @@ using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using OutGame.UI.Display.Screen;
+using OutGame.UI.Display.Window;
 using UnityEngine;
 
 namespace OutGame.Title
@@ -14,7 +15,7 @@ namespace OutGame.Title
         [SerializeField]
         private TitleScreenPresenter _screen;
         [SerializeField]
-        private WindowPresenter _window;
+        private OutGameBookWindowPresenter _window;
         
         private void Start()
         {
@@ -35,20 +36,11 @@ namespace OutGame.Title
         public async UniTask OpenTitleWindowAsync(CancellationToken ct)
         {
             await _window.ShowAsync(ct);
-        }
-        
-        /// <summary>
-        ///  タイトルスクリーンを表示する
-        /// </summary>
-        public async UniTask ShowTitleAsync(CancellationToken ct)
-        {
-            await _window.HideAsync(ct);
             await _screen.ShowAsync(ct);
         }
         
         public async UniTask LoadTitleAsync()
         {
-            await _window.HideAsync(destroyCancellationToken);
             await LoadingScreenPresenter.Instance.TitleToLoadingAsync();
             AudioManager.Instance.StopBGM();
         }
