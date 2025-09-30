@@ -4,77 +4,88 @@ using UnityEngine.Pool;
 namespace Common.Audio
 {
     /// <summary>
-    /// オーディオソースのプール
+    /// オーディオソースのプール管理クラス。
+    /// - UnityEngine.Pool.ObjectPool を利用して Source を効率的に再利用する
+    /// - AudioManager 経由で BGM/SE 再生に使われる
+    /// - Source は再生終了時に自動で Release されるため、明示的な返却処理は不要
     /// </summary>
     public class AudioSourcePool
     {
-        private Source _source;
-        private Transform _parent;
+        private readonly Source _prefab;         // 生成元となるプレハブ
+        private readonly Transform _parent;      // 親 Transform（Hierarchy整理用）
+        private readonly ObjectPool<Source> _sourcePool;
 
-        private ObjectPool<Source> _sourcePool;
-
+        /// <summary>
+        /// コンストラクタ。
+        /// </summary>
+        /// <param name="source">生成元となる Source プレハブ</param>
+        /// <param name="parent">生成時の親 Transform</param>
+        /// <param name="capacity">プールの初期容量</param>
         public AudioSourcePool(Source source, Transform parent, int capacity)
         {
-            _source = source;
+            _prefab = source;
             _parent = parent;
 
-            _sourcePool = new(
-                () => OnCreateSource(),
-                (source) => OnGetSource(source),
-                (source) => OnReleaseSource(source),
-                (source) => OnDestroySource(source),
+            _sourcePool = new ObjectPool<Source>(
+                createFunc: OnCreateSource,
+                actionOnGet: OnGetSource,
+                actionOnRelease: OnReleaseSource,
+                actionOnDestroy: OnDestroySource,
                 defaultCapacity: capacity
             );
         }
 
         /// <summary>
-        /// オーディオソースを取得
+        /// プールからオーディオソースを取得。
+        /// - 利用後は Source 側で自動的に Release される
         /// </summary>
-        /// <returns></returns>
-        public Source GetSorce()
+        public Source GetSource()
         {
             return _sourcePool.Get();
         }
 
         /// <summary>
-        /// プールを空にする
+        /// プールをクリアして全インスタンスを破棄。
         /// </summary>
         public void Clear()
         {
             _sourcePool.Clear();
         }
 
+        // =============================
+        // ObjectPool 用コールバック群
+        // =============================
+
         /// <summary>
-        /// プールに入れるインスタンスを新しく生成する際に行う処理
+        /// 新しいインスタンス生成時の処理。
         /// </summary>
-        /// <returns></returns>
         private Source OnCreateSource()
         {
-            return Object.Instantiate(_source, _parent);
+            return Object.Instantiate(_prefab, _parent);
         }
 
         /// <summary>
-        /// プールからインスタンスを取得した際に行う処理
+        /// プールから取得された時の処理。
+        /// - Dispose 時に Release されるようにコールバックを設定
         /// </summary>
-        /// <param name="source"></param>
         private void OnGetSource(Source source)
         {
             source.Initialize(() => _sourcePool.Release(source));
         }
 
         /// <summary>
-        /// プールにインスタンスを返却した際に行う処理
+        /// プールに返却された時の処理。
+        /// - 今回は特に何もしない（必要なら状態リセット処理を入れる）
         /// </summary>
-        /// <param name="source"></param>
         private void OnReleaseSource(Source source)
         {
-
+            
         }
 
         /// <summary>
-        /// プールから削除される際に行う処理
+        /// プールから削除される時の処理。
+        /// - Dispose を呼んでから GameObject を破棄
         /// </summary>
-        /// <param name="source"></param>
         private void OnDestroySource(Source source)
         {
             source.Dispose();
