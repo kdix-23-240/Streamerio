@@ -12,7 +12,7 @@ namespace Common.UI.Display.Window.Book
     /// - Show/Hide 時に ChapterManager を通してチャプターの開閉を制御する
     /// </summary>
     [RequireComponent(typeof(CommonWindowView))]
-    public abstract class BookWindowPresenterBase : DisplayPresenterBase<CommonWindowView>
+    public abstract class BookWindowPresenterBase : WindowPresenterBase
     {
         public override void Initialize()
         {

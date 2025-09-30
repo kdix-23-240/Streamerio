@@ -23,8 +23,6 @@ namespace InGame
         [SerializeField]private float _timeLimit = 180f;
         [SerializeField, LabelText("プレイヤー")]
         private Transform _playerTransform;
-        [SerializeField, LabelText("遊び方ウィンドウ")]
-        private InGameBookWindowPresenter _inGameWindow;
         
         [SerializeField, LabelText("ゲーム画面")]
         private InGameScreenPresenter _inGameScreen;
@@ -38,10 +36,9 @@ namespace InGame
             var url = await WebsocketManager.Instance.GetFrontUrlAsync();
             await QRCodeSpriteGenerater.InitializeSprite(url);
             
-            _inGameWindow.Initialize();
-            _inGameWindow.Hide();
-            
             _inGameScreen.Initialize(QRCodeSpriteGenerater.GetQRCodeSprite(), _timeLimit);
+            
+            WindowManager.Instance.Initialize();
             
             OverlayManager.Instance.Initialize();
             
@@ -52,7 +49,7 @@ namespace InGame
             
             if (!isPlayed)
             {
-                await _inGameWindow.ShowAsync(destroyCancellationToken);
+                await WindowManager.Instance.OpenAndWaitCloseAsync<InGameBookWindowPresenter>(destroyCancellationToken);
                 SaveManager.Instance.SavePlayed();
                 OpenQRCodeDialog();
             }
@@ -72,7 +69,6 @@ namespace InGame
         /// </summary>
         public async void OpenQRCodeDialog()
         {
-            await _inGameWindow.HideAsync(destroyCancellationToken);
             await DialogManager.Instance.OpenAndWaitCloseAsync<QRCodeDialogPresenter>(destroyCancellationToken);
             StartGame();
         }

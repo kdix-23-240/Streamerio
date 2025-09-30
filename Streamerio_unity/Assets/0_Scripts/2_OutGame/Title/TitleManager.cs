@@ -14,8 +14,6 @@ namespace OutGame.Title
     {
         [SerializeField]
         private TitleScreenPresenter _screen;
-        [SerializeField]
-        private OutGameBookWindowPresenter _window;
         
         private void Start()
         {
@@ -24,8 +22,7 @@ namespace OutGame.Title
             _screen.Initialize();
             _screen.Show();
             
-            _window.Initialize();
-            _window.Hide();
+            WindowManager.Instance.Initialize();
             
             LoadingScreenPresenter.Instance.HideAsync().Forget();
         }
@@ -35,7 +32,7 @@ namespace OutGame.Title
         /// </summary>
         public async UniTask OpenTitleWindowAsync(CancellationToken ct)
         {
-            await _window.ShowAsync(ct);
+            await WindowManager.Instance.OpenAndWaitCloseAsync<OutGameBookWindowPresenter>(ct);
             await _screen.ShowAsync(ct);
         }
         
