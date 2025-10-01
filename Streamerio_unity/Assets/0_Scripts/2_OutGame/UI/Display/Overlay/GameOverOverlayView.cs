@@ -3,7 +3,7 @@ using Common.UI;
 using Common.UI.Part.Button;
 using UnityEngine;
 
-namespace OutGame.GameOver.Overlay
+namespace OutGame.UI.Display.Overlay
 {
     /// <summary>
     /// ゲームオーバー画面の View。

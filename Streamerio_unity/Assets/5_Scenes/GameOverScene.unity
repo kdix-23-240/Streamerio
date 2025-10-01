@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 572350549}
   - component: {fileID: 572350548}
   m_Layer: 0
-  m_Name: GameOverManager
+  m_Name: GameOverBooster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
 
-namespace OutGame.GameOver.Overlay
+namespace OutGame.UI.Display.Overlay
 {
     /// <summary>
     /// ゲームオーバー時のオーバーレイ Presenter。
