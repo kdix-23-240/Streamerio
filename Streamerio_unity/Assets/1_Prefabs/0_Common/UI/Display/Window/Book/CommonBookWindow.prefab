@@ -29,7 +29,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4203064732994368821}
   m_Father: {fileID: 2786838231688197781}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -110,7 +111,6 @@ RectTransform:
   m_Children:
   - {fileID: 4417198736753747963}
   - {fileID: 3570075708126123594}
-  - {fileID: 4203064732994368821}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -201,8 +201,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 2786838231688197781}
   _canvasGroup: {fileID: 84501704387346200}
+  _bookRectTransform: {fileID: 0}
   _background: {fileID: 2351420737450003676}
-  _bookAnimation: {fileID: 7248069436254290330}
+  _initialPosition: {x: 0, y: -1080}
   _showAnimParam:
     DurationSec: 0.2
     Ease: 2
@@ -234,12 +235,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4692654194847596547}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2786838231688197781}
+  m_Father: {fileID: 3570075708126123594}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}

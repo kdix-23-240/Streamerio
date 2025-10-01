@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Common.UI.Display.Window
 {
     /// <summary>
@@ -7,6 +9,7 @@ namespace Common.UI.Display.Window
     /// - 共通処理は DisplayPresenterBase に集約されているため、
     ///   ここでは特に追加実装はせず「マーカー的役割」を担う
     /// </summary>
+    [RequireComponent(typeof(CommonWindowView))]
     public abstract class WindowPresenterBase : DisplayPresenterBase<CommonWindowView>
     {
         
