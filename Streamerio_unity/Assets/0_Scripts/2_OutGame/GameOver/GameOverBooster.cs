@@ -1,4 +1,5 @@
 using Common;
+using Common.UI.Display;
 using Common.UI.Display.Overlay;
 using Common.UI.Loading;
 using OutGame.UI.Display.Overlay;
@@ -16,14 +17,14 @@ namespace OutGame.GameOver
         /// <summary>
         /// ゲームオーバー演出の開始処理。
         /// Unity の Start で非同期フローを実行する。
-        /// 1) OverlayManager の初期化
+        /// 1) UI の初期化
         /// 2) ローディング画面を閉じる
         /// 3) GameOverOverlay を開いて、閉じられるまで待機
         /// </summary>
         private async void Start()
         {
-            // 1) Overlay 系 UI の初期化
-            OverlayManager.Instance.Initialize();
+            // 1) UI の初期化
+            DisplayBooster.Instance.Boost();
 
             // 2) ローディング画面を非表示
             await LoadingScreenPresenter.Instance.HideAsync();
