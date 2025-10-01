@@ -3,6 +3,7 @@ using Common.Audio;
 using Common.Scene;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
+using OutGame.Title;
 using R3;
 using UnityEngine;
 
@@ -52,19 +53,9 @@ namespace Common.UI.Display.Window.Panel
 
             // ゲーム開始ボタン
             _view.StartButton.OnClickAsObservable
-                .SubscribeAwait(async (_, ct) =>
+                .Subscribe(_ =>
                 {
-                    // タイトル演出 → ローディングへ
-                    await LoadingScreenPresenter.Instance.TitleToLoadingAsync();
-                    
-                    // 通信接続開始
-                    WebsocketManager.Instance.ConnectWebSocket();
-                    
-                    // タイトルBGMを停止
-                    AudioManager.Instance.StopBGM();
-                    
-                    // ゲームシーンへ遷移（非同期実行）
-                    SceneManager.Instance.LoadSceneAsync(SceneType.GameScene).Forget();
+                    TitleManager.Instance.LoadInGame();
                 }).RegisterTo(destroyCancellationToken);
             
             // 遊び方ボタン

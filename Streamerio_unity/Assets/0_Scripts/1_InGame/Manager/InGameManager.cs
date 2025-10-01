@@ -5,7 +5,6 @@ using Common.Save;
 using Common.Scene;
 using Common.UI.Dialog;
 using Common.UI.Display;
-using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
@@ -71,13 +70,10 @@ namespace InGame
         /// <summary>
         /// ゲーム開始
         /// </summary>
-        public async void StartGame()
+        public void StartGame()
         {
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
-            
-            await UniTask.Delay(1000, cancellationToken: destroyCancellationToken);
-            GameClear();
         }
 
         /// <summary>

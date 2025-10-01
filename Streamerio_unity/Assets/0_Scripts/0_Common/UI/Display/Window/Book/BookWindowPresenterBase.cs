@@ -54,15 +54,14 @@ namespace Common.UI.Display.Window.Book
         protected override void Bind()
         {
             base.Bind();
-
+        
             ChapterManager.Instance.IsBusyProp
                 .DistinctUntilChanged()   // 状態が変わった時だけ反応
                 .SkipWhile(isBusy => isBusy) // Busy 中はスキップ
                 .Where(isBusy => !isBusy) // false (チャプター全閉じ) になった時だけ実行
                 .SubscribeAwait(async (_, ct) =>
                 {
-                    // チャプターが全て閉じた → ウィンドウも閉じる
-                    await HideAsync(ct);
+                    await WindowManager.Instance.CloseTopAsync(ct);
                 })
                 .RegisterTo(destroyCancellationToken);
         }
