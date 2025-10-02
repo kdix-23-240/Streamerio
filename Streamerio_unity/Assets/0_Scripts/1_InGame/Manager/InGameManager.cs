@@ -4,17 +4,15 @@ using Common.Audio;
 using Common.Save;
 using Common.Scene;
 using Common.UI.Dialog;
-using Common.UI.Display.Overlay;
+using Common.UI.Display;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using InGame.UI.Display.Dialog.QRCode;
-using InGame.UI.Display.Overlay;
 using InGame.UI.Display.Screen;
 using InGame.UI.QRCode;
 using InGame.UI.Window;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace InGame
 {
@@ -31,18 +29,14 @@ namespace InGame
         {
             AudioManager.Instance.PlayAsync(BGMType.singetunoyami, destroyCancellationToken).Forget();
             
+            DisplayBooster.Instance.Boost();
+            
             var isPlayed = SaveManager.Instance.LoadPlayed();
             
             var url = await WebsocketManager.Instance.GetFrontUrlAsync();
             await QRCodeSpriteGenerater.InitializeSprite(url);
             
             _inGameScreen.Initialize(QRCodeSpriteGenerater.GetQRCodeSprite(), _timeLimit);
-            
-            WindowManager.Instance.Initialize();
-            
-            OverlayManager.Instance.Initialize();
-            
-            DialogManager.Instance.Initialize();
             
             // ゲーム画面表示
             await LoadingScreenPresenter.Instance.LoadingToInGameAsync();
@@ -98,8 +92,9 @@ namespace InGame
         /// </summary>
         public async void GameClear()
         {
+            await LoadingScreenPresenter.Instance.ShowAsync(_playerTransform.position);
             await WebsocketManager.Instance.SendWebSocketMessage( "{\"type\": \"game_end\" }" );
-            await OverlayManager.Instance.OpenAndWaitCloseAsync<ClearOverlayPresenter>(destroyCancellationToken);
+            SceneManager.Instance.LoadSceneAsync(SceneType.ClearScene).Forget();
             AudioManager.Instance.StopBGM();
             Debug.Log("ゲームクリア");
         }

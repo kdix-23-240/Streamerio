@@ -92,6 +92,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: InGameBookWindow
       objectReference: {fileID: 0}
+    - target: {fileID: 4564600478829257381, guid: f75c55f6646a340a4a081b00eee07114, type: 3}
+      propertyPath: _bookRectTransform
+      value: 
+      objectReference: {fileID: 8638785586528192590}
     - target: {fileID: 7210522309632558226, guid: f75c55f6646a340a4a081b00eee07114, type: 3}
       propertyPath: _firstChapterType
       value: 2
@@ -141,6 +145,22 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5325944291603498503}
   m_SourcePrefab: {fileID: 100100000, guid: f75c55f6646a340a4a081b00eee07114, type: 3}
+--- !u!114 &2521458929164181406 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7248069436254290330, guid: f75c55f6646a340a4a081b00eee07114, type: 3}
+  m_PrefabInstance: {fileID: 5073398754331909636}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8814582501462557938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31d1e50777fe14b8d826bed0d0301a16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!224 &8638785586528192590 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3570075708126123594, guid: f75c55f6646a340a4a081b00eee07114, type: 3}
+  m_PrefabInstance: {fileID: 5073398754331909636}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &8732728970156375201 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4564600478829257381, guid: f75c55f6646a340a4a081b00eee07114, type: 3}
@@ -170,3 +190,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CommonView: {fileID: 8732728970156375201}
+  _bookAnimation: {fileID: 2521458929164181406}
