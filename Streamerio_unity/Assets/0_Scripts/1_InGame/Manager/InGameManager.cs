@@ -93,7 +93,7 @@ namespace InGame
         public async void GameClear()
         {
             await LoadingScreenPresenter.Instance.ShowAsync(_playerTransform.position);
-            await WebsocketManager.Instance.SendWebSocketMessage( "{\"type\": \"game_end\" }" );
+            await WebsocketManager.Instance.GameEnd();
             SceneManager.Instance.LoadSceneAsync(SceneType.ClearScene).Forget();
             AudioManager.Instance.StopBGM();
             Debug.Log("ゲームクリア");

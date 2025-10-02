@@ -84,7 +84,9 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     return;
   }
 
-  // WebSocketからメッセージを受信する
+  ///<summary>
+  /// WebSocketからメッセージを受信する
+  ///</summary>
   private void ReceiveWebSocketMessage(byte[] bytes)
   {
     var message = System.Text.Encoding.UTF8.GetString(bytes);
@@ -150,7 +152,9 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     return;
   }
 
-  // WebSocketを切断する
+  ///<summary>
+  /// WebSocketを切断する
+  ///</summary>
   public async void DisconnectWebSocket()
   {
     if (!_isConnected)
@@ -168,6 +172,9 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     await _websocket.Close();
   }
   
+  ///<summary>
+  /// フロントエンドのURLを取得する
+  ///</summary>
   public async UniTask<string> GetFrontUrlAsync()
   {
     if (_url != string.Empty)
@@ -181,9 +188,19 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     return _url;
   }
 
-  // UnityからWebSocketにメッセージを送信する
-  // 使わないかも
-  public async UniTask SendWebSocketMessage(string message)
+  ///<summary>
+  /// ゲーム終了通知
+  ///</summary>
+  public async UniTask GameEnd()
+  {
+    await SendWebSocketMessage( "{\"type\": \"game_end\" }" );
+  }
+
+
+  ///<summary>
+  /// UnityからWebSocketにメッセージを送信する
+  ///</summary>
+  private async UniTask SendWebSocketMessage(string message)
   {
     if (_websocket.State == WebSocketState.Closed)
     {
@@ -195,13 +212,17 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   }
 
 
-  // アプリケーションが終了したときにwebsocketを閉じる
+  ///<summary>
+  /// アプリケーションが終了したときにwebsocketを閉じる
+  ///</summary>
   private async void OnApplicationQuit()
   {
     await _websocket.Close();
   }
   
-  // JSONの型定義
+  ///<summary>
+  /// JSONの型定義
+  ///</summary>
   private class BaseMessage
   {
     public string type;
