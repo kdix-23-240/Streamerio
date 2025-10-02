@@ -31,6 +31,7 @@ public class Skeleton : MonoBehaviour
         
         float rand = Random.Range(5f, 8f);
         transform.position += new Vector3(_player.position.x + rand, _player.position.y, 0); // 少し上にずらして生成
+        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
 
     void Update()
@@ -47,8 +48,5 @@ public class Skeleton : MonoBehaviour
             }
         }
         transform.Translate(Vector2.left * speed * Time.deltaTime);
-        
-        
-        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
 }
