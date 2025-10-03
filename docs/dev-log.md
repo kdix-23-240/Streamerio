@@ -1,3 +1,28 @@
+## 2025-10-03 WebSocket再接続（roomId維持）対応
+
+### 目的
+- Cloud Run スケールインやネットワーク断で Unity 側の WebSocket が切断された際、同一 `room_id` のまま速やかに再接続できるようにする。
+
+### 実装概要
+- `GET /ws-unity?room_id=...` を受けると、既存の `room_id` に紐づく接続を置換して再登録するように変更。
+- 新規接続は従来通り新しい `room_id` を払い出す。
+- `unregister` は引数の接続が現在の接続と一致する場合のみ削除し、再接続置換時の誤削除を防止。
+- 再接続時の初期メッセージは `type: "room_ready"` にしてクライアント側の分岐を容易に。
+
+### 変更ファイル
+- `internal/handler/websocket.go`
+  - `registerNew`/`registerWithID` を新設
+  - `unregister(id, ws, c)` に変更し、接続一致時のみ削除
+  - `HandleUnityConnection` で `room_id` クエリを解釈し、初期メッセージ種別を `room_created`/`room_ready` で出し分け
+
+### 意図・設計上の判断
+- 高凝集: 接続登録/解除の責務を `WebSocketHandler` 内に閉じる。
+- 低結合: 既存サービス層への影響を最小化し、ハンドラ内のみで再接続制御を完結。
+- 安全性: defer の `unregister` が新接続を消してしまう競合を防ぐため、接続ポインタ比較で保護。
+
+### 今後の課題
+- インスタンス跨ぎ（Cloud Run 水平スケール時）の接続管理は別途 Redis などで分散管理が必要。
+- Unity クライアント側で `room_ready` 受信をトリガに状態復元（必要なら）を検討。
 # 開発ログ (game-end-handling)
 
 - 2024-09-21 02:00 作業ブランチ `game-end-handling` を作成し、既存仕様と `docs/game_end_plan.md` を再確認。終了イベントと集計要件を把握し、命名統一済み (`skill*/enemy*`) を前提に進める方針を明文化。
