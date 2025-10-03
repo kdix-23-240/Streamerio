@@ -87,7 +87,7 @@ namespace OutGame.Title
             await LoadingScreenPresenter.Instance.TitleToLoadingAsync();
 
             // 4) 通信接続開始
-            WebsocketManager.Instance.ConnectWebSocket();
+            await WebsocketManager.Instance.ConnectWebSocket();
 
             // 5) タイトル BGM を停止
             AudioManager.Instance.StopBGM();
