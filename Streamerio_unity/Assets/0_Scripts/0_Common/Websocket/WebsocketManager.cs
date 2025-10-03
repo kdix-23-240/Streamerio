@@ -72,10 +72,15 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       Debug.Log("Error! " + e);
     };
 
-    _websocket.OnClose += (e) =>
+    _websocket.OnClose += async (e) =>
     {
       Debug.Log("Connection closed!");
       _isConnected = false;
+
+      // 再接続を試行
+      // タイムアウトを指定できないので1回のみ
+      Debug.Log("Retry to connect...");
+      await ConnectWebSocket();
     };
 
     _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
@@ -155,7 +160,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///<summary>
   /// WebSocketを切断する
   ///</summary>
-  public async void DisconnectWebSocket()
+  private async UniTask DisconnectWebSocket()
   {
     if (!_isConnected)
     {
