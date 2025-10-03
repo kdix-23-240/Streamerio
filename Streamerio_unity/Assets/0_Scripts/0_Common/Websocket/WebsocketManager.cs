@@ -39,8 +39,14 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
   }
 
-  // websocketのコネクションを確立する
+  // websocketのコネクションを確立する（引数なし版）
   public async UniTask ConnectWebSocket()
+  {
+    await ConnectWebSocket(null);
+  }
+
+  // websocketのコネクションを確立する（引数あり版）
+  public async UniTask ConnectWebSocket(string websocketId)
   {
     if (_isConnected)
     {
@@ -49,7 +55,10 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
     
     // WebSocketのインスタンスを生成
-    _websocket = new WebSocket("wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity");
+    string websocketUrl = string.IsNullOrEmpty(websocketId) 
+      ? "wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity" 
+      : "wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity?room_id=" + websocketId;
+    _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
     {
@@ -78,9 +87,8 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       _isConnected = false;
 
       // 再接続を試行
-      // タイムアウトを指定できないので1回のみ
-      Debug.Log("Retry to connect...");
-      await ConnectWebSocket();
+      // 現在のwebsocketIdが空の場合は新しくwebsocketIdを生成して接続
+      await ConnectWebSocket(_websocketId ?? string.Empty);
     };
 
     _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);

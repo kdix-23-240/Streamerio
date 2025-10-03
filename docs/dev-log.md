@@ -33,4 +33,26 @@
 - 2025-09-20 12:10 CORS/クッキー運用の見直し。Cloud Run(backend) と Vercel(frontend) 間で `credentials: 'include'` を使うため、Echo の CORS を allowlist（`FRONTEND_URL`）+ `AllowCredentials=true` に変更。`/get_viewer_id` の Cookie を `SameSite=None; Secure` に更新してクロスサイト送受信を許可。ローカルデフォルトの `FRONTEND_URL="*"` の場合は `AllowCredentials=false` とし、意図せずワイルドカード+資格情報が混在しないようガード。
 - 2024-09-21 04:10 終了サマリーに視聴者名を含めるようバックエンドを拡張し、Unity への `game_end_summary` と REST レスポンス双方で表示名を送出。リザルト画面は名前を優先表示し、未設定の場合は ULID をフォールバックとして表示するよう更新。
 
+## 2025-10-03 ConnectWebSocketメソッドオーバーロード実装
+
+### 目的
+- Unity側のWebSocket接続時に、カスタムURLを指定できるオプションを提供
+- 既存の引数なし呼び出しとの互換性を維持
+- テスト環境や異なるサーバー環境への接続を可能にする
+
+### 実装概要
+- `ConnectWebSocket()` - 引数なし版（既存の動作を維持）
+- `ConnectWebSocket(string customUrl)` - カスタムURL指定版
+- 引数なし版は内部的にnullを渡して引数あり版を呼び出すことで実装を統一
+
+### 変更ファイル
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/WebsocketManager.cs`
+  - メソッドオーバーロードを追加
+  - デフォルトURL使用時とカスタムURL使用時の分岐処理を実装
+
+### 意図・設計上の判断
+- 高凝集: WebSocket接続の責務をWebsocketManager内に閉じる
+- 低結合: 既存の呼び出し元に影響を与えない後方互換性を維持
+- 拡張性: 将来的な開発環境やテスト環境での柔軟な接続先変更を可能にする
+
  
