@@ -42,7 +42,8 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   // websocketのコネクションを確立する（引数なし版）
   public async UniTask ConnectWebSocket()
   {
-    await ConnectWebSocket(null);
+    ConnectWebSocket(null).Forget();
+    return;
   }
 
   // websocketのコネクションを確立する（引数あり版）
