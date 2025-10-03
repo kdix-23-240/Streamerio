@@ -1,8 +1,9 @@
+using System;
 using System.Threading;
-using Alchemy.Inspector;
-using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
 namespace Common.UI.Loading
 {
@@ -12,29 +13,24 @@ namespace Common.UI.Loading
     /// - View の表示/非表示/遷移アニメーションを操作
     /// - 表示中は UI の操作を無効化し、演出が終わると再度制御を戻す
     /// </summary>
-    [RequireComponent(typeof(LoadingScreenView))]
-    public class LoadingScreenPresenter : SingletonBase<LoadingScreenPresenter>
+    public class LoadingScreenPresenter: IStartable, IDisposable
     {
-        [SerializeField, ReadOnly]
         private LoadingScreenView _view;
-
-#if UNITY_EDITOR
-        /// <summary>
-        /// インスペクタ更新時のチェック。
-        /// - View 参照が未設定なら自動取得
-        /// </summary>
-        private void OnValidate()
+        private CancellationTokenSource _cts;
+        
+        [Inject]
+        public LoadingScreenPresenter(LoadingScreenView view)
         {
-            _view ??= GetComponent<LoadingScreenView>();
+            _view = view;
         }
-#endif
         
         /// <summary>
         /// 初期化処理。
         /// - View を初期化し、アニメーションコンポーネントを準備
         /// </summary>
-        public void Initialize()
+        public void Start()
         {
+            _cts = new CancellationTokenSource();
             _view.Initialize();
         }
         
@@ -45,7 +41,7 @@ namespace Common.UI.Loading
         public async UniTask ShowAsync()
         {
             _view.SetInteractable(true);
-            await _view.ShowAsync(destroyCancellationToken);
+            await _view.ShowAsync(_cts.Token);
         }
         
         /// <summary>
@@ -54,7 +50,7 @@ namespace Common.UI.Loading
         public async UniTask ShowAsync(Vector3 centerCirclePosition)
         {
             _view.SetInteractable(true);
-            await _view.ShowAsync(centerCirclePosition, destroyCancellationToken);
+            await _view.ShowAsync(centerCirclePosition, _cts.Token);
         }
 
         /// <summary>
@@ -72,7 +68,7 @@ namespace Common.UI.Loading
         /// </summary>
         public async UniTask HideAsync()
         {
-            await _view.HideAsync(destroyCancellationToken);
+            await _view.HideAsync(_cts.Token);
             _view.SetInteractable(false);
         }
         
@@ -82,7 +78,7 @@ namespace Common.UI.Loading
         public async UniTask TitleToLoadingAsync()
         {
             _view.SetInteractable(true);
-            await _view.TitleToLoadingAsync(destroyCancellationToken);
+            await _view.TitleToLoadingAsync(_cts.Token);
         }
         
         /// <summary>
@@ -91,8 +87,14 @@ namespace Common.UI.Loading
         /// </summary>
         public async UniTask LoadingToInGameAsync()
         {
-            await _view.LoadingToInGameAsync(destroyCancellationToken);
+            await _view.LoadingToInGameAsync(_cts.Token);
             _view.SetInteractable(false);
+        }
+
+        public void Dispose()
+        {
+            _cts.Cancel();
+            _cts.Dispose();
         }
     }
 }

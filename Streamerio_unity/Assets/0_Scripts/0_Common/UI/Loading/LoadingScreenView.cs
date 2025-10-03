@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer.Unity;
 
 namespace Common.UI.Loading
 {
@@ -13,7 +14,7 @@ namespace Common.UI.Loading
     /// - Image に専用マテリアルを割り当て、シェーダプロパティを書き換えてイリス演出を実現
     /// - IrisIn/IrisOut コンポーネントを用いて表示/非表示/シーン遷移をアニメーション制御
     /// </summary>
-    public class LoadingScreenView : UIBehaviourBase
+    public class LoadingScreenView : UIBehaviourBase, IStartable
     {
         [SerializeField, ReadOnly]
         private Image _image;
@@ -65,7 +66,7 @@ namespace Common.UI.Loading
         /// - Image.material を複製して専用マテリアルを生成
         /// - 各種アニメーションコンポーネントを作成
         /// </summary>
-        public override void Initialize()
+        void IStartable.Start()
         {
             base.Initialize();
 

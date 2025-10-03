@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6513916331779527677}
   - component: {fileID: 8066417646364474472}
   - component: {fileID: 9174078284597191163}
-  - component: {fileID: 1007013334669152481}
+  - component: {fileID: 6968772182867010546}
   m_Layer: 5
   m_Name: LoadingScreen
   m_TagString: Untagged
@@ -145,7 +145,7 @@ MonoBehaviour:
     Center: {x: 0.5, y: 0.5}
     MinRadius: 0
     MaxRadius: 2
---- !u!114 &1007013334669152481
+--- !u!114 &6968772182867010546
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,10 +154,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2946619780781935292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d867f08ae37422593bc946317c26eba, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e60a0a3d278490e8e763d323e45cbf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _view: {fileID: 9174078284597191163}
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects: []
+  _view: {fileID: 0}
 --- !u!1001 &6158916701073076904
 PrefabInstance:
   m_ObjectHideFlags: 0
