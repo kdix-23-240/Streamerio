@@ -3,42 +3,40 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 
-public class BurningGhoulMovement : MonoBehaviour
+public class BurningGhoulMovement : MonoBehaviour, IAttackable
 {
-    [Header("移動設定")]
-    [SerializeField] private float followSpeed = 1.5f;
-    [SerializeField] private float detectionRange = 8f;
-    [SerializeField] private float stopDistance = 0.5f; // プレイヤーに近づきすぎないための距離
-    [SerializeField] private float attackCooldown = 0.8f; // 攻撃間隔
-    
+    [SerializeField] private BurningGhoulScriptableObject _burningGhoulScriptableObject;
+
+    private float _speed;
+    private float _detectionRange;
+    private float _stopDistance;
+
     private Transform _player;
-    private EnemyAttackManager _attackManager;
-    private float _lastAttackTime = -999f;
+
+    public float Power => _burningGhoulScriptableObject.Power;
+
+    void Awake()
+    {
+        _speed = _burningGhoulScriptableObject.Speed;
+        _detectionRange = _burningGhoulScriptableObject.DetectionRange;
+        _stopDistance = _burningGhoulScriptableObject.StopRange;
+    }
 
     void Start()
     {
         // プレイヤーを探す
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-        {
-            _player = playerObj.transform;
-        }
-        else
-        {
-            Debug.LogWarning("Player not found for BurningGhoul!");
-        }
-
-        _attackManager = GetComponent<EnemyAttackManager>();
+        _player = playerObj.transform;
         
-        float rand = Random.Range(6f, 10f);
-        transform.position += new Vector3(_player.position.x + rand, _player.position.y, 0); // 少し上にずらして生成
+        float randPosX = Random.Range(_burningGhoulScriptableObject.MinRelativeSpawnPosX, _burningGhoulScriptableObject.MaxRelativeSpawnPosX);
+        float randPosY = Random.Range(_burningGhoulScriptableObject.MinRelativeSpawnPosY, _burningGhoulScriptableObject.MaxRelativeSpawnPosY);
+        transform.position += new Vector3(_player.position.x + randPosX, _player.position.y + randPosY, 0);
+
         AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()
     {
-        if (_player == null) return;
-        
         FollowPlayer();
     }
     
@@ -47,13 +45,13 @@ public class BurningGhoulMovement : MonoBehaviour
         float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
         
         // 検出範囲内かつ停止距離より遠い場合のみ移動
-        if (distanceToPlayer <= detectionRange && distanceToPlayer > stopDistance)
+        if (distanceToPlayer <= _detectionRange && distanceToPlayer > _stopDistance)
         {
             // プレイヤーの方向を計算
             Vector2 direction = (_player.position - transform.position).normalized;
             
             // プレイヤーに向かって移動
-            transform.Translate(direction * followSpeed * Time.deltaTime);
+            transform.Translate(direction * _speed * Time.deltaTime);
             
             // スプライトの向きを調整（オプション）
             if (direction.x < 0)
