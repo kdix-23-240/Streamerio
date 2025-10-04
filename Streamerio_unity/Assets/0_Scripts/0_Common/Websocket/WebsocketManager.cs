@@ -12,8 +12,8 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   private WebSocket _websocket;
 
   [SerializeField]
-  private string _websocketId = string.Empty;
-  public string WebsocketId => _websocketId;
+  private string _roomId = string.Empty;
+  public string RoomId => _roomId;
   
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
@@ -39,8 +39,15 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
   }
 
-  // websocketのコネクションを確立する
+  // websocketのコネクションを確立する（引数なし版）
   public async UniTask ConnectWebSocket()
+  {
+    ConnectWebSocket(null).Forget();
+    return;
+  }
+
+  // websocketのコネクションを確立する（引数あり版）
+  public async UniTask ConnectWebSocket(string websocketId)
   {
     if (_isConnected)
     {
@@ -49,7 +56,10 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
     
     // WebSocketのインスタンスを生成
-    _websocket = new WebSocket("wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity");
+    string websocketUrl = string.IsNullOrEmpty(websocketId) 
+      ? "wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity" 
+      : "wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity?room_id=" + websocketId;
+    _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
     {
@@ -72,10 +82,14 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       Debug.Log("Error! " + e);
     };
 
-    _websocket.OnClose += (e) =>
+    _websocket.OnClose += async (e) =>
     {
       Debug.Log("Connection closed!");
       _isConnected = false;
+
+      // 再接続を試行
+      // 現在のwebsocketIdが空の場合は新しくwebsocketIdを生成して接続
+      await ConnectWebSocket(_roomId ?? string.Empty);
     };
 
     _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
@@ -115,7 +129,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
         var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
         if (room != null)
         {
-          _websocketId = room.room_id;
+          _roomId = room.room_id;
           return;
         }
       }
@@ -155,7 +169,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///<summary>
   /// WebSocketを切断する
   ///</summary>
-  public async void DisconnectWebSocket()
+  private async UniTask DisconnectWebSocket()
   {
     if (!_isConnected)
     {
@@ -182,8 +196,8 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       return _url;
     }
     
-    await UniTask.WaitWhile(() => _websocketId == string.Empty);
-    _url = ZString.Format(_frontendUrlFormat, _websocketId);
+    await UniTask.WaitWhile(() => _roomId == string.Empty);
+    _url = ZString.Format(_frontendUrlFormat, _roomId);
     
     return _url;
   }
