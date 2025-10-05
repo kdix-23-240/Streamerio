@@ -2,20 +2,24 @@ using Common.Audio;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class Skeleton : MonoBehaviour
+public class Skeleton : MonoBehaviour, IAttackable
 {
-    [Header("ステータス")]
-    [SerializeField] private int damage = 10;
-    [SerializeField] private float speed = 0.5f;
-    private float startMoveDelay = 0.6f; // 追加: 移動開始までの遅延
+    [SerializeField] private SkeletonScriptableObject _skeletonScriptableObject;
+    private float _speed;
+    private float _startMoveDelay; // 追加: 移動開始までの遅延
 
     private float _spawnTime;
     private bool _canMove = false;
 
     private Transform _player;
 
+    public float Power => _skeletonScriptableObject.Power;
+
     void Awake()
     {
+        _speed = _skeletonScriptableObject.Speed;
+        _startMoveDelay = _skeletonScriptableObject.StartMoveDelay; // 追加: スクリプタブルオブジェクトから取得
+
         _spawnTime = Time.time;              // 追加: 出現時間記録
         _canMove = false;   
     }
@@ -38,7 +42,7 @@ public class Skeleton : MonoBehaviour
     {
         if (!_canMove)
         {
-            if (Time.time - _spawnTime >= startMoveDelay)
+            if (Time.time - _spawnTime >= _startMoveDelay)
             {
                 _canMove = true;             // 追加: 一度だけ移行
             }
@@ -47,6 +51,6 @@ public class Skeleton : MonoBehaviour
                 return;                      // まだ移動しない
             }
         }
-        transform.Translate(Vector2.left * speed * Time.deltaTime);
+        transform.Translate(Vector2.left * _speed * Time.deltaTime);
     }
 }
