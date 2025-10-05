@@ -1,19 +1,23 @@
 package handler
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"sync"
 	"time"
 
 	"golang.org/x/net/websocket"
 
+	"streamerrio-backend/internal/service"
+	"streamerrio-backend/pkg/pubsub"
+
 	"github.com/labstack/echo/v4"
 	"github.com/oklog/ulid/v2"
-	"streamerrio-backend/internal/service"
 )
 
 type WebSocketHandler struct {
@@ -21,12 +25,19 @@ type WebSocketHandler struct {
 	mu             sync.RWMutex
 	roomService    *service.RoomService
 	sessionService *service.GameSessionService
+	pubsub         pubsub.PubSub
+	logger         *slog.Logger
 	ulidEntropy    io.Reader
 }
 
-func NewWebSocketHandler() *WebSocketHandler {
+func NewWebSocketHandler(ps pubsub.PubSub, logger *slog.Logger) *WebSocketHandler {
+	if logger == nil {
+		logger = slog.Default()
+	}
 	return &WebSocketHandler{
 		connections: make(map[string]*websocket.Conn),
+		pubsub:      ps,
+		logger:      logger,
 		ulidEntropy: ulid.Monotonic(rand.Reader, 0),
 	}
 }
@@ -226,4 +237,45 @@ func (h *WebSocketHandler) ListClients(c echo.Context) error {
 		ids = append(ids, id)
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{"clients": ids})
+}
+
+// StartPubSubSubscription: Pub/Sub購読を開始（別goroutineで実行）
+// REST APIからのイベントをUnityに配信する
+func (h *WebSocketHandler) StartPubSubSubscription(ctx context.Context) error {
+	handler := func(channel string, message []byte) error {
+		var payload map[string]interface{}
+		if err := json.Unmarshal(message, &payload); err != nil {
+			h.logger.Error("pubsub message unmarshal failed", slog.Any("error", err))
+			return err
+		}
+
+		// room_idを取得
+		roomID, ok := payload["room_id"].(string)
+		if !ok || roomID == "" {
+			h.logger.Warn("pubsub message missing room_id", slog.Any("payload", payload))
+			return fmt.Errorf("room_id not found in payload")
+		}
+
+		// 自分が接続を持っている場合のみ配信
+		if err := h.SendEventToUnity(roomID, payload); err != nil {
+			// 接続がないのは正常（他のインスタンスが持っている）
+			h.logger.Debug("no local connection for room, skip delivery",
+				slog.String("room_id", roomID),
+				slog.String("event_type", fmt.Sprintf("%v", payload["event_type"])))
+			return nil
+		}
+
+		h.logger.Info("event delivered to unity via pubsub",
+			slog.String("room_id", roomID),
+			slog.String("event_type", fmt.Sprintf("%v", payload["event_type"])))
+		return nil
+	}
+
+	// 購読開始（ブロッキング）
+	h.logger.Info("starting pubsub subscription", slog.String("channel", pubsub.ChannelGameEvents))
+	if err := h.pubsub.Subscribe(ctx, pubsub.ChannelGameEvents, handler); err != nil {
+		h.logger.Error("pubsub subscription failed", slog.Any("error", err))
+		return err
+	}
+	return nil
 }
