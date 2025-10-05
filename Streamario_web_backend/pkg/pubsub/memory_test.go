@@ -16,7 +16,7 @@ func TestMemoryPubSub_PublishSubscribe(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	channel := "test_channel"
+	channel := ChannelGameEvents // 定数を使用
 	testMessage := []byte("hello world")
 
 	// 受信メッセージを格納
@@ -75,7 +75,7 @@ func TestMemoryPubSub_MultipleSubscribers(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	channel := "test_channel"
+	channel := ChannelGameEvents // 定数を使用
 	testMessage := []byte("broadcast")
 
 	// 複数の購読者
@@ -135,7 +135,7 @@ func TestMemoryPubSub_NoSubscribers(t *testing.T) {
 	defer ps.Close()
 
 	ctx := context.Background()
-	channel := "test_channel"
+	channel := ChannelGameEvents // 定数を使用
 	testMessage := []byte("nobody listening")
 
 	// 購読者なしでもエラーにならない

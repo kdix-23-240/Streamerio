@@ -48,6 +48,7 @@ pkg/pubsub/
 ├── interface.go      # 抽象インターフェース定義
 ├── redis.go          # Redis Pub/Sub実装（本番用）
 ├── memory.go         # インメモリ実装（開発/テスト用）
+├── channels.go       # チャネル名定数定義
 ├── memory_test.go    # 単体テスト
 └── README.md         # 使用方法ドキュメント
 ```
@@ -125,7 +126,7 @@ if int(current) >= threshold {
     }
     
     message, _ := json.Marshal(payload)
-    if err := s.pubsub.Publish(ctx, "game_events", message); err != nil {
+    if err := s.pubsub.Publish(ctx, pubsub.ChannelGameEvents, message); err != nil {
         s.logger.Error("event publish failed", slog.Any("error", err))
     }
 }
@@ -148,10 +149,10 @@ handler := func(channel string, message []byte) error {
     return wsHandler.SendEventToUnity(roomID, payload)
 }
 
-// 購読開始（別goroutine推奨）
+// 購読開始（別goroutine推奨、定数を使用）
 go func() {
     ctx := context.Background()
-    if err := ps.Subscribe(ctx, "game_events", handler); err != nil {
+    if err := ps.Subscribe(ctx, pubsub.ChannelGameEvents, handler); err != nil {
         log.Error("subscription failed", slog.Any("error", err))
     }
 }()
@@ -159,10 +160,13 @@ go func() {
 
 ## チャネル設計
 
-### `game_events`
+チャネル名は `pkg/pubsub/channels.go` で定数定義されています。
+
+### `pubsub.ChannelGameEvents`
 ボタンイベントの閾値到達通知
 
-**用途**: REST API → WebSocket → Unity
+**実際の文字列**: `"game_events"`  
+**用途**: REST API → WebSocket → Unity  
 **Payload**:
 ```json
 {
@@ -174,10 +178,11 @@ go func() {
 }
 ```
 
-### `game_end_notifications`（将来拡張用）
+### `pubsub.ChannelGameEnd`（将来拡張用）
 ゲーム終了通知
 
-**用途**: WebSocket → REST API（統計更新など）
+**実際の文字列**: `"game_end_notifications"`  
+**用途**: WebSocket → REST API（統計更新など）  
 **Payload**:
 ```json
 {

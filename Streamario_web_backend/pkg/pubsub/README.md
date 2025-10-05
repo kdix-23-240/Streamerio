@@ -59,8 +59,8 @@ payload := map[string]interface{}{
 }
 message, _ := json.Marshal(payload)
 
-// チャネルに発行
-err := ps.Publish(ctx, "game_events", message)
+// チャネルに発行（定数を使用）
+err := ps.Publish(ctx, pubsub.ChannelGameEvents, message)
 ```
 
 ### 3. メッセージ購読（WebSocketサーバー）
@@ -79,14 +79,18 @@ handler := func(channel string, message []byte) error {
     return wsHandler.SendEventToUnity(roomID, payload)
 }
 
-// 購読開始（ブロッキング）
-err := ps.Subscribe(ctx, "game_events", handler)
+// 購読開始（ブロッキング、定数を使用）
+err := ps.Subscribe(ctx, pubsub.ChannelGameEvents, handler)
 ```
 
 ## チャネル設計
 
-### game_events
+チャネル名は `channels.go` で定数定義されています。タイポ防止のため、必ず定数を使用してください。
+
+### pubsub.ChannelGameEvents
 REST APIで受信したイベントをWebSocketサーバーへ配信
+
+**チャネル名**: `"game_events"`
 
 **Payload例:**
 ```json
@@ -99,8 +103,10 @@ REST APIで受信したイベントをWebSocketサーバーへ配信
 }
 ```
 
-### game_end_notifications
+### pubsub.ChannelGameEnd
 ゲーム終了通知（将来拡張用）
+
+**チャネル名**: `"game_end_notifications"`
 
 **Payload例:**
 ```json
