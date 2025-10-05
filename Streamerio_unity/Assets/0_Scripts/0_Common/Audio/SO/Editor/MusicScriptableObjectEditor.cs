@@ -9,7 +9,7 @@ namespace Common.Audio.Editor
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TSO"></typeparam>
-    public class MusicScriptableObjectEditor<TKey, TSO>: AutoSetDataScriptableObjectEditor<TKey, AudioClip, AudioClip, TSO>
+    public class MusicScriptableObjectEditor<TKey, TSO>: AutoSetDataScriptableObjectEditor<TKey, MusicData, AudioClip, TSO>
         where TKey: Enum
         where TSO: MusicScriptableObjectBase<TKey>
     {
@@ -19,9 +19,13 @@ namespace Common.Audio.Editor
             IsSetNone = true;
         }
         
-        protected override AudioClip CreateValue(AudioClip file)
+        protected override MusicData CreateValue(AudioClip file)
         {
-            return file;
+            return new MusicData()
+            {
+                Clip = file,
+                Capacity = Target.DefaultCapacity
+            };
         }
     }
 }

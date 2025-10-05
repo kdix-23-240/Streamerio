@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1604836040412205578}
-  - component: {fileID: 3843024272301097620}
+  - component: {fileID: 9181885634258927412}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3843024272301097620
+--- !u!114 &9181885634258927412
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,14 +41,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 2775795374422467973}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26a6948d8ea8441895dd07322159f7a2, type: 3}
+  m_Script: {fileID: 11500000, guid: ed90b234ea384af1bde84154c6bd24af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioMixer: {fileID: 24100000, guid: c5143b869dd9f45038d4b17f274b128f, type: 2}
-  _audioMixerParameterSO: {fileID: 11400000, guid: bdbf3136376a7924b9fbd84c3006687f, type: 2}
+  parentReference:
+    TypeName: Common.CommonLifeTimeScope
+  autoRun: 1
+  autoInjectGameObjects: []
+  _sourceDataDict:
+    _keyValuePairs:
+    - _key: 2
+      _value:
+        Source: {fileID: 9115305619869959060, guid: 3949e1c7425b0d34bab31e13e06b836c, type: 3}
+        Parent: {fileID: 1604836040412205578}
+    - _key: 3
+      _value:
+        Source: {fileID: 8116295250773488449, guid: d35dc888b9dd3c541bc4d889a1da24a1, type: 3}
+        Parent: {fileID: 1604836040412205578}
   _bgmSO: {fileID: 11400000, guid: 4ac6aa48692cb5d4c9b00a089f9fd01f, type: 2}
-  _bgmSource: {fileID: 9115305619869959060, guid: 3949e1c7425b0d34bab31e13e06b836c, type: 3}
-  _bgmSourcePoolCapacity: 3
   _seSO: {fileID: 11400000, guid: c0c905d3d21464340a37cd2a506ef267, type: 2}
-  _seSource: {fileID: 8116295250773488449, guid: d35dc888b9dd3c541bc4d889a1da24a1, type: 3}
-  _seSourcePoolCapacity: 10
+  _audioMixer: {fileID: 24100000, guid: c5143b869dd9f45038d4b17f274b128f, type: 2}
+  _parameterSO: {fileID: 11400000, guid: bdbf3136376a7924b9fbd84c3006687f, type: 2}

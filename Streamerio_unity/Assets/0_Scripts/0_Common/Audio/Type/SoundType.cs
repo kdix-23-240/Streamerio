@@ -1,7 +1,6 @@
 namespace Common.Audio
 {
-    
-    public enum VolumeType
+    public enum SoundType
     {
 		Master = 1,
 		BGM = 2,

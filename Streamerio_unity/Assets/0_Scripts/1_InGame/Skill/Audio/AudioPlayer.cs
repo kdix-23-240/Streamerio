@@ -11,7 +11,7 @@ namespace InGame.Skill.Audio
         
         public void PlaySE()
         {
-            AudioManager.Instance.PlayAsync(_seType, destroyCancellationToken).Forget();
+           // AudioFacade.Instance.PlayAsync(_seType, destroyCancellationToken).Forget();
         }
     }
 }

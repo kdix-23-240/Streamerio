@@ -27,7 +27,7 @@ namespace Common.Audio
         protected void OnValidate()
         {
             // Editor 上で AudioSource を自動取得
-            _audioSource = _audioSource == null ? GetComponent<AudioSource>() : _audioSource;
+            _audioSource ??= GetComponent<AudioSource>();
         }  
 #endif
 
