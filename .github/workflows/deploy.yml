@@ -12,7 +12,7 @@ env:
   GCP_PROJECT_ID: streamerio-472706
   GCP_REGION: asia-northeast1
   ARTIFACT_REGISTRY_REPO: streamario
-  IMAGE_NAME: asia-northeast1-docker.pkg.dev/streamario/streamario/streamario-web-backend
+  IMAGE_NAME: asia-northeast1-docker.pkg.dev/streamerio-472706/streamario/streamario-web-backend
 
 jobs:
   deploy:
