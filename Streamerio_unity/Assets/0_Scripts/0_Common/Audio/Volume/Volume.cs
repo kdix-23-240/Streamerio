@@ -4,41 +4,48 @@ using UnityEngine;
 namespace Common.Audio
 {
     /// <summary>
-    /// 音量
+    /// 音量データを表すクラス。
+    /// - UI などから扱う「0〜100」の値と、AudioMixer に渡す「dB 値」を両方保持する
+    /// - 入力値は常に 0〜100 の範囲にクランプされる
+    /// - AudioMixer 用には対数変換で dB に変換
     /// </summary>
     [Serializable]
     public class Volume
     {
-        /// <summary>
-        /// 入力として受け取れる音量のデフォルト値
-        /// </summary>
+        /// <summary>音量のデフォルト値 (0〜100)</summary>
         public const float DEFAULT_VALUE = 50;
 
-        // 入力として受け取れる最小値・最大値
+        /// <summary>UIで扱う最小/最大音量 (0〜100)</summary>
         public const float MIN_VALUE = 0;
         public const float MAX_VALUE = 100;
 
-        // オーディオミキサーの最小値・最大値
+        /// <summary>AudioMixer に設定可能な最小/最大の dB 値</summary>
         private const float MIN_MIXER_VOLUME = -80f;
         private const float MAX_MIXER_VOLUME = 20f;
 
-        // オーディオミキサーに設定できる最大値(オーディオミキサーの上限まで上げると大きすぎるため)
+        /// <summary>
+        /// 実際に AudioMixer に反映する最大値（20dB まで上げると大きすぎるため 0dB を上限にしている）
+        /// </summary>
         private const float CUSTOM_MAX_VOLUME = 0f;
 
         [SerializeField, Header("音量"), Range(MIN_VALUE, MAX_VALUE)]
         private float _value = 0f;
+
         /// <summary>
-        /// 0~100の音量(UIとかで使う用)
+        /// 0〜100 の音量値。UIやセーブデータなどで使う。
         /// </summary>
         public float Value => _value;
 
         private float _mixerValue;
         /// <summary>
-        /// オーディオミキサーに設定する音量
+        /// AudioMixer に適用する dB 値。
         /// </summary>
         public float MixerValue => _mixerValue;
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// Inspector 上で値を変更した際に自動で dB 値を更新。
+        /// </summary>
         private void OnValidate()
         {
             _mixerValue = ConvertVolume2dB(_value);
@@ -46,30 +53,37 @@ namespace Common.Audio
 #endif
 
         /// <summary>
-        /// 音量
-        /// <param>入力は強制的に0~100の値になる</param>
+        /// コンストラクタ。
+        /// - 渡された値を 0〜100 にクランプ
+        /// - dB 値に変換して保持
         /// </summary>
-        /// <param name="value"> 0~100の音量 </param>
+        /// <param name="value">0〜100 の音量値</param>
         public Volume(float value)
         {
             _value = Mathf.Clamp(value, MIN_VALUE, MAX_VALUE);
-            _mixerValue = ConvertVolume2dB(value);
+            _mixerValue = ConvertVolume2dB(_value);
         }
 
         /// <summary>
-        /// 音量をデシベルに変換(オーディオミキサーに設定する音量に変換)
+        /// 音量 (0〜100) を AudioMixer 用の dB 値に変換する。
+        /// 対数変換を用いて、人間の聴覚に近い音量変化を再現。
         /// </summary>
-        /// <param name="volume"></param>
-        /// <returns></returns>
         private float ConvertVolume2dB(float volume)
-            => Mathf.Clamp(MAX_MIXER_VOLUME * Mathf.Log10(ScaleToZeroToOne(volume)), MIN_MIXER_VOLUME, CUSTOM_MAX_VOLUME);
+        {
+            return Mathf.Clamp(
+                MAX_MIXER_VOLUME * Mathf.Log10(ScaleToZeroToOne(volume)),
+                MIN_MIXER_VOLUME,
+                CUSTOM_MAX_VOLUME
+            );
+        }
 
         /// <summary>
-        /// 音量を0~1の間にする
+        /// 音量 (0〜100) を 0〜1 にスケーリング。
+        /// - Log10 に渡すため 0 〜 1 に正規化する
         /// </summary>
-        /// <param name="volume"></param>
-        /// <returns></returns>
         private float ScaleToZeroToOne(float volume)
-            => Mathf.Clamp(volume, MIN_VALUE, MAX_VALUE) / MAX_VALUE;
+        {
+            return Mathf.Clamp(volume, MIN_VALUE, MAX_VALUE) / MAX_VALUE;
+        }
     }
 }

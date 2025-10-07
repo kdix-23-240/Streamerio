@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class EnemyHpManager : MonoBehaviour
@@ -15,10 +17,15 @@ public class EnemyHpManager : MonoBehaviour
             health = 0;
             Die();
         }
+        else
+        {
+            AudioManager.Instance.PlayAsync(SEType.どん_効果音,destroyCancellationToken).Forget();
+        }
     }
 
     protected virtual void Die()
     {
+        AudioManager.Instance.PlayAsync(SEType.敵のダウン,destroyCancellationToken).Forget();
         Destroy(gameObject);
     }
 }

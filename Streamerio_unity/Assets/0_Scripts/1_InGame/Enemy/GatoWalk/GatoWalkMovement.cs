@@ -1,3 +1,5 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class GatoWalkMovement : MonoBehaviour
@@ -13,6 +15,7 @@ public class GatoWalkMovement : MonoBehaviour
     private float _jumpTimer = 0f;
     private EnemyAttackManager _attackManager;
     private float _lastAttackTime = -999f;
+    private Transform _player;
 
     void Start()
     {
@@ -22,14 +25,22 @@ public class GatoWalkMovement : MonoBehaviour
             _rigidbody = gameObject.AddComponent<Rigidbody2D>();
         }
 
+        // プレイヤーを探す
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            _player = playerObj.transform;
+        }
+
         // 物理設定
-        _rigidbody.gravityScale = 2f;
+            _rigidbody.gravityScale = 2f;
         _rigidbody.freezeRotation = true;
 
         _attackManager = GetComponent<EnemyAttackManager>();
         _jumpTimer = jumpInterval;
         
-        transform.position += new Vector3(8, 0, 0); // 少し上にずらして生成
+        transform.position += new Vector3(_player.position.x + 10, _player.position.y + 1, 0); // 少し上にずらして生成
+        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()

@@ -3,6 +3,10 @@ namespace Common.Audio
     
     public enum SEType
     {
+		None = 0,
+		Monster012 = 43,
+		どん_効果音 = 41,
+		敵のダウン = 42,
 		Explosion01 = 19,
 		Explosion02 = 20,
 		Explosion03 = 21,

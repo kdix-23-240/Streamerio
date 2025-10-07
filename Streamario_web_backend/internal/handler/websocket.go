@@ -42,15 +42,26 @@ func (h *WebSocketHandler) HandleUnityConnection(c echo.Context) error {
 		Handler: func(ws *websocket.Conn) {
 			defer ws.Close()
 
-			// 接続登録
-			id := h.register(ws, c)
-			defer h.unregister(id, c)
+			// 接続登録（再接続の場合は同一 room_id を維持）
+			requestedID := c.QueryParam("room_id")
+			var id string
+			if requestedID != "" {
+				id = h.registerWithID(requestedID, ws, c)
+			} else {
+				id = h.registerNew(ws, c)
+			}
+			defer h.unregister(id, ws, c)
 
 			// 接続直後に必ずログを出す
 			c.Logger().Infof("Client connected: %s id=%s", c.Request().RemoteAddr, id)
 
+			// 初期メッセージ（再接続時はタイプのみ変える）
+			initType := "room_created"
+			if requestedID != "" {
+				initType = "room_ready"
+			}
 			payload := map[string]interface{}{
-				"type":    "room_created",
+				"type":    initType,
 				"room_id": id,
 				"qr_code": "data:image/png;base64,...",
 				"web_url": "https://example.com",
@@ -140,7 +151,8 @@ func (h *WebSocketHandler) SetGameSessionService(gs *service.GameSessionService)
 	h.sessionService = gs
 }
 
-func (h *WebSocketHandler) register(ws *websocket.Conn, c echo.Context) string {
+// registerNew: 新規接続用に新しい roomID を払い出して登録
+func (h *WebSocketHandler) registerNew(ws *websocket.Conn, c echo.Context) string {
 	id := ulid.MustNew(ulid.Timestamp(time.Now()), h.ulidEntropy).String()
 
 	if h.roomService != nil {
@@ -157,12 +169,36 @@ func (h *WebSocketHandler) register(ws *websocket.Conn, c echo.Context) string {
 	return id
 }
 
-func (h *WebSocketHandler) unregister(id string, c echo.Context) {
+// registerWithID: 指定 roomID で接続を登録（再接続時）
+// 既存接続がある場合は置き換える
+func (h *WebSocketHandler) registerWithID(id string, ws *websocket.Conn, c echo.Context) string {
+	// 既存の DB レコードは触らない（既に存在している前提）。無い場合のみ作成。
+	if h.roomService != nil {
+		if err := h.roomService.CreateIfNotExists(id, "unity"); err != nil {
+			c.Logger().Errorf("room db ensure failed id=%s err=%v", id, err)
+		}
+	}
+
+	h.mu.Lock()
+	h.connections[id] = ws
+	h.mu.Unlock()
+	c.Logger().Infof("room re-registered id=%s", id)
+	return id
+}
+
+// unregister: 接続が同一の場合のみ削除（置換時の誤削除防止）
+func (h *WebSocketHandler) unregister(id string, ws *websocket.Conn, c echo.Context) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	delete(h.connections, id)
-	c.Logger().Infof("Client unregistered id=%s", id)
+	cur := h.connections[id]
+	if cur == ws {
+		delete(h.connections, id)
+		c.Logger().Infof("Client unregistered id=%s", id)
+	} else {
+		// すでに別の接続に置き換わっている
+		c.Logger().Infof("Skip unregister (replaced) id=%s", id)
+	}
 }
 
 func (h *WebSocketHandler) SendEventToUnity(roomID string, payload interface{}) error {
