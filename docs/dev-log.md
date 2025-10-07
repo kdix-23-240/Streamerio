@@ -55,4 +55,41 @@
 - 低結合: 既存の呼び出し元に影響を与えない後方互換性を維持
 - 拡張性: 将来的な開発環境やテスト環境での柔軟な接続先変更を可能にする
 
+## 2025-10-07 GitHub Actions デプロイ時の環境変数設定
+
+### 目的
+- Cloud Runへのデプロイ時に実行環境で必要な環境変数を設定できるようにする
+- GitHub Secretsを使用してセキュアに環境変数を管理する
+- データベース（Supabase）やRedis（Upstash）などの外部サービスへの接続情報を安全に設定する
+
+### 実装概要
+- `.github/workflows/deploy.yml` の Cloud Run デプロイステップに `--set-env-vars` フラグを追加
+- 以下の環境変数をGitHub Secretsから取得してCloud Runに設定：
+  - `PORT`: APIサーバのポート（デフォルト: 8888）
+  - `FRONTEND_URL`: CORS許可先（本番では具体的なドメインを指定推奨）
+  - `DATABASE_URL`: PostgreSQL接続URL（Supabase等）
+  - `REDIS_URL`: Redisアドレス（Upstash等）
+  - `LOG_LEVEL`: ログレベル（info/debug/warn/error）
+  - `LOG_FORMAT`: ログフォーマット（text/json、本番はjson推奨）
+  - `LOG_ADD_SOURCE`: ログに呼び出し元情報を付与するか（true/false）
+
+### 変更ファイル
+- `.github/workflows/deploy.yml`
+  - Deploy to Cloud Runステップに環境変数設定を追加
+- `docs/deployment-env-vars.md`（新規作成）
+  - 環境変数の詳細説明とGitHub Secretsの設定手順をドキュメント化
+  - ローカル開発時の設定例も記載
+  - トラブルシューティングガイドを追加
+
+### 意図・設計上の判断
+- セキュリティ: 機密情報（DB接続情報等）をGitHub Secretsで管理し、コードに含めない
+- 環境分離: 開発/本番環境で異なる設定を使用できるよう柔軟性を確保
+- 運用性: 環境変数の変更がデプロイフローで自動的に反映される仕組みを構築
+- ドキュメント: 設定手順を明文化し、チーム開発や運用時の参照を容易にする
+
+### 今後の課題
+- GitHub Secretsに実際の本番環境の値を設定する必要がある
+- 本番環境では `FRONTEND_URL` を `*` から具体的なドメインに変更してCORS制御を厳密化
+- ログフォーマットを本番環境では `json` に設定し、構造化ログで監視しやすくする
+
  

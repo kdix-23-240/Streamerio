@@ -12,7 +12,7 @@ env:
   GCP_PROJECT_ID: streamerio-472706
   GCP_REGION: asia-northeast1
   ARTIFACT_REGISTRY_REPO: streamario
-  IMAGE_NAME: asia-northeast1-docker.pkg.dev/streamario/streamario/streamario-web-backend
+  IMAGE_NAME: asia-northeast1-docker.pkg.dev/streamerio-472706/streamario/streamario-web-backend
 
 jobs:
   deploy:
@@ -28,7 +28,7 @@ jobs:
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: 'projects/streamerio-472706/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-pool'
+          workload_identity_provider: 'projects/282618030957/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-pool'
           service_account: github-actions@streamerio-472706.iam.gserviceaccount.com
 
       - name: Set up Cloud SDK
@@ -56,4 +56,7 @@ jobs:
             --image ${IMAGE_NAME}:${IMAGE_TAG} \
             --platform managed \
             --region ${GCP_REGION} \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" \
+            --set-env-vars "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+            --set-env-vars "REDIS_URL=${{ secrets.REDIS_URL }}" \
