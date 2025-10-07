@@ -99,6 +99,24 @@ public class PlayerView : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("敵");
+            var attackManager = collision.gameObject.GetComponent<EnemyAttackManager>();
+            if (attackManager != null)
+            {
+                // EnemyAttackManager に CurrentDamage プロパティ（または public int）がある想定
+                TakeDamage(attackManager.CurrentDamage);
+            }
+            else
+            {
+                Debug.LogWarning($"[PlayerView] EnemyAttackManager が {collision.gameObject.name} にありません。");
+            }
+        }
+    }
+
     private void TakeDamage(int damage)
     {
         if (hpPresenter == null) return;
