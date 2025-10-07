@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using System;
 using System.Threading;
 using UnityEngine;
 
@@ -67,8 +66,7 @@ namespace Common.UI.Animation
     /// - イージング
     /// などの基本的な設定を保持
     /// </summary>
-    [Serializable]
-    public class UIAnimationComponentParam
+    public class UIAnimationComponentParamSO: ScriptableObject
     {
         [Header("アニメーションの時間(秒)")]
         [SerializeField, Min(0.01f)]

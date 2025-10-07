@@ -1,5 +1,3 @@
-using System;
-using Alchemy.Inspector;
 using DG.Tweening;
 using UnityEngine;
 
@@ -16,7 +14,7 @@ namespace Common.UI.Animation
         /// コンストラクタ。
         /// - 指定された CanvasGroup 配列とパラメータで Sequence を構築
         /// </summary>
-        public FadePartsAnimationComponent(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParam param): base()
+        public FadePartsAnimationComponent(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParamSO param)
         {
             SetSequence(canvasGroups, param);
         }
@@ -26,7 +24,7 @@ namespace Common.UI.Animation
         /// - 各 CanvasGroup に対してフェードを追加
         /// - パーツ間にインターバルを挿入して「順番に」アニメーションする
         /// </summary>
-        private void SetSequence(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParam param)
+        private void SetSequence(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParamSO param)
         {
             foreach (var canvasGroup in canvasGroups)
             {
@@ -36,17 +34,5 @@ namespace Common.UI.Animation
                 Sequence.AppendInterval(param.ShowDelaySec);
             }
         }
-    }
-
-    /// <summary>
-    /// FadePartsAnimationComponent の設定用パラメータ。
-    /// - Alpha / Duration / Ease は FadeAnimationComponentParam から継承
-    /// - ShowDelaySec を追加してパーツごとの遅延を指定可能
-    /// </summary>
-    [Serializable]
-    public class FadePartsAnimationComponentParam : FadeAnimationComponentParam
-    {
-        [SerializeField, LabelText("パーツごとの表示ディレイ(秒)"), Min(0.001f)]
-        public float ShowDelaySec = 0.05f;
     }
 }

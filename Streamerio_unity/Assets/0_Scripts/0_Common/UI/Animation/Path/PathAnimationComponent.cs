@@ -1,6 +1,4 @@
-using System;
 using System.Threading;
-using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -17,9 +15,9 @@ namespace Common.UI.Animation
     public class PathAnimationComponent : IUIAnimationComponent
     {
         private readonly RectTransform _rectTransform;
-        private readonly PathAnimationComponentParam _param;
+        private readonly PathAnimationComponentParamSO _param;
 
-        public PathAnimationComponent(RectTransform rectTransform, PathAnimationComponentParam param)
+        public PathAnimationComponent(RectTransform rectTransform, PathAnimationComponentParamSO param)
         {
             _rectTransform = rectTransform;
             _param = param;
@@ -37,21 +35,5 @@ namespace Common.UI.Animation
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
         }  
-    }
-
-    /// <summary>
-    /// パス移動アニメーションの設定パラメータ。
-    /// - Path: オブジェクトが通る座標リスト（ローカル座標系）
-    /// - PathType: 補間方法（Linear / CatmullRom など）
-    /// - DurationSec / Ease: アニメーション速度やイージング（基底から継承）
-    /// </summary>
-    [Serializable]
-    public class PathAnimationComponentParam : UIAnimationComponentParam
-    {
-        [SerializeField, LabelText("オブジェクトが通る点 (先頭から順に)")]
-        public Vector3[] Path;
-
-        [SerializeField, LabelText("パスの種類 (直線/曲線)")]
-        public PathType PathType = PathType.CatmullRom;
     }
 }

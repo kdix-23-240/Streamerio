@@ -1,7 +1,6 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using System;
-using System.Threading;
 using UnityEngine;
 
 namespace Common.UI.Animation
@@ -14,9 +13,9 @@ namespace Common.UI.Animation
     public class FadeAnimationComponent : IUIAnimationComponent
     {
         private readonly CanvasGroup _canvasGroup;
-        private readonly FadeAnimationComponentParam _param;
+        private readonly FadeAnimationComponentParamSO _param;
 
-        public FadeAnimationComponent(CanvasGroup canvasGroup, FadeAnimationComponentParam param)
+        public FadeAnimationComponent(CanvasGroup canvasGroup, FadeAnimationComponentParamSO param)
         {
             _canvasGroup = canvasGroup;
             _param = param;
@@ -35,19 +34,5 @@ namespace Common.UI.Animation
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
         }
-    }
-
-    /// <summary>
-    /// フェードアニメーションの設定パラメータ。
-    /// - Alpha: 目標の透明度
-    /// - DurationSec: アニメーション時間
-    /// - Ease: イージング
-    /// </summary>
-    [Serializable]
-    public class FadeAnimationComponentParam : UIAnimationComponentParam
-    {
-        [Header("透明度")]
-        [SerializeField, Range(0f, 1f)]
-        public float Alpha;
     }
 }

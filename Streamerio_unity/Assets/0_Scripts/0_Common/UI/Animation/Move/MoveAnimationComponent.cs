@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -14,9 +13,9 @@ namespace Common.UI.Animation
     public class MoveAnimationComponent : IUIAnimationComponent
     {
         private readonly RectTransform _rectTransform;
-        private readonly MoveAnimationComponentParam _param;
+        private readonly MoveAnimationComponentParamSO _param;
         
-        public MoveAnimationComponent(RectTransform rectTransform, MoveAnimationComponentParam param)
+        public MoveAnimationComponent(RectTransform rectTransform, MoveAnimationComponentParamSO param)
         {
             _rectTransform = rectTransform;
             _param = param;
@@ -34,19 +33,5 @@ namespace Common.UI.Animation
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
         }
-    }
-    
-    /// <summary>
-    /// 移動アニメーションの設定パラメータ。
-    /// - Position: 目標座標（AnchoredPosition）
-    /// - DurationSec: アニメーション時間（基底から継承）
-    /// - Ease: 補間方法（基底から継承）
-    /// </summary>
-    [Serializable]
-    public class MoveAnimationComponentParam : UIAnimationComponentParam
-    {
-        [Header("移動先座標")]
-        [SerializeField]
-        public Vector2 AnchoredPosition;
     }
 }

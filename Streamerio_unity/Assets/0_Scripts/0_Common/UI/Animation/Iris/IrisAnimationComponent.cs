@@ -1,6 +1,4 @@
-using System;
 using System.Threading;
-using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -12,7 +10,7 @@ namespace Common.UI.Animation
     /// </summary>
     public class IrisInAnimationComponent : IrisAnimationComponent
     {
-        public IrisInAnimationComponent(Material material, IrisAnimationComponentParam param) 
+        public IrisInAnimationComponent(Material material, IrisAnimationComponentParamSO param) 
             : base(material, param) { }
 
         public override async UniTask PlayAsync(CancellationToken ct)
@@ -26,7 +24,7 @@ namespace Common.UI.Animation
     /// </summary>
     public class IrisOutAnimationComponent : IrisAnimationComponent
     {
-        public IrisOutAnimationComponent(Material material, IrisAnimationComponentParam param) 
+        public IrisOutAnimationComponent(Material material, IrisAnimationComponentParamSO param) 
             : base(material, param) { }
 
         public override async UniTask PlayAsync(CancellationToken ct)
@@ -43,9 +41,9 @@ namespace Common.UI.Animation
     public abstract class IrisAnimationComponent : IUIAnimationComponent
     {
         private readonly Material _material;
-        protected IrisAnimationComponentParam Param;
+        protected IrisAnimationComponentParamSO Param;
         
-        protected IrisAnimationComponent(Material material, IrisAnimationComponentParam param)
+        protected IrisAnimationComponent(Material material, IrisAnimationComponentParamSO param)
         {
             _material = material;
             Param = param;
@@ -73,30 +71,5 @@ namespace Common.UI.Animation
                 .SetEase(Param.Ease)
                 .ToUniTask(cancellationToken: ct);
         }
-    }
-
-    /// <summary>
-    /// Irisアニメーションのパラメータ。
-    /// - 中心座標
-    /// - 半径プロパティ名
-    /// - 開閉範囲（Min/Max半径）
-    /// </summary>
-    [Serializable]
-    public class IrisAnimationComponentParam : UIAnimationComponentParam
-    {
-        [SerializeField, LabelText("円の中心のプロパティ名")]
-        public string CenterPropertyName = "_CenterUV";
-        
-        [SerializeField, LabelText("円の半径のプロパティ名")]
-        public string RadiusPropertyName = "_Radius";
-        
-        [SerializeField, LabelText("円の中心位置 (UV座標)")]
-        public Vector2 Center = new(0.5f, 0.5f);
-        
-        [SerializeField, LabelText("イリスの最小半径")]
-        public float MinRadius = 0f;
-        
-        [SerializeField, LabelText("イリスの最大半径")]
-        public float MaxRadius = 1.5f;
     }
 }
