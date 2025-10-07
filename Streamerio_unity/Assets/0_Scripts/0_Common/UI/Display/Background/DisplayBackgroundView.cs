@@ -1,9 +1,7 @@
 using System.Threading;
-using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using UnityEngine;
+using VContainer;
 
 namespace Common.UI.Display.Background
 {
@@ -14,36 +12,15 @@ namespace Common.UI.Display.Background
     /// </summary>
     public class DisplayBackgroundView : DisplayViewBase
     {
-        [Header("アニメーション")]
-        [SerializeField, LabelText("表示アニメーション")]
-        private FadeAnimationComponentParam _showFadeAnimationParam = new ()
-        {
-            Alpha = 1f,
-            DurationSec = 0.1f,
-            Ease = Ease.InSine,
-        };
-
-        [SerializeField, LabelText("非表示アニメーション")]
-        private FadeAnimationComponentParam _hideFadeAnimationParam = new ()
-        {
-            Alpha = 0f,
-            DurationSec = 0.1f,
-            Ease = Ease.OutSine,
-        };
+        private IUIAnimationComponent _showAnimation;
+        private IUIAnimationComponent _hideAnimation;
         
-        private FadeAnimationComponent _showAnimation;
-        private FadeAnimationComponent _hideAnimation;
-        
-        /// <summary>
-        /// 初期化処理。
-        /// - フェードイン/フェードアウト用のアニメーションコンポーネントを生成
-        /// </summary>
-        public override void Initialize()
+        [Inject]
+        public void Construct([Key(AnimationType.Show)] IUIAnimationComponent showAnimation,
+                                     [Key(AnimationType.Hide)] IUIAnimationComponent hideAnimation)
         {
-            base.Initialize();
-            
-            _showAnimation = new FadeAnimationComponent(CanvasGroup, _showFadeAnimationParam);
-            _hideAnimation = new FadeAnimationComponent(CanvasGroup, _hideFadeAnimationParam);
+            _showAnimation = showAnimation;
+            _hideAnimation = hideAnimation;
         }
         
         /// <summary>
@@ -59,7 +36,7 @@ namespace Common.UI.Display.Background
         /// </summary>
         public override void Show()
         {
-            CanvasGroup.alpha = _showFadeAnimationParam.Alpha;
+            CanvasGroup.alpha = UIUtil.DEFAULT_SHOW_ALPHA;
         }
 
         /// <summary>
@@ -75,7 +52,7 @@ namespace Common.UI.Display.Background
         /// </summary>
         public override void Hide()
         {
-            CanvasGroup.alpha = _hideFadeAnimationParam.Alpha;
+            CanvasGroup.alpha = UIUtil.DEFAULT_HIDE_ALPHA;
         }
     }
 }

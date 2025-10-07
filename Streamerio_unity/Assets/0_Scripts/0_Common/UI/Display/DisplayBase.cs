@@ -1,105 +1,150 @@
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
+using VContainer.Unity;
 
 namespace Common.UI.Display
 {
     /// <summary>
     /// UI 表示制御の共通インターフェース。
-    /// - 表示/非表示の状態管理
-    /// - 初期化
-    /// - アニメーション付き表示/非表示
+    /// <para>
+    /// - 表示／非表示状態の管理  
+    /// - アニメーション付き／即時表示・非表示  
+    /// - Presenter 層での統一的な制御を目的とする
+    /// </para>
     /// </summary>
     public interface IDisplay
     {
         /// <summary>
-        /// 現在 UI が表示されているかどうか
+        /// 現在 UI が表示されているかどうか。
         /// </summary>
         bool IsShow { get; }
         
         /// <summary>
-        /// 初期化処理
-        /// </summary>
-        void Initialize();
-        
-        /// <summary>
-        /// アニメーション付きで表示する
+        /// アニメーション付きで UI を表示する。
         /// </summary>
         /// <param name="ct">キャンセル用トークン</param>
         UniTask ShowAsync(CancellationToken ct);
         
         /// <summary>
-        /// 即座に表示する
+        /// 即座に UI を表示する。
         /// </summary>
         void Show();
         
         /// <summary>
-        /// アニメーション付きで非表示にする
+        /// アニメーション付きで UI を非表示にする。
         /// </summary>
         /// <param name="ct">キャンセル用トークン</param>
         UniTask HideAsync(CancellationToken ct);
         
         /// <summary>
-        /// 即座に非表示にする
+        /// 即座に UI を非表示にする。
         /// </summary>
         void Hide();
     }
 
     /// <summary>
-    /// Display の制御を行う Presenter の基底クラス。
-    /// - View を参照して実際の見た目を制御
-    /// - 表示状態を管理
+    /// View 側の表示制御インターフェース。
+    /// <para>
+    /// Presenter から呼ばれ、実際のアニメーションや表示／非表示処理を担当する。
+    /// </para>
+    /// <remarks>
+    /// UI の見た目やトランジションを担うロジックは、Presenter ではなく View 側に集約する。
+    /// </remarks>
+    /// </summary>
+    public interface IDisplayView: ICommonUIBehaviour
+    {
+        /// <summary>
+        /// アニメーション付きで UI を表示する。
+        /// <para>
+        /// フェードイン・スライドインなど、見た目の演出をここで実装する。
+        /// Presenter 側から表示要求があったときに呼び出される。
+        /// </para>
+        /// </summary>
+        /// <param name="ct">アニメーションを中断するためのキャンセルトークン</param>
+        UniTask ShowAsync(CancellationToken ct);
+
+        /// <summary>
+        /// アニメーションなしで即座に UI を表示する。
+        /// <para>
+        /// 主に初期化時やアニメーションをスキップしたい場合に使用される。
+        /// </para>
+        /// </summary>
+        void Show();
+
+        /// <summary>
+        /// アニメーション付きで UI を非表示にする。
+        /// <para>
+        /// フェードアウト・スライドアウトなど、見た目の演出をここで実装する。
+        /// Presenter 側から非表示要求があったときに呼び出される。
+        /// </para>
+        /// </summary>
+        /// <param name="ct">アニメーションを中断するためのキャンセルトークン</param>
+        UniTask HideAsync(CancellationToken ct);
+
+        /// <summary>
+        /// アニメーションなしで即座に UI を非表示にする。
+        /// <para>
+        /// 強制的に非表示状態にしたいときや、初期化・画面切り替えなどで利用される。
+        /// </para>
+        /// </summary>
+        void Hide();
+    }
+    
+    /// <summary>
+    /// Display の制御を担う Presenter の基底クラス。
+    /// <para>
+    /// - View を介して UI の見た目を制御  
+    /// - 表示状態を管理  
     /// - イベントやデータバインディングを設定
+    /// </para>
     /// </summary>
     /// <typeparam name="TView">対応する View の型</typeparam>
-    public abstract class DisplayPresenterBase<TView> : UIBehaviour, IDisplay
-        where TView : DisplayViewBase
+    public abstract class DisplayPresenterBase<TView> : IDisplay, IInitializable
+        where TView : IDisplayView
     {
+        /// <summary>
+        /// 現在の表示状態。
+        /// </summary>
         protected bool _isShow;
         public bool IsShow => _isShow;
         
-        [SerializeField, Alchemy.Inspector.ReadOnly]
-        protected TView CommonView;
-
-#if UNITY_EDITOR
         /// <summary>
-        /// Inspector 上で View 参照を自動補完
+        /// 共通のView。
         /// </summary>
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            CommonView ??= GetComponent<TView>();
-        }
-#endif
+        protected TView CommonView;
         
+        protected DisplayPresenterBase(TView view)
+        {
+            CommonView = view;
+        }
+
         /// <summary>
         /// 初期化処理。
-        /// - 状態リセット
-        /// - View 初期化
-        /// - イベント/バインディング設定
+        /// <para>
+        /// - 表示状態のリセット  
+        /// - イベント設定・データバインディング呼び出し
+        /// </para>
         /// </summary>
         public virtual void Initialize()
         {
             _isShow = false;
-            
-            CommonView.Initialize();
-            
             SetEvent();
             Bind();
         }
 
         /// <summary>
-        /// UI のイベント設定（クリックや入力イベントの登録など）
+        /// UI のイベント設定（クリックや入力など）。
+        /// Presenter 側で View に対するイベント購読を行う。
         /// </summary>
         protected virtual void SetEvent() { }
 
         /// <summary>
-        /// データバインディングや購読の設定
+        /// データバインディングや購読設定。
+        /// Presenter 側でモデルやシグナルとの接続を行う。
         /// </summary>
         protected virtual void Bind() { }
         
+        /// <inheritdoc />
         public virtual async UniTask ShowAsync(CancellationToken ct)
         {
             _isShow = true;
@@ -107,6 +152,7 @@ namespace Common.UI.Display
             CommonView.SetInteractable(true);
         }
 
+        /// <inheritdoc />
         public virtual void Show()
         {
             _isShow = true;
@@ -114,6 +160,7 @@ namespace Common.UI.Display
             CommonView.SetInteractable(true);
         }
 
+        /// <inheritdoc />
         public virtual async UniTask HideAsync(CancellationToken ct)
         {
             CommonView.SetInteractable(false);
@@ -121,6 +168,7 @@ namespace Common.UI.Display
             await CommonView.HideAsync(ct);
         }
 
+        /// <inheritdoc />
         public virtual void Hide()
         {
             CommonView.SetInteractable(false);
@@ -130,30 +178,24 @@ namespace Common.UI.Display
     }
 
     /// <summary>
-    /// UI の見た目を担う View の基底クラス。
-    /// - アニメーションや表示/非表示の実装を担当
-    /// - Presenter から制御される
+    /// UI の見た目（View）を担う基底クラス。
+    /// <para>
+    /// - 実際のアニメーションや CanvasGroup の制御を実装  
+    /// - Presenter から呼ばれて表示／非表示処理を行う
+    /// </para>
     /// </summary>
-    public abstract class DisplayViewBase : UIBehaviourBase
+    public abstract class DisplayViewBase : UIBehaviourBase, IDisplayView
     {
-        /// <summary>
-        /// アニメーション付きで表示
-        /// </summary>
+        /// <inheritdoc />
         public abstract UniTask ShowAsync(CancellationToken ct);
 
-        /// <summary>
-        /// 即座に表示
-        /// </summary>
+        /// <inheritdoc />
         public abstract void Show();
         
-        /// <summary>
-        /// アニメーション付きで非表示
-        /// </summary>
+        /// <inheritdoc />
         public abstract UniTask HideAsync(CancellationToken ct);
 
-        /// <summary>
-        /// 即座に非表示
-        /// </summary>
+        /// <inheritdoc />
         public abstract void Hide();
     }
 }

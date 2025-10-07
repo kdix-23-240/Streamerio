@@ -1,76 +1,84 @@
 using System;
 using System.Threading;
-using Alchemy.Inspector;
 using Common.Audio;
 using Cysharp.Threading.Tasks;
 using R3;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using IDisposable = System.IDisposable;
 
 namespace Common.UI.Click
 {
     /// <summary>
-    /// クリックイベントの仲介クラス。
-    /// - 任意の Observable を購読し、クリックイベントとして配信
-    /// - 一定間隔の連打防止 (ThrottleFirst)
-    /// - クリック時に SE を再生
+    /// クリックイベントを外部へ配信するためのインターフェース。
     /// </summary>
-    public class ClickEventBinder : UIBehaviour, IDisposable
+    public interface IClickEventBinder : IDisposable
     {
-        [SerializeField, LabelText("SE")]
-        private SEType _seType = SEType.SNESRPG01;
-
-        [SerializeField, LabelText("ボタンのクリック間隔(秒)")]
-        private float _clickIntervalSec = 0.5f;
-        
-        private Subject<Unit> _clickEvent;
         /// <summary>
-        /// 外部から購読可能なクリックイベント
+        /// クリックイベントを購読可能な Observable。
         /// </summary>
-        public Observable<Unit> ClickEvent => _clickEvent;
+        Observable<Unit> ClickEvent { get; }
+
+        /// <summary>
+        /// 指定された Observable をクリックイベントとしてバインドする。
+        /// </summary>
+        /// <typeparam name="T">Observable のイベント型</typeparam>
+        void BindClickEvent();
+    }
+
+    /// <summary>
+    /// UI のクリック入力を仲介し、クリックイベントを配信するクラス。
+    /// - クリック Observable を購読してイベント化
+    /// - Throttle 処理による連打防止
+    /// - クリック時に SE 再生
+    /// </summary>
+    public class ClickEventBinder<T> : IClickEventBinder
+    {
+        private const float _clickIntervalSec = 0.1f;
+
+        private readonly IAudioFacade _audioFacade;
+        private readonly SEType _seType;
         
+        private readonly Subject<Unit> _clickEvent;
+
+        private Observable<T> _clickObservable;
+
         private CancellationTokenSource _cts;
 
+        /// <inheritdoc/>
+        public Observable<Unit> ClickEvent => _clickEvent;
+
         /// <summary>
-        /// 初期化処理。
-        /// - 内部イベントストリームを生成
+        /// コンストラクタ。内部イベントストリームを初期化する。
         /// </summary>
-        public void Initialize()
+        /// <param name="seType">クリック時に再生する SE の種類</param>
+        public ClickEventBinder(Observable<T> clickObservable, IAudioFacade audioFacade, SEType seType = SEType.SNESRPG01)
         {
             _clickEvent = new Subject<Unit>();
-        }
-        
-        /// <summary>
-        /// 指定されたクリック系 Observable を購読し、ClickEvent を発火させる。
-        /// - 連打防止のため一定時間内の複数クリックを間引く
-        /// - SE を再生
-        /// </summary>
-        /// <param name="clickObservable">UI のクリックイベントなどの Observable</param>
-        public void BindClickEvent<T>(Observable<T> clickObservable)
-        {
-            _cts = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+            _clickObservable = clickObservable;
             
-            clickObservable
+            _audioFacade = audioFacade;
+            _seType = seType;
+        }
+
+        /// <inheritdoc/>
+        public void BindClickEvent()
+        {
+            _cts = new CancellationTokenSource();
+
+            _clickObservable
                 .ThrottleFirst(TimeSpan.FromSeconds(_clickIntervalSec)) // 連打防止
                 .Subscribe(_ =>
                 {
-                    AudioManager.Instance.PlayAsync(_seType, destroyCancellationToken).Forget();
+                    _audioFacade.PlayAsync(_seType, _cts.Token).Forget();
                     _clickEvent.OnNext(Unit.Default);
                 })
-                .RegisterTo(destroyCancellationToken);
+                .RegisterTo(_cts.Token);
         }
 
-        /// <summary>
-        /// リソース破棄処理。
-        /// - 購読解除
-        /// - CancellationTokenSource を破棄
-        /// </summary>
+        /// <inheritdoc/>
         public void Dispose()
         {
             _cts?.Cancel();
             _cts?.Dispose();
-            _cts = null;
+            _clickEvent?.Dispose();
         }
     }
 }
