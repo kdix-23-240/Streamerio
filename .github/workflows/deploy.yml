@@ -56,4 +56,8 @@ jobs:
             --image ${IMAGE_NAME}:${IMAGE_TAG} \
             --platform managed \
             --region ${GCP_REGION} \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars "PORT=${{ secrets.PORT }}" \
+            --set-env-vars "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" \
+            --set-env-vars "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+            --set-env-vars "REDIS_URL=${{ secrets.REDIS_URL }}" \
