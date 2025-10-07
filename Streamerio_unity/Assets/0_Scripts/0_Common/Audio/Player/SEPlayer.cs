@@ -35,7 +35,6 @@ namespace Common.Audio
         /// </summary>
         /// <param name="musicDict">SEType ごとの音源データ。</param>
         /// <param name="poolFactory">SoundType と容量から AudioSourcePool を生成するファクトリ。</param>
-        [Inject]
         public SEPlayer(
             IReadOnlyDictionary<SEType, MusicData> musicDict,
             Func<SoundType, int, AudioSourcePool> poolFactory

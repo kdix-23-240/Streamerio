@@ -38,7 +38,6 @@ namespace Common.Audio
         /// </summary>
         /// <param name="musicDict">BGMType ごとの音源データ。</param>
         /// <param name="poolFactory">SoundType と容量から AudioSourcePool を生成するファクトリ。</param>
-        [Inject]
         public BGMPlayer(
             IReadOnlyDictionary<BGMType, MusicData> musicDict,
             Func<SoundType, int, AudioSourcePool> poolFactory

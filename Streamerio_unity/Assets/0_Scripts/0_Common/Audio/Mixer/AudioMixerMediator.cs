@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine.Audio;
-using VContainer;
 
 namespace Common.Audio
 {
@@ -29,7 +28,6 @@ namespace Common.Audio
         /// </summary>
         /// <param name="audioMixer">対象の AudioMixer。</param>
         /// <param name="volumeParamDict">SoundType とパラメータ名の対応表。</param>
-        [Inject]
         public AudioMixerMediator(AudioMixer audioMixer, IReadOnlyDictionary<SoundType, string> volumeParamDict)
         {
             _audioMixer = audioMixer;

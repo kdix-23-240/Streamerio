@@ -9,7 +9,7 @@ namespace Common.Audio
     /// <summary>
     /// 各サウンドタイプの音量を仲介・制御するインターフェイス。
     /// </summary>
-    public interface IVolumeMediator
+    public interface IVolumeMediator: IDisposable
     {
         /// <summary>
         /// サウンドタイプごとの音量情報を保持する辞書（読み取り専用）。
@@ -49,7 +49,7 @@ namespace Common.Audio
     /// 実行中の音量変更・ミュート操作は AudioMixer に即時反映され、終了時には音量設定がセーブされます。
     /// </para>
     /// </summary>
-    public class VolumeMediator : IStartable, IDisposable, IVolumeMediator, IMuteMediator
+    public class VolumeMediator : IVolumeMediator, IMuteMediator
     {
         /// <summary>
         /// ミュート時に適用される音量値。
@@ -91,7 +91,6 @@ namespace Common.Audio
         /// </summary>
         /// <param name="saveManager">音量データの保存・読み込みを行う。</param>
         /// <param name="volumeController">AudioMixer への音量適用を行うコントローラ。</param>
-        [Inject]
         public VolumeMediator(IVolumeSaveFacade saveManager, IVolumeController volumeController)
         {
             _saveManager = saveManager;
@@ -109,14 +108,7 @@ namespace Common.Audio
                 { SoundType.BGM,    false },
                 { SoundType.SE,     false },
             };
-        }
-
-        /// <summary>
-        /// 起動時に呼び出され、セーブデータから音量設定を読み込み、
-        /// ミュート状態を初期化したうえで AudioMixer に適用します。
-        /// </summary>
-        void IStartable.Start()
-        {
+            
             // セーブデータから音量情報を復元
             _volumeDict = new(_saveManager.LoadVolumes());
             

@@ -84,16 +84,12 @@ namespace Common.Audio
         /// 依存関係はすべて DI で注入されます。
         /// </summary>
         [Inject]
-        public AudioFacade(
-            IBGMPlayer bgmPlayer,
-            ISEPlayer sePlayer,
-            IVolumeMediator volumeMediator,
-            IMuteMediator muteMediator)
+        public AudioFacade(AudioMediator mediator)
         {
-            _bgmPlayer = bgmPlayer;
-            _sePlayer = sePlayer;
-            _volumeMediator = volumeMediator;
-            _muteMediator = muteMediator;
+            _bgmPlayer = mediator.BGMPlayer;
+            _sePlayer = mediator.SEPlayer;
+            _volumeMediator = mediator.VolumeMediator;
+            _muteMediator = mediator.MuteMediator;
         }
 
         /// <inheritdoc />
