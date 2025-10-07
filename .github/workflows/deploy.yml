@@ -1,0 +1,50 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    paths:
+      - Streamario_web_backend/**
+
+env:
+  GCP_PROJECT_ID: streamario
+  GCP_REGION: asia-northeast1
+  ARTIFACT_REGISTRY_REPO: streamario
+  IMAGE_NAME: asia-northeast1-docker.pkg.dev/streamario/streamario/streamario-web-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+
+      - name: Build and push Docker image
+        run: |
+          TAG=$(echo $GITHUB_SHA | head -c7)
+          docker build -t ${IMAGE_NAME}:${TAG} -t ${IMAGE_NAME}:latest \
+            -f Streamario_web_backend/Dockerfile \
+            ./Streamario_web_backend
+          docker push ${IMAGE_NAME}:${TAG}
+          docker push ${IMAGE_NAME}:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          TAG=$(echo $GITHUB_SHA | head -c7)
+          gcloud run deploy streamario-web-backend \
+            --image ${IMAGE_NAME}:${TAG} \
+            --platform managed \
+            --region ${GCP_REGION} \
+            --allow-unauthenticated
