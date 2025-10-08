@@ -2,13 +2,16 @@ package repository
 
 import (
 	"database/sql"
-	"streamerrio-backend/internal/model"
+	"log/slog"
 	"time"
+
+	"streamerrio-backend/internal/model"
 
 	"github.com/jmoiron/sqlx"
 )
 
 // EventRepository: イベント永続化用インタフェース
+// 主要イベントクエリのトレースログを出力し、運用時の観測性を高める。
 type EventRepository interface {
 	CreateEvent(event *model.Event) error // 単一イベント挿入
 	ListEventViewerCounts(roomID string) ([]model.EventAggregate, error)
@@ -17,10 +20,18 @@ type EventRepository interface {
 	ListViewerEventCounts(roomID, viewerID string) ([]model.ViewerEventCount, error)
 }
 
-type eventRepository struct{ db *sqlx.DB }
+type eventRepository struct {
+	db     *sqlx.DB
+	logger *slog.Logger
+}
 
 // NewEventRepository: 実装生成
-func NewEventRepository(db *sqlx.DB) EventRepository { return &eventRepository{db: db} }
+func NewEventRepository(db *sqlx.DB, logger *slog.Logger) EventRepository {
+	if logger == nil {
+		logger = slog.Default()
+	}
+	return &eventRepository{db: db, logger: logger}
+}
 
 // CreateEvent: events テーブルへ挿入 (TriggeredAt 未設定なら現在時刻)
 func (r *eventRepository) CreateEvent(event *model.Event) error {
@@ -28,8 +39,26 @@ func (r *eventRepository) CreateEvent(event *model.Event) error {
 		event.TriggeredAt = time.Now()
 	}
 	q := `INSERT INTO events (room_id, viewer_id, event_type, triggered_at, metadata) VALUES ($1,$2,$3,$4,$5)`
-	_, err := r.db.Exec(q, event.RoomID, event.ViewerID, event.EventType, event.TriggeredAt, event.Metadata)
-	return err
+	attrs := []any{
+		slog.String("repo", "event"),
+		slog.String("op", "create_event"),
+		slog.String("room_id", event.RoomID),
+		slog.String("event_type", string(event.EventType)),
+		slog.Bool("has_viewer", event.ViewerID != nil),
+	}
+	if event.ViewerID != nil {
+		attrs = append(attrs, slog.String("viewer_id", *event.ViewerID))
+	}
+	logger := r.logger.With(attrs...)
+	start := time.Now()
+	res, err := r.db.Exec(q, event.RoomID, event.ViewerID, event.EventType, event.TriggeredAt, event.Metadata)
+	if err != nil {
+		logger.Error("db.exec failed", slog.Any("error", err))
+		return err
+	}
+	rows, _ := res.RowsAffected()
+	logger.Debug("db.exec", slog.Int64("rows_affected", rows), slog.Duration("elapsed", time.Since(start)))
+	return nil
 }
 
 func (r *eventRepository) ListEventViewerCounts(roomID string) ([]model.EventAggregate, error) {
@@ -40,16 +69,25 @@ func (r *eventRepository) ListEventViewerCounts(roomID string) ([]model.EventAgg
 		Count      int             `db:"count"`
 	}{}
 	q := `SELECT e.event_type,
-	             e.viewer_id,
-	             v.name AS viewer_name,
-	             COUNT(*) AS count
-	      FROM events e
-	      LEFT JOIN viewers v ON v.id = e.viewer_id
-	      WHERE e.room_id = $1 AND e.viewer_id IS NOT NULL
-	      GROUP BY e.event_type, e.viewer_id, v.name`
+             e.viewer_id,
+             v.name AS viewer_name,
+             COUNT(*) AS count
+      FROM events e
+      LEFT JOIN viewers v ON v.id = e.viewer_id
+      WHERE e.room_id = $1 AND e.viewer_id IS NOT NULL
+      GROUP BY e.event_type, e.viewer_id, v.name`
+	logger := r.logger.With(
+		slog.String("repo", "event"),
+		slog.String("op", "list_event_viewer_counts"),
+		slog.String("room_id", roomID),
+	)
+	start := time.Now()
 	if err := r.db.Select(&rows, q, roomID); err != nil {
+		logger.Error("db.query failed", slog.Any("error", err))
 		return nil, err
 	}
+	logger.Debug("db.query", slog.Int("row_count", len(rows)), slog.Duration("elapsed", time.Since(start)))
+
 	aggs := make([]model.EventAggregate, 0, len(rows))
 	for _, row := range rows {
 		if !row.ViewerID.Valid {
@@ -67,12 +105,20 @@ func (r *eventRepository) ListEventViewerCounts(roomID string) ([]model.EventAgg
 func (r *eventRepository) ListEventTotals(roomID string) ([]model.EventTotal, error) {
 	rows := []model.EventTotal{}
 	q := `SELECT event_type, COUNT(*) AS count
-		FROM events
-		WHERE room_id = $1
-		GROUP BY event_type`
+        FROM events
+        WHERE room_id = $1
+        GROUP BY event_type`
+	logger := r.logger.With(
+		slog.String("repo", "event"),
+		slog.String("op", "list_event_totals"),
+		slog.String("room_id", roomID),
+	)
+	start := time.Now()
 	if err := r.db.Select(&rows, q, roomID); err != nil {
+		logger.Error("db.query failed", slog.Any("error", err))
 		return nil, err
 	}
+	logger.Debug("db.query", slog.Int("row_count", len(rows)), slog.Duration("elapsed", time.Since(start)))
 	return rows, nil
 }
 
@@ -83,16 +129,25 @@ func (r *eventRepository) ListViewerTotals(roomID string) ([]model.ViewerTotal, 
 		Count      int            `db:"count"`
 	}{}
 	q := `SELECT e.viewer_id,
-	             v.name AS viewer_name,
-	             COUNT(*) AS count
-	      FROM events e
-	      LEFT JOIN viewers v ON v.id = e.viewer_id
-	      WHERE e.room_id = $1 AND e.viewer_id IS NOT NULL
-	      GROUP BY e.viewer_id, v.name
-	      ORDER BY count DESC, e.viewer_id`
+             v.name AS viewer_name,
+             COUNT(*) AS count
+      FROM events e
+      LEFT JOIN viewers v ON v.id = e.viewer_id
+      WHERE e.room_id = $1 AND e.viewer_id IS NOT NULL
+      GROUP BY e.viewer_id, v.name
+      ORDER BY count DESC, e.viewer_id`
+	logger := r.logger.With(
+		slog.String("repo", "event"),
+		slog.String("op", "list_viewer_totals"),
+		slog.String("room_id", roomID),
+	)
+	start := time.Now()
 	if err := r.db.Select(&rows, q, roomID); err != nil {
+		logger.Error("db.query failed", slog.Any("error", err))
 		return nil, err
 	}
+	logger.Debug("db.query", slog.Int("row_count", len(rows)), slog.Duration("elapsed", time.Since(start)))
+
 	totals := make([]model.ViewerTotal, 0, len(rows))
 	for _, row := range rows {
 		if !row.ViewerID.Valid || row.ViewerID.String == "" {
@@ -110,12 +165,21 @@ func (r *eventRepository) ListViewerTotals(roomID string) ([]model.ViewerTotal, 
 func (r *eventRepository) ListViewerEventCounts(roomID, viewerID string) ([]model.ViewerEventCount, error) {
 	rows := []model.ViewerEventCount{}
 	q := `SELECT event_type, COUNT(*) AS count
-		FROM events
-		WHERE room_id = $1 AND viewer_id = $2
-		GROUP BY event_type`
+        FROM events
+        WHERE room_id = $1 AND viewer_id = $2
+        GROUP BY event_type`
+	logger := r.logger.With(
+		slog.String("repo", "event"),
+		slog.String("op", "list_viewer_event_counts"),
+		slog.String("room_id", roomID),
+		slog.String("viewer_id", viewerID),
+	)
+	start := time.Now()
 	if err := r.db.Select(&rows, q, roomID, viewerID); err != nil {
+		logger.Error("db.query failed", slog.Any("error", err))
 		return nil, err
 	}
+	logger.Debug("db.query", slog.Int("row_count", len(rows)), slog.Duration("elapsed", time.Since(start)))
 	return rows, nil
 }
 

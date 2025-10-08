@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using Common.UI.Part.Button;
+using R3;
 
 public class StickInput : MonoBehaviour, IController
 {
@@ -15,9 +16,18 @@ public class StickInput : MonoBehaviour, IController
     void Start()
     {
         _jumpButton.Initialize();
+        _jumpButton.OnClickAsObservable
+            .Subscribe(_ =>
+            {
+                Jump();
+            }).RegisterTo(destroyCancellationToken);
+
         _attackButton.Initialize();
-        _jumpButton.SetClickEvent(Jump);
-        _attackButton.SetClickEvent(Attack);
+        _attackButton.OnClickAsObservable
+            .Subscribe(_ =>
+            {
+                Attack();
+            }).RegisterTo(destroyCancellationToken);
     }
 
     void Update()

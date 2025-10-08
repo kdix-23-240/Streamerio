@@ -1,5 +1,21 @@
 [
   {
+    "Name": "None",
+    "Num": 0
+  },
+  {
+    "Name": "Monster012",
+    "Num": 43
+  },
+  {
+    "Name": "どん_効果音",
+    "Num": 41
+  },
+  {
+    "Name": "敵のダウン",
+    "Num": 42
+  },
+  {
     "Name": "Explosion01",
     "Num": 19
   },
@@ -54,5 +70,25 @@
   {
     "Name": "SNESRPG01",
     "Num": 28
+  },
+  {
+    "Name": "ThunderBullet",
+    "Num": 38
+  },
+  {
+    "Name": "TuinURT",
+    "Num": 35
+  },
+  {
+    "Name": "UltThunder",
+    "Num": 36
+  },
+  {
+    "Name": "電撃魔法2",
+    "Num": 39
+  },
+  {
+    "Name": "魔法1",
+    "Num": 37
   }
 ]

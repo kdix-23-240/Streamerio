@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Common.Audio;
 
 public class UltBullet : MonoBehaviour
 {
@@ -44,6 +45,8 @@ public class UltBullet : MonoBehaviour
             // フレームベースでインターバルを計算（子弾のみ）
             _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
         }
+        
+        AudioManager.Instance.PlayAsync(SEType.ThunderBullet, this.GetCancellationTokenOnDestroy()).Forget();
     }
 
     void Update()
@@ -96,7 +99,7 @@ public class UltBullet : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            var enemy = collision.gameObject.GetComponent<WeakEnemy>();
+            var enemy = collision.gameObject.GetComponent<EnemyHpManager>();
             if (enemy != null)
             {
                 //Debug.Log($"UltBullet hit: {collision.gameObject.name}");

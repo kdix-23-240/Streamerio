@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"streamerrio-backend/internal/model"
@@ -18,10 +18,14 @@ type GameSessionService struct {
 	viewerRepo  repository.ViewerRepository
 	counter     counter.Counter
 	wsSender    WebSocketSender
+	logger      *slog.Logger
 }
 
-func NewGameSessionService(roomService *RoomService, eventRepo repository.EventRepository, viewerRepo repository.ViewerRepository, counter counter.Counter, sender WebSocketSender) *GameSessionService {
-	return &GameSessionService{roomService: roomService, eventRepo: eventRepo, viewerRepo: viewerRepo, counter: counter, wsSender: sender}
+func NewGameSessionService(roomService *RoomService, eventRepo repository.EventRepository, viewerRepo repository.ViewerRepository, counter counter.Counter, sender WebSocketSender, logger *slog.Logger) *GameSessionService {
+	if logger == nil {
+		logger = slog.Default()
+	}
+	return &GameSessionService{roomService: roomService, eventRepo: eventRepo, viewerRepo: viewerRepo, counter: counter, wsSender: sender, logger: logger}
 }
 
 // EndGame: Unity からの終了通知時に呼ぶ。集計→ルーム終了→Unity へ結果送信までを担う。
@@ -51,7 +55,7 @@ func (s *GameSessionService) EndGame(roomID string) (*model.RoomResultSummary, e
 	// Redis カウンタは終了時にリセットしておく（失敗しても致命的ではないためログのみ）
 	for _, et := range model.ListEventTypes() {
 		if err := s.counter.Reset(roomID, string(et)); err != nil {
-			log.Printf("warn: reset counter failed room=%s event=%s err=%v", roomID, et, err)
+			s.logger.Warn("reset counter failed", slog.String("room_id", roomID), slog.String("event_type", string(et)), slog.Any("error", err))
 		}
 	}
 
@@ -69,7 +73,7 @@ func (s *GameSessionService) EndGame(roomID string) (*model.RoomResultSummary, e
 			},
 		}
 		if err := s.wsSender.SendEventToUnity(roomID, payload); err != nil {
-			log.Printf("warn: failed to send end summary to unity room=%s err=%v", roomID, err)
+			s.logger.Warn("failed to send end summary to unity", slog.String("room_id", roomID), slog.Any("error", err))
 		}
 	}
 

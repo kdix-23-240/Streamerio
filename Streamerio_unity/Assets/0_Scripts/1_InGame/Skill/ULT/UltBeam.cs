@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Common.Audio;
 
 public class UltBeam : MonoBehaviour
 {
@@ -33,6 +34,8 @@ public class UltBeam : MonoBehaviour
         }
         // フレームベースでインターバルを計算
         _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
+        
+        AudioManager.Instance.PlayAsync(SEType.魔法1, this.GetCancellationTokenOnDestroy()).Forget();
     }
 
     void Update()
@@ -60,7 +63,7 @@ public class UltBeam : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            var enemy = collision.gameObject.GetComponent<WeakEnemy>();
+            var enemy = collision.gameObject.GetComponent<EnemyHpManager>();
             if (enemy != null)
             {
                 Debug.Log($"UltBeam entered: {collision.gameObject.name}");
@@ -83,7 +86,7 @@ public class UltBeam : MonoBehaviour
             // インターバルに達したら持続ダメージを与える
             if (_enemyDamageCounters[collision.gameObject] >= _damageIntervalFrames)
             {
-                var enemy = collision.gameObject.GetComponent<WeakEnemy>();
+                var enemy = collision.gameObject.GetComponent<EnemyHpManager>();
                 if (enemy != null)
                 {
                     Debug.Log($"UltBeam continuous damage: {collision.gameObject.name}");

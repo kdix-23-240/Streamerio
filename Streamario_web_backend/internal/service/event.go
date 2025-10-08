@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"math"
 
 	"streamerrio-backend/internal/model"
@@ -20,11 +20,15 @@ type EventService struct {
 	eventRepo repository.EventRepository
 	wsHandler WebSocketSender
 	configs   map[model.EventType]*model.EventConfig
+	logger    *slog.Logger
 }
 
 // NewEventService: 依存（カウンタ / リポジトリ / WebSocket）を束ねてサービス生成
-func NewEventService(counter counter.Counter, eventRepo repository.EventRepository, wsHandler WebSocketSender) *EventService {
-	return &EventService{counter: counter, eventRepo: eventRepo, wsHandler: wsHandler, configs: getDefaultEventConfigs()}
+func NewEventService(counter counter.Counter, eventRepo repository.EventRepository, wsHandler WebSocketSender, logger *slog.Logger) *EventService {
+	if logger == nil {
+		logger = slog.Default()
+	}
+	return &EventService{counter: counter, eventRepo: eventRepo, wsHandler: wsHandler, configs: getDefaultEventConfigs(), logger: logger}
 }
 
 // ProcessEvent: 1イベント処理の本流 (DB保存→視聴者アクティビティ更新→カウント加算→閾値判定→発動通知/リセット)
@@ -61,7 +65,7 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, vi
 	res := &model.EventResult{EventType: eventType, CurrentCount: int(current), RequiredCount: threshold, ViewerCount: viewers, EffectTriggered: false, NextThreshold: threshold}
 
 	if int(current) >= threshold {
-		log.Printf("🚀 trigger room=%s event=%s count=%d threshold=%d viewers=%d", roomID, eventType, current, threshold, viewers)
+		s.logger.Info("event triggered", slog.String("room_id", roomID), slog.String("event_type", string(eventType)), slog.Int("count", int(current)), slog.Int("threshold", threshold), slog.Int("active_viewers", viewers))
 		payload := map[string]interface{}{
 			"type":          "game_event",
 			"event_type":    string(eventType),
@@ -69,9 +73,9 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, vi
 			"viewer_count":  viewers,
 		}
 		if err := s.wsHandler.SendEventToUnity(roomID, payload); err != nil {
-			log.Printf("❌ unity send failed: %v", err)
+			s.logger.Error("unity notification failed", slog.String("room_id", roomID), slog.String("event_type", string(eventType)), slog.Any("error", err))
 		} else {
-			log.Printf("✅ unity notified: room=%s event=%s", roomID, eventType)
+			s.logger.Info("unity notified", slog.String("room_id", roomID), slog.String("event_type", string(eventType)))
 		}
 		_ = s.counter.Reset(roomID, string(eventType))
 		res.EffectTriggered = true

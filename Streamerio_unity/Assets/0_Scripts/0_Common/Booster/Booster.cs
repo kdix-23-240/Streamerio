@@ -14,6 +14,7 @@ namespace Common.Booster
         private void Start()
         {
             LoadingScreenPresenter.Instance.Initialize();
+            LoadingScreenPresenter.Instance.Show();
             AudioManager.Instance.Initialize();
             SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
         }

@@ -15,9 +15,13 @@ public class PlayerView : MonoBehaviour
     [SerializeField, LabelText("アニメーション"), ReadOnly]
     private PlayerAnimation _animation;
     
+    [SerializeField] private HpPresenter hpPresenter;
+    [SerializeField] private float hitCooldown = 0.4f;     // 連続ヒット抑制
+    private float _lastHitTime = -999f;
+    
     // private bool _isGrounded = false; // 地面に接地しているかどうかのフラグ
     // public bool IsGrounded => _isGrounded;
-    
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -73,5 +77,53 @@ public class PlayerView : MonoBehaviour
     public void Attack(int num)
     {
         _animation.PlayAttack(num);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("触れた");
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("敵");
+            // EnemyAttackManager 取得（存在しない敵でもエラーにならないよう防御的に）
+            var attackManager = collision.gameObject.GetComponent<EnemyAttackManager>();
+            if (attackManager != null)
+            {
+                // EnemyAttackManager に CurrentDamage プロパティ（または public int）がある想定
+                TakeDamage(attackManager.CurrentDamage);
+            }
+            else
+            {
+                Debug.LogWarning($"[PlayerView] EnemyAttackManager が {collision.gameObject.name} にありません。");
+            }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("敵");
+            var attackManager = collision.gameObject.GetComponent<EnemyAttackManager>();
+            if (attackManager != null)
+            {
+                // EnemyAttackManager に CurrentDamage プロパティ（または public int）がある想定
+                TakeDamage(attackManager.CurrentDamage);
+            }
+            else
+            {
+                Debug.LogWarning($"[PlayerView] EnemyAttackManager が {collision.gameObject.name} にありません。");
+            }
+        }
+    }
+
+    private void TakeDamage(int damage)
+    {
+        if (hpPresenter == null) return;
+        //if (Time.time - _lastHitTime < hitCooldown) return;
+
+        hpPresenter.Decrease(damage);
+        //Debug.Log($"Enemy attacked! Player HP: {hpPresenter.Amount}");
+        _lastHitTime = Time.time;
     }
 }

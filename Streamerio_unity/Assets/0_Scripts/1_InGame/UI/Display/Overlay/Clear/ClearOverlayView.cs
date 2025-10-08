@@ -1,49 +1,32 @@
-using System.Threading;
 using Alchemy.Inspector;
-using Common.UI.Display.Overlay;
+using Common.UI;
 using Common.UI.Part.Text;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace InGame.UI.Display.Overlay
 {
     /// <summary>
-    /// クリアのオーバレイView
+    /// ゲームクリア時のオーバーレイ View。
+    /// - プレイヤーにクリックを促すテキストを表示
+    /// - Presenter からアニメーションの開始/停止を制御される
     /// </summary>
-    public class ClearOverlayView: OverlayViewBase
+    public class ClearOverlayView : UIBehaviourBase
     {
         [SerializeField, LabelText("クリックテキスト")]
         private FlashText _clickText;
+        /// <summary>
+        /// 入力を促すための点滅テキスト
+        /// </summary>
+        public FlashText ClickText => _clickText;
         
+        /// <summary>
+        /// 初期化処理。
+        /// - クリックテキストを初期化
+        /// </summary>
         public override void Initialize()
         {
             base.Initialize();
-            
             _clickText.Initialize();
-        }
-
-        public override async UniTask ShowAsync(CancellationToken ct)
-        {
-            await base.ShowAsync(ct);
-            _clickText.PlayStartTextAnimation();
-        }
-        
-        public override void Show()
-        {
-            base.Show();
-            _clickText.PlayStartTextAnimation();
-        }
-        
-        public override async UniTask HideAsync(CancellationToken ct)
-        {
-            await base.HideAsync(ct);
-            _clickText.StopStartTextAnimation();
-        }
-        
-        public override void Hide()
-        {
-            base.Hide();
-            _clickText.StopStartTextAnimation();
         }
     }
 }
