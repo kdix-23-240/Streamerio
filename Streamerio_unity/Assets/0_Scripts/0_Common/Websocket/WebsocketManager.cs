@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using NativeWebSocket;
 using R3;
+using UnityEngine.Networking;
 public class WebsocketManager : SingletonBase<WebsocketManager>
 {
   private bool _isConnected = false;
@@ -14,14 +15,16 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   [SerializeField]
   private string _roomId = string.Empty;
   public string RoomId => _roomId;
-  
+
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
-  
+
   private string _url = string.Empty;
-  
+
   private string _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
-  
+
+  private string _backendUrl = "https://streamerio-282618030957.asia-northeast1.run.app";
+
   private void Awake()
   {
     foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
@@ -223,6 +226,15 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
 
     await _websocket.SendText(message);
+  }
+
+  ///<summary>
+  /// ヘルスチェック
+  ///</summary>
+  public void HealthCheck()
+  {
+    UnityWebRequest.Get(_backendUrl + "/").SendWebRequest();
+    Debug.Log("HealthCheck");
   }
 
 
