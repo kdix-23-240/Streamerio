@@ -1,6 +1,5 @@
 using Alchemy.Inspector;
 using Common.Audio;
-using Common.UI.Animation;
 using Common.UI.Click;
 using R3.Triggers;
 using UnityEngine;
@@ -31,13 +30,6 @@ namespace Common.UI.Display.Background
         [Tooltip("背景クリック時に再生する SE")]
         [SerializeField]
         private SEType _clickSE = SEType.NESRPG0112;
-        
-        [Header("アニメーション")]
-        [SerializeField, LabelText("表示アニメーション")]
-        private FadeAnimationComponentParamSO _showFadeAnimationParam;
-
-        [SerializeField, LabelText("非表示アニメーション")]
-        private FadeAnimationComponentParamSO _hideFadeAnimationParam;
 
 
 #if UNITY_EDITOR
@@ -61,24 +53,11 @@ namespace Common.UI.Display.Background
         /// </remarks>
         protected override void Configure(IContainerBuilder builder)
         {
-            builder
-                .Register<IUIAnimationComponent>(_ =>
-                {
-                    return new FadeAnimationComponent(_view.CanvasGroup, _showFadeAnimationParam);
-                }, Lifetime.Singleton)
-                .Keyed(AnimationType.Show);
-            
-            builder
-                .Register<IUIAnimationComponent>(_ =>
-                {
-                    return new FadeAnimationComponent(_view.CanvasGroup, _hideFadeAnimationParam);
-                }, Lifetime.Singleton)
-                .Keyed(AnimationType.Hide);
-            
             // 背景 View の登録
             builder
                 .RegisterComponent(_view)
-                .As<IDisplayView>();
+                .As<IDisplayView>()
+                .As<IInitializable>();
 
             // クリックイベントのバインダ登録（PointerEventData を利用）
             builder
@@ -92,10 +71,8 @@ namespace Common.UI.Display.Background
             // 背景 Presenter の登録
             builder
                 .Register<DisplayBackgroundPresenter>(Lifetime.Singleton)
-                .As<DisplayBackgroundPresenter>()
+                .AsSelf()
                 .As<IInitializable>();
-
-            builder.RegisterEntryPoint<BackGroundTest>();
         }
     }
 }

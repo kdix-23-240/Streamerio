@@ -105,6 +105,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 5703924959444502392}
   _canvasGroup: {fileID: 5650579027399127566}
+  _showAnimationParam: {fileID: 11400000, guid: 6ea2943fb386c4f6abe72be09ac52c2a, type: 2}
+  _hideAnimationParam: {fileID: 11400000, guid: 5ac7f87e8e8fa426fb49c00158b11276, type: 2}
 --- !u!114 &8957841177701401010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,7 +132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: Common.Audio.AudioLifeTimeScope
+    TypeName: Common.GlobalLifeTimeScope
   autoRun: 1
   autoInjectGameObjects: []
   _view: {fileID: 9005919754493262024}

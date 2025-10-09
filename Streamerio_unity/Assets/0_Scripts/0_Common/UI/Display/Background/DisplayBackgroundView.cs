@@ -1,7 +1,8 @@
 using System.Threading;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
-using VContainer;
+using UnityEngine;
+using VContainer.Unity;
 
 namespace Common.UI.Display.Background
 {
@@ -10,17 +11,20 @@ namespace Common.UI.Display.Background
     /// - CanvasGroup を用いたフェードアニメーションで表示/非表示を制御
     /// - 即時表示/非表示にも対応
     /// </summary>
-    public class DisplayBackgroundView : DisplayViewBase
+    public class DisplayBackgroundView : DisplayViewBase, IInitializable
     {
+        [SerializeField]
+        private FadeAnimationComponentParamSO _showAnimationParam;
+        [SerializeField]
+        private FadeAnimationComponentParamSO _hideAnimationParam;
+        
         private IUIAnimationComponent _showAnimation;
         private IUIAnimationComponent _hideAnimation;
-        
-        [Inject]
-        public void Construct([Key(AnimationType.Show)] IUIAnimationComponent showAnimation,
-                                     [Key(AnimationType.Hide)] IUIAnimationComponent hideAnimation)
+
+        public void Initialize()
         {
-            _showAnimation = showAnimation;
-            _hideAnimation = hideAnimation;
+            _showAnimation = new FadeAnimationComponent(CanvasGroup, _showAnimationParam);
+            _hideAnimation = new FadeAnimationComponent(CanvasGroup, _hideAnimationParam);
         }
         
         /// <summary>
