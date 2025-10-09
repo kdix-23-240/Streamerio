@@ -16,6 +16,7 @@ namespace Common.Booster
             LoadingScreenPresenter.Instance.Initialize();
             LoadingScreenPresenter.Instance.Show();
             AudioManager.Instance.Initialize();
+            WebsocketManager.Instance.HealthCheck();
             SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
         }
     }
