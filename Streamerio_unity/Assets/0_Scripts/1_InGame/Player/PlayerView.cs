@@ -86,12 +86,30 @@ public class PlayerView : MonoBehaviour
         {
             Debug.Log("敵");
             // EnemyAttackManager 取得（存在しない敵でもエラーにならないよう防御的に）
-            var attackable = collision.gameObject.GetComponent<IAttackable>();
-            TakeDamage(attackable.Power);
+            //var attackable = collision.gameObject.GetComponent<IAttackable>();
+            //TakeDamage(attackable.Power);
         }
     }
 
-    private void TakeDamage(float damage)
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            //Debug.Log("敵");
+            //var attackManager = collision.gameObject.GetComponent<EnemyAttackManager>();
+            //if (attackManager != null)
+            //{
+            //    // EnemyAttackManager に CurrentDamage プロパティ（または public int）がある想定
+            //    TakeDamage(attackManager.CurrentDamage);
+            //}
+            //else
+            //{
+            //    Debug.LogWarning($"[PlayerView] EnemyAttackManager が {collision.gameObject.name} にありません。");
+            //}
+        }
+    }
+
+    private void TakeDamage(int damage)
     {
         if (hpPresenter == null) return;
         //if (Time.time - _lastHitTime < hitCooldown) return;
