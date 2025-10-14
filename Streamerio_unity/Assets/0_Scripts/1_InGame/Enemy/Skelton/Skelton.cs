@@ -1,31 +1,44 @@
 using Common.Audio;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 
 public class Skelton : MonoBehaviour, IAttackable, IHealth
 {
-    [SerializeField] private SkeltonScriptableObject _skeltonScriptableObject;
+    // DI経由で注入される依存関係
+    private IEnemyStats _enemyStats;
+    private EnemyHpManager _enemyHpManager;
+    
+    // 内部状態
     private float _speed;
-    private float _startMoveDelay; // 追加: 移動開始までの遅延
-
+    private float _startMoveDelay;
     private float _spawnTime;
     private bool _canMove = false;
-
     private Transform _player;
 
-    private EnemyHpManager _enemyHpManager;
+    // IAttackable, IHealth の実装
+    public float Power => _enemyStats.Power;
+    public int Health => _enemyStats.Health;
 
-    public float Power => _skeltonScriptableObject.Power;
-    public int Health => _skeltonScriptableObject.Health;
+    /// <summary>
+    /// VContainer によるコンストラクタインジェクション
+    /// </summary>
+    [Inject]
+    public void Construct(IEnemyStats enemyStats, EnemyHpManager enemyHpManager)
+    {
+        _enemyStats = enemyStats;
+        _enemyHpManager = enemyHpManager;
+        
+        // パラメーター初期化
+        _speed = _enemyStats.Speed;
+        _startMoveDelay = _enemyStats.StartMoveDelay;
+    }
 
     void Awake()
     {
-        _speed = _skeltonScriptableObject.Speed;
-        _startMoveDelay = _skeltonScriptableObject.StartMoveDelay; // 追加: スクリプタブルオブジェクトから取得
-
-        _spawnTime = Time.time;              // 追加: 出現時間記録
+        _spawnTime = Time.time;
         _canMove = false;
-        _enemyHpManager = GetComponent<EnemyHpManager>();
+        // GetComponent は削除（DIで注入されるため）
     }
 
     void Start()
@@ -39,8 +52,9 @@ public class Skelton : MonoBehaviour, IAttackable, IHealth
 
         _enemyHpManager.Initialize(Health);
 
-        float randPosX = Random.Range(_skeltonScriptableObject.MinRelativeSpawnPosX, _skeltonScriptableObject.MaxRelativeSpawnPosX);
-        float randPosY = Random.Range(_skeltonScriptableObject.MinRelativeSpawnPosY, _skeltonScriptableObject.MaxRelativeSpawnPosY);
+        // DIで注入された _enemyStats を使用
+        float randPosX = Random.Range(_enemyStats.MinRelativeSpawnPosX, _enemyStats.MaxRelativeSpawnPosX);
+        float randPosY = Random.Range(_enemyStats.MinRelativeSpawnPosY, _enemyStats.MaxRelativeSpawnPosY);
         transform.position += new Vector3(_player.position.x + randPosX, _player.position.y + randPosY, 0);
 
         AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
@@ -52,11 +66,11 @@ public class Skelton : MonoBehaviour, IAttackable, IHealth
         {
             if (Time.time - _spawnTime >= _startMoveDelay)
             {
-                _canMove = true;             // 追加: 一度だけ移行
+                _canMove = true;
             }
             else
             {
-                return;                      // まだ移動しない
+                return;
             }
         }
         transform.Translate(Vector2.left * _speed * Time.deltaTime);
