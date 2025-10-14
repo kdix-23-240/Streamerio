@@ -43,12 +43,12 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       }
       else
       {
-        SetDefaultConfig();
+        Debug.Log("Not found ServerConfig.json!");
       }
     }
     catch
     {
-      SetDefaultConfig();
+      Debug.Log("Failed to load config!");
     }
     foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
     {
@@ -296,13 +296,6 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public string event_type;
     public int trigger_count;
     
-  }
-
-  private void SetDefaultConfig()
-  {
-    _backendHttpUrl = "https://streamerio-282618030957.asia-northeast1.run.app";
-    _backendWsBaseUrl = "wss://streamerio-282618030957.asia-northeast1.run.app";
-    _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
   }
 }
 
