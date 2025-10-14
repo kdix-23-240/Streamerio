@@ -93,3 +93,35 @@
 - ログフォーマットを本番環境では `json` に設定し、構造化ログで監視しやすくする
 
  
+## 2025-10-14 Unity: URL設定の外部化と集中管理
+
+### 目的
+- Unity側でハードコードされていた Backend/Frontend/WS のURLを外部設定に移し、保守性と環境切替（dev/stg/prod）の容易さを高める。
+
+### 実装概要
+- `Assets/Resources/ServerConfig.json` を追加し、`backendHttpBaseUrl` / `backendWsBaseUrl` / `frontendUrlFormat` を定義。
+- `WebsocketManager.cs` で `Resources.Load<TextAsset>("ServerConfig")` を用いて起動時に読込む。失敗時は現行運用中のURLをデフォルトとしてフォールバック。
+- フロントURL生成（`GetFrontUrlAsync`）は `frontendUrlFormat` を利用し、`roomId` を埋め込み。
+- WebSocket接続URLは `backendWsBaseUrl` + `/ws-unity`（`?room_id=` 付与）で組み立て。
+- ヘルスチェックは `backendHttpBaseUrl` + `/` を利用。
+
+### 変更ファイル
+- `Streamerio_unity/Assets/Resources/ServerConfig.json`（新規）
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/WebsocketManager.cs`
+
+### 意図・設計上の判断
+- 高凝集: URL組み立て責務を `WebsocketManager` に集約しつつ、可変要素（ベースURL）は外部設定に切り出し。
+- 低結合: 他スクリプトからURLを直接参照しない。将来は `AppConfig` などの共通ローダーへ移譲可能な構造。
+- フェイルセーフ: 設定ファイルが欠落/破損しても、既存の運用URLで動作継続。
+
+### 使い方/運用
+- 環境ごとに `Assets/Resources/ServerConfig.json` の内容を切替（例: CI で上書き、またはAddressables/ビルドパイプラインで差し替え）。
+- 形式:
+  ```json
+  {
+    "backendHttpBaseUrl": "https://example.com",
+    "backendWsBaseUrl": "wss://example.com",
+    "frontendUrlFormat": "https://front.example.com/?streamer_id={0}"
+  }
+  ```
+

@@ -1,0 +1,7 @@
+{
+  "backendHttpBaseUrl": "https://streamerio-282618030957.asia-northeast1.run.app",
+  "backendWsBaseUrl": "wss://streamerio-282618030957.asia-northeast1.run.app",
+  "frontendUrlFormat": "https://streamerio.vercel.app/?streamer_id={0}"
+}
+
+

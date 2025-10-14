@@ -21,12 +21,35 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
 
   private string _url = string.Empty;
 
-  private string _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
+  private string _frontendUrlFormat = null; // loaded from AppConfig
 
-  private string _backendUrl = "https://streamerio-282618030957.asia-northeast1.run.app";
+  private string _backendUrl = null; // loaded from AppConfig
 
-  private void Awake()
+  private string _backendWsBaseUrl = null; // loaded from config
+
+  protected override void Awake()
   {
+    base.Awake();
+    // load config from Resources/ServerConfig.json (fallback to defaults)
+    try
+    {
+      var textAsset = Resources.Load<TextAsset>("ServerConfig");
+      if (textAsset != null)
+      {
+        var cfg = JsonUtility.FromJson<ServerConfigLocal>(textAsset.text);
+        _backendUrl = cfg.backendHttpBaseUrl;
+        _backendWsBaseUrl = cfg.backendWsBaseUrl;
+        _frontendUrlFormat = cfg.frontendUrlFormat;
+      }
+      else
+      {
+        SetDefaultConfig();
+      }
+    }
+    catch
+    {
+      SetDefaultConfig();
+    }
     foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
     {
       _frontEventDict[key] = new Subject<Unit>();
@@ -43,10 +66,9 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   }
 
   // websocketのコネクションを確立する（引数なし版）
-  public async UniTask ConnectWebSocket()
+  public UniTask ConnectWebSocket()
   {
-    ConnectWebSocket(null).Forget();
-    return;
+    return ConnectWebSocket(null);
   }
 
   // websocketのコネクションを確立する（引数あり版）
@@ -59,9 +81,10 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
     
     // WebSocketのインスタンスを生成
+    var wsBase = _backendWsBaseUrl;
     string websocketUrl = string.IsNullOrEmpty(websocketId) 
-      ? "wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity" 
-      : "wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity?room_id=" + websocketId;
+      ? wsBase + "/ws-unity" 
+      : wsBase + "/ws-unity?room_id=" + websocketId;
     _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
@@ -254,6 +277,14 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public string type;
   }
 
+  [Serializable]
+  private class ServerConfigLocal
+  {
+    public string backendHttpBaseUrl;
+    public string backendWsBaseUrl;
+    public string frontendUrlFormat;
+  }
+
   private class RoomCreatedNotification
   {
     public string type;
@@ -267,6 +298,13 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public string event_type;
     public int trigger_count;
     
+  }
+
+  private void SetDefaultConfig()
+  {
+    _backendUrl = "https://streamerio-282618030957.asia-northeast1.run.app";
+    _backendWsBaseUrl = "wss://streamerio-282618030957.asia-northeast1.run.app";
+    _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
   }
 }
 
