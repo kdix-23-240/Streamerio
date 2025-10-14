@@ -23,7 +23,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
 
   private string _frontendUrlFormat = null; // loaded from AppConfig
 
-  private string _backendUrl = null; // loaded from AppConfig
+  private string _backendHttpUrl = null; // loaded from AppConfig
 
   private string _backendWsBaseUrl = null; // loaded from config
 
@@ -37,7 +37,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       if (textAsset != null)
       {
         var cfg = JsonUtility.FromJson<ServerConfigLocal>(textAsset.text);
-        _backendUrl = cfg.backendHttpBaseUrl;
+        _backendHttpUrl = cfg.backendHttpBaseUrl;
         _backendWsBaseUrl = cfg.backendWsBaseUrl;
         _frontendUrlFormat = cfg.frontendUrlFormat;
       }
@@ -81,10 +81,8 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
     
     // WebSocketのインスタンスを生成
-    var wsBase = _backendWsBaseUrl;
-    string websocketUrl = string.IsNullOrEmpty(websocketId) 
-      ? wsBase + "/ws-unity" 
-      : wsBase + "/ws-unity?room_id=" + websocketId;
+    string wsBase = _backendWsBaseUrl;
+    string websocketUrl = ZString.Format("{0}/ws-unity?room_id={1}", wsBase, websocketId);
     _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
@@ -256,7 +254,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///</summary>
   public void HealthCheck()
   {
-    UnityWebRequest.Get(_backendUrl + "/").SendWebRequest();
+    UnityWebRequest.Get(_backendHttpUrl + "/").SendWebRequest();
     Debug.Log("HealthCheck");
   }
 
@@ -302,7 +300,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
 
   private void SetDefaultConfig()
   {
-    _backendUrl = "https://streamerio-282618030957.asia-northeast1.run.app";
+    _backendHttpUrl = "https://streamerio-282618030957.asia-northeast1.run.app";
     _backendWsBaseUrl = "wss://streamerio-282618030957.asia-northeast1.run.app";
     _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
   }
