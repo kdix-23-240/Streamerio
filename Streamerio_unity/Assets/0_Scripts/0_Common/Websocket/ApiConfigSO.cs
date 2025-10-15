@@ -7,8 +7,8 @@ public class ApiConfigSO : ScriptableObject
     public string frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
     
     [Header("バックエンドのWebsocket用URL")]
-    public string backendUrl = "wss://streamario-web-backend-282618030957.asia-northeast1.run.app";
+    public string backendUrl = "wss://streamario-web-backend-282618030957.asia-northeast1.run.app/ws-unity";
     
     [Header("バックエンドのHTTP用URL")]
-    public string backendHttpUrl = "https://streamario-web-backend-282618030957.asia-northeast1.run.app";
+    public string backendHttpUrl = "https://streamario-web-backend-282618030957.asia-northeast1.run.app/";
 }

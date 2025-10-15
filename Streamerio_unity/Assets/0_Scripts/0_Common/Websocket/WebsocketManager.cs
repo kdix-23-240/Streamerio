@@ -17,7 +17,10 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
 
-  private string _url = string.Empty;
+  [SerializeField]
+  private ApiConfigSO _apiConfigSO;
+  
+  private string _qrCodeURL = string.Empty;
 
   private string _frontendUrlFormat = null; // loaded from AppConfig
 
@@ -28,26 +31,18 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   protected override void Awake()
   {
     base.Awake();
-    // load config from Resources/ServerConfig.json (fallback to defaults)
-    try
+    
+    if (_apiConfigSO != null)
     {
-      var textAsset = Resources.Load<TextAsset>("ServerConfig");
-      if (textAsset != null)
-      {
-        var cfg = JsonUtility.FromJson<ServerConfigLocal>(textAsset.text);
-        _backendHttpUrl = cfg.backendHttpBaseUrl;
-        _backendWsBaseUrl = cfg.backendWsBaseUrl;
-        _frontendUrlFormat = cfg.frontendUrlFormat;
-      }
-      else
-      {
-        Debug.Log("Not found ServerConfig.json!");
-      }
+      _frontendUrlFormat = _apiConfigSO.frontendUrlFormat;
+      _backendHttpUrl = _apiConfigSO.backendHttpUrl;
+      _backendWsBaseUrl = _apiConfigSO.backendUrl;
     }
-    catch
+    else
     {
-      Debug.Log("Failed to load config!");
+      Debug.Log("ApiConfigSO is null!");
     }
+    
     foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
     {
       _frontEventDict[key] = new Subject<Unit>();
@@ -80,7 +75,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     
     // WebSocketのインスタンスを生成
     string wsBase = _backendWsBaseUrl;
-    string websocketUrl = ZString.Format("{0}/ws-unity?room_id={1}", wsBase, websocketId);
+    string websocketUrl = ZString.Format("{0}?room_id={1}", wsBase, websocketId);
     _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
@@ -213,15 +208,15 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///</summary>
   public async UniTask<string> GetFrontUrlAsync()
   {
-    if (_url != string.Empty)
+    if (_qrCodeURL != string.Empty)
     {
-      return _url;
+      return _qrCodeURL;
     }
     
     await UniTask.WaitWhile(() => _roomId == string.Empty);
-    _url = ZString.Format(_frontendUrlFormat, _roomId);
+    _qrCodeURL = ZString.Format(_frontendUrlFormat, _roomId);
     
-    return _url;
+    return _qrCodeURL;
   }
 
   ///<summary>
@@ -252,7 +247,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///</summary>
   public void HealthCheck()
   {
-    UnityWebRequest.Get(_backendHttpUrl + "/").SendWebRequest();
+    UnityWebRequest.Get(_backendHttpUrl).SendWebRequest();
     Debug.Log("HealthCheck");
   }
 
@@ -271,14 +266,6 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   private class BaseMessage
   {
     public string type;
-  }
-
-  [Serializable]
-  private class ServerConfigLocal
-  {
-    public string backendHttpBaseUrl;
-    public string backendWsBaseUrl;
-    public string frontendUrlFormat;
   }
 
   private class RoomCreatedNotification
