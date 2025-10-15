@@ -12,9 +12,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   private bool _isConnected = false;
   private WebSocket _websocket;
 
-  [SerializeField]
   private string _roomId = string.Empty;
-  public string RoomId => _roomId;
 
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
