@@ -17,16 +17,19 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
 
+  // アプリケーション終了中フラグ
+  private bool _isShuttingDown = false;
+  
   [SerializeField]
   private ApiConfigSO _apiConfigSO;
   
   private string _qrCodeURL = string.Empty;
 
-  private string _frontendUrlFormat = null; // loaded from AppConfig
+  private string _frontendUrlFormat = null; 
 
-  private string _backendHttpUrl = null; // loaded from AppConfig
+  private string _backendHttpUrl = null;
 
-  private string _backendWsBaseUrl = null; // loaded from config
+  private string _backendWsBaseUrl = null;
 
   protected override void Awake()
   {
@@ -106,7 +109,10 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     {
       Debug.Log("Connection closed!");
       _isConnected = false;
-
+      
+      // アプリケーション終了中は再接続しない
+      if (_isShuttingDown) return;
+      
       // 再接続を試行
       // 現在のwebsocketIdが空の場合は新しくwebsocketIdを生成して接続
       await ConnectWebSocket(_roomId ?? string.Empty);
@@ -260,7 +266,15 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///</summary>
   private async void OnApplicationQuit()
   {
-    await _websocket.Close();
+    _isShuttingDown = true;
+    try
+    {
+      await DisconnectWebSocket();
+    }
+    catch (Exception ex)
+    {
+      Debug.Log($"Error during WebSocket disconnection: {ex.Message}");
+    }
   }
   
   ///<summary>
