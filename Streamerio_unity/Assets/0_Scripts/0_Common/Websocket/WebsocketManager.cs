@@ -36,7 +36,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     {
       _frontendUrlFormat = _apiConfigSO.frontendUrlFormat;
       _backendHttpUrl = _apiConfigSO.backendHttpUrl;
-      _backendWsBaseUrl = _apiConfigSO.backendUrl;
+      _backendWsBaseUrl = _apiConfigSO.backendWsUrl;
     }
     else
     {
@@ -58,13 +58,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
   }
 
-  // websocketのコネクションを確立する（引数なし版）
-  public UniTask ConnectWebSocket()
-  {
-    return ConnectWebSocket(null);
-  }
-
-  // websocketのコネクションを確立する（引数あり版）
+  // websocketのコネクションを確立する
   public async UniTask ConnectWebSocket(string websocketId)
   {
     if (_isConnected)
@@ -74,8 +68,17 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
     
     // WebSocketのインスタンスを生成
-    string wsBase = _backendWsBaseUrl;
-    string websocketUrl = ZString.Format("{0}?room_id={1}", wsBase, websocketId);
+    string websocketUrl;
+    if (string.IsNullOrEmpty(websocketId))
+    {
+      websocketUrl = _backendWsBaseUrl;
+    }
+    else
+    {
+      websocketUrl = ZString.Format("{0}?room_id={1}", _backendWsBaseUrl, websocketId);
+    }
+    
+    Debug.Log(websocketUrl);
     _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
