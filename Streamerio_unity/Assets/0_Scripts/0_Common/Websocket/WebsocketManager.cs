@@ -81,7 +81,6 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       websocketUrl = ZString.Format("{0}?room_id={1}", _backendWsBaseUrl, websocketId);
     }
     
-    Debug.Log(websocketUrl);
     _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
