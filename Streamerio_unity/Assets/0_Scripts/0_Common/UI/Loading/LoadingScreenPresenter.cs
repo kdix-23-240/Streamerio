@@ -1,9 +1,6 @@
-using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using VContainer;
-using VContainer.Unity;
 
 namespace Common.UI.Loading
 {
@@ -13,25 +10,19 @@ namespace Common.UI.Loading
     /// - View の表示/非表示/遷移アニメーションを操作
     /// - 表示中は UI の操作を無効化し、演出が終わると再度制御を戻す
     /// </summary>
-    public class LoadingScreenPresenter: IStartable, IDisposable
+    public class LoadingScreenPresenter: IAttachable<LoadingScreenPresenterContext>
     {
         private LoadingScreenView _view;
         private CancellationTokenSource _cts;
-        
-        [Inject]
-        public LoadingScreenPresenter(LoadingScreenView view)
-        {
-            _view = view;
-        }
         
         /// <summary>
         /// 初期化処理。
         /// - View を初期化し、アニメーションコンポーネントを準備
         /// </summary>
-        public void Start()
+        public void Attach(LoadingScreenPresenterContext context)
         {
+            _view = context.View;
             _cts = new CancellationTokenSource();
-            _view.Initialize();
         }
         
         /// <summary>
@@ -91,10 +82,15 @@ namespace Common.UI.Loading
             _view.SetInteractable(false);
         }
 
-        public void Dispose()
+        public void Detach()
         {
             _cts.Cancel();
             _cts.Dispose();
         }
+    }
+    
+    public class LoadingScreenPresenterContext
+    {
+        public LoadingScreenView View;
     }
 }

@@ -13,7 +13,17 @@ namespace Common.UI.Loading
         {
             builder.RegisterComponent(_view)
                 .AsSelf()
-                .As<IStartable>(); 
+                .As<IInitializable>();
+
+            builder
+                .RegisterEntryPoint<Wiring<LoadingScreenPresenter, LoadingScreenPresenterContext>>()
+                .WithParameter(resolver =>
+                {
+                    return new LoadingScreenPresenterContext
+                    {
+                        View = resolver.Resolve<LoadingScreenView>()
+                    };
+                });
         }
     }
 }

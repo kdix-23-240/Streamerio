@@ -29,7 +29,7 @@ namespace Common.Scene
             }
             
             _isReloaded=false;
-            LoadingScreenPresenter.Instance.Show();
+            //LoadingScreenPresenter.Instance.Show();
 
             if(_currentScene != SceneType.None)
             {
@@ -51,7 +51,7 @@ namespace Common.Scene
         public async UniTask ReloadSceneAsync()
         {
             _isReloaded=true;
-            LoadingScreenPresenter.Instance.Show();
+            //LoadingScreenPresenter.Instance.Show();
 
             await UnityEngine.SceneManagement.SceneManager
                 .UnloadSceneAsync(_currentScene.ToString())
