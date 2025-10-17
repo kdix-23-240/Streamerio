@@ -77,6 +77,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b430adc0594e7396f24799005669a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentReference:
+    TypeName: GlobalLifetimeScope
+  autoRun: 1
+  autoInjectGameObjects: []
   _audioMixer: {fileID: 24100000, guid: c5143b869dd9f45038d4b17f274b128f, type: 2}
   _audioMixerParameterSO: {fileID: 11400000, guid: bdbf3136376a7924b9fbd84c3006687f, type: 2}
   _sourceDict:

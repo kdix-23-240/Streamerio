@@ -1,3 +1,8 @@
+// モジュール概要:
+// Source プレハブを ObjectPool で管理し、音声再生時に効率的な取得と返却を行う。
+// 依存関係: UnityEngine.Pool.ObjectPool、Source コンポーネント。
+// 使用例: AudioPlayerBase が SoundType ごとにプールを生成し、GetSource() で Source を取得して再生する。
+
 using UnityEngine;
 using UnityEngine.Pool;
 

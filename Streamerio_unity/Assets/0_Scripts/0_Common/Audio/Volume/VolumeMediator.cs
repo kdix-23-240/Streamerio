@@ -1,3 +1,8 @@
+// モジュール概要:
+// 音量・ミュート設定を管理し、セーブデータと AudioMixer の間で状態を同期するメディエーターを定義する。
+// 依存関係: IVolumeSaveFacade で永続化を行い、IVolumeController を通じて AudioMixer へ反映する。
+// 使用例: AudioFacade が IVolumeMediator/IMuteMediator を利用して音量変更やミュート切替を処理する。
+
 using System;
 using System.Collections.Generic;
 using Common.Save;
@@ -91,6 +96,7 @@ namespace Common.Audio
         /// </summary>
         /// <param name="saveManager">音量データの保存・読み込みを行う。</param>
         /// <param name="volumeController">AudioMixer への音量適用を行うコントローラ。</param>
+        [Inject]
         public VolumeMediator(IVolumeSaveFacade saveManager, IVolumeController volumeController)
         {
             _saveManager = saveManager;

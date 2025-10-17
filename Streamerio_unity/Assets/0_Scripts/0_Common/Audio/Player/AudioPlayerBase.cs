@@ -1,3 +1,8 @@
+// モジュール概要:
+// BGM/SE など音声プレイヤーの共通処理を提供する抽象クラス。音源辞書と AudioSourcePool を扱う。
+// 依存関係: MusicData 辞書、AudioSourcePoolFactory デリゲート、Cysharp.Threading.Tasks。
+// 使用例: BGMPlayer・SEPlayer が継承し、Enum ごとの再生とプール管理を共有する。
+
 using System;
 using System.Collections.Generic;
 using System.Threading;

@@ -1,3 +1,8 @@
+// モジュール概要:
+// BGMType と MusicData を紐付ける ScriptableObject。AudioLifeTimeScope から参照され BGM 再生に利用される。
+// 依存関係: MusicScriptableObjectBase を継承し、AutoSetDataScriptableObject により Enum 値を自動管理する。
+// 使用例: エディタで BGMType ごとに AudioClip を割り当て、BGMPlayer が辞書として利用する。
+
 using UnityEngine;
 
 namespace Common.Audio

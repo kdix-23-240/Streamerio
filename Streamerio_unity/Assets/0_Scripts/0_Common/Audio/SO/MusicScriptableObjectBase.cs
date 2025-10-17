@@ -1,3 +1,8 @@
+// モジュール概要:
+// BGM/SE 用 ScriptableObject の共通基底実装。Enum と MusicData の自動連携を提供し、容量などのメタ情報も管理する。
+// 依存関係: AutoSetDataScriptableObject を継承し、MusicData 構造体と連携する。
+// 使用例: BGMScriptableObject / SEScriptableObject が派生し、AudioLifeTimeScope から音源辞書として利用する。
+
 using System;
 using UnityEngine;
 

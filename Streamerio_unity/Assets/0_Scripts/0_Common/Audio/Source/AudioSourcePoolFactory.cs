@@ -1,3 +1,8 @@
+// モジュール概要:
+// SoundType ごとの Source プレハブ設定から AudioSourcePool を生成するファクトリ。
+// 依存関係: SourceData 辞書（プレハブと親 Transform）を参照し、AudioSourcePool を初期化する。
+// 使用例: AudioLifeTimeScope がファクトリを作成し、BGM/SE プレイヤーが必要に応じてプールを生成する。
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;

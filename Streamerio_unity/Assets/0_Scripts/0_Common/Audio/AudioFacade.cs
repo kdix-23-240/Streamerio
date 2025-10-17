@@ -1,3 +1,8 @@
+// モジュール概要:
+// アプリ全体のオーディオ制御を統括するファサードと、その契約・コンテキストを定義する。
+// 依存関係: BGM/SE プレイヤー、音量・ミュート仲介 (VolumeMediator)、VContainer を通じた DI。
+// 使用例: AudioLifeTimeScope が Wiring 経由で AudioFacade を起動し、ゲーム全体で音再生 API を統一提供する。
+
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -14,7 +19,7 @@ namespace Common.Audio
     /// など、音に関する操作を一括で提供します。
     /// </para>
     /// </summary>
-    public interface IAudioFacade
+    public interface IAudioFacade: IAttachable<AudioFacadeContext>
     {
         /// <summary>
         /// 現在の音量状態を取得します。
@@ -65,31 +70,55 @@ namespace Common.Audio
     }
 
     /// <summary>
-    /// オーディオ機能の統括ファサード。  
-    /// <para>
-    /// - BGM / SE の再生・停止  
-    /// - 音量・ミュートの管理  
-    /// - AudioMixer との連携  
-    /// を一括で扱う窓口クラスです。
-    /// </para>
+    /// 【目的】オーディオ機能を一括管理するファサード実装。BGM/SE 再生、音量・ミュート制御などを統合する。
+    /// 【理由】複数コンポーネントへ散らばりがちな音制御を一本化し、UI やゲームロジックが簡潔な API で扱えるようにするため。
     /// </summary>
     public class AudioFacade : IAudioFacade
     {
-        private readonly IBGMPlayer _bgmPlayer;
-        private readonly ISEPlayer _sePlayer;
-        private readonly IVolumeMediator _volumeMediator;
-        private readonly IMuteMediator _muteMediator;
+        /// <summary>
+        /// 【目的】BGM 再生を担当するプレイヤーを保持する。
+        /// 【理由】依存注入で受け取った後も Play/Stop を即座に呼び出せるようにするため。
+        /// </summary>
+        private IBGMPlayer _bgmPlayer;
+        /// <summary>
+        /// 【目的】SE 再生を担当するプレイヤーを保持する。
+        /// 【理由】短い効果音の再生要求をファサードから委譲できるようにするため。
+        /// </summary>
+        private ISEPlayer _sePlayer;
+        /// <summary>
+        /// 【目的】音量制御を仲介するコンポーネントを保持する。
+        /// 【理由】ChangeVolume 呼び出し時に AudioMixer へ即反映できるようにするため。
+        /// </summary>
+        private IVolumeMediator _volumeMediator;
+        /// <summary>
+        /// 【目的】ミュート状態を仲介するコンポーネントを保持する。
+        /// 【理由】ToggleMute 呼び出し時に状態の反転と音量再適用を行うため。
+        /// </summary>
+        private IMuteMediator _muteMediator;
 
         /// <summary>
-        /// 依存関係はすべて DI で注入されます。
+        /// 【目的】Wiring から渡される依存を接続し、ファサードの内部状態を初期化する。
+        /// 【理由】プレイヤーやメディエーターをフィールドへキャッシュし、以降の API が利用できるようにするため。
         /// </summary>
-        [Inject]
-        public AudioFacade(AudioMediator mediator)
+        /// <param name="context">【用途】BGM/SE プレイヤーや音量・ミュート仲介をまとめたコンテキスト。</param>
+        public void Attach(AudioFacadeContext context)
         {
-            _bgmPlayer = mediator.BGMPlayer;
-            _sePlayer = mediator.SEPlayer;
-            _volumeMediator = mediator.VolumeMediator;
-            _muteMediator = mediator.MuteMediator;
+            _bgmPlayer = context.BgmPlayer;
+            _sePlayer = context.SePlayer;
+            _volumeMediator = context.VolumeMediator;
+            _muteMediator = context.MuteMediator;
+        }
+        
+        /// <summary>
+        /// 【目的】参照している依存を解放し、ガベージコレクションを促す。
+        /// 【理由】スコープ破棄時に保持参照を残さず、ライフサイクル整合性を保つため。
+        /// </summary>
+        public void Detach()
+        {
+            _bgmPlayer = null;
+            _sePlayer = null;
+            _volumeMediator = null;
+            _muteMediator = null;
         }
 
         /// <inheritdoc />
@@ -107,17 +136,45 @@ namespace Common.Audio
             => _muteMediator.ToggleMute(soundType);
 
         /// <inheritdoc />
-        public async UniTask PlayAsync(BGMType bgm, CancellationToken ct = default)
+        public async UniTask PlayAsync(BGMType bgm, CancellationToken ct)
             => await _bgmPlayer.PlayAsync(bgm, ct);
 
         /// <inheritdoc />
-        public async UniTask PlayAsync(SEType se, CancellationToken ct = default)
-            => await _sePlayer.PlayAsync(se, ct);
+        public async UniTask PlayAsync(SEType se, CancellationToken ct)
+            => await _sePlayer.PlayAsync(se, ct);   
 
         /// <inheritdoc />
         public void StopBGM() => _bgmPlayer.Stop();
 
         /// <inheritdoc />
         public void StopSE() => _sePlayer.Stop();
+    }
+
+    /// <summary>
+    /// 【目的】AudioFacade が必要とする依存（プレイヤーや仲介クラス）を束ねるコンテキスト。
+    /// 【理由】Wiring で一括注入し、Attach 内で簡潔に展開できるようにするため。
+    /// </summary>
+    public class AudioFacadeContext
+    {
+        /// <summary>
+        /// 【目的】BGM 再生を担当するプレイヤー。
+        /// 【理由】AudioFacade から BGM 再生/停止を委譲するために保持する。
+        /// </summary>
+        public IBGMPlayer BgmPlayer;
+        /// <summary>
+        /// 【目的】SE 再生を担当するプレイヤー。
+        /// 【理由】短時間の効果音再生を委譲し、ファサードが音の種類を意識しないようにするため。
+        /// </summary>
+        public ISEPlayer SePlayer;
+        /// <summary>
+        /// 【目的】音量設定を管理するメディエーター。
+        /// 【理由】ChangeVolume 呼び出し時に AudioMixer へ値を適用するため。
+        /// </summary>
+        public IVolumeMediator VolumeMediator;
+        /// <summary>
+        /// 【目的】ミュート状態を管理するメディエーター。
+        /// 【理由】ToggleMute 呼び出し時に状態を反転させ、音量を再適用するため。
+        /// </summary>
+        public IMuteMediator MuteMediator;
     }
 }

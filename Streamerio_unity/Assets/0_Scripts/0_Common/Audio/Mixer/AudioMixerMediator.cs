@@ -1,3 +1,8 @@
+// モジュール概要:
+// AudioMixer と SoundType の対応を保持し、音量変更要求を実際の AudioMixer.SetFloat へ反映するミドルレイヤー。
+// 依存関係: UnityEngine.AudioMixer と SoundType→パラメータ名の辞書。
+// 使用例: VolumeMediator が ChangeVolume を呼び出し、AudioMixer に音量を適用する。
+
 using System.Collections.Generic;
 using UnityEngine.Audio;
 

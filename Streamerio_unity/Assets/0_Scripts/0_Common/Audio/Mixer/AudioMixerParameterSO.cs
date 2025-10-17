@@ -1,3 +1,8 @@
+// モジュール概要:
+// AudioMixer のパラメータ名を ScriptableObject で管理し、コード側で安全に参照する。
+// 依存関係: SerializeDictionary で SoundType ごとのパラメータ名を保持。
+// 使用例: AudioLifeTimeScope が VolumeParamDict を渡し、AudioMixerMediator が音量制御に利用する。
+
 using Alchemy.Inspector;
 using System.Collections.Generic;
 using UnityEngine;

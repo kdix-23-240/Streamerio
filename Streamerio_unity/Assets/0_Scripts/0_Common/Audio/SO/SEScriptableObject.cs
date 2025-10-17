@@ -1,3 +1,8 @@
+// モジュール概要:
+// SEType と MusicData を紐付ける ScriptableObject。効果音の辞書として SEPlayer が利用する。
+// 依存関係: MusicScriptableObjectBase を継承し、エディタ拡張で Enum と AudioClip の整合性を保つ。
+// 使用例: SE 用フォルダで ScriptableObject を作成し、AudioLifeTimeScope が辞書を読み込む。
+
 using UnityEngine;
 
 namespace Common.Audio

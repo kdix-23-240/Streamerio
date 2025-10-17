@@ -1,3 +1,7 @@
+// モジュール概要:
+// AudioMixer などへ音量を適用するコントローラ契約を定義する。
+// 使用例: AudioMixerMediator が実装し、VolumeMediator 経由で ChangeVolume が呼ばれる。
+
 namespace Common.Audio
 {
     /// <summary>

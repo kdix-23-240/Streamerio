@@ -1,3 +1,8 @@
+// モジュール概要:
+// BGM 再生の具体実装と公開インターフェースを提供する。AudioPlayerBase を継承して BGMType を扱う。
+// 依存関係: MusicData 辞書、AudioSourcePoolFactory デリゲート、Cysharp.Threading.Tasks。
+// 使用例: AudioFacade が IBGMPlayer を介して BGM 再生/停止を指示する。
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
