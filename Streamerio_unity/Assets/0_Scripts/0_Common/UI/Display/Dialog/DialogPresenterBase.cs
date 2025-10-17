@@ -20,7 +20,7 @@ namespace Common.UI.Dialog
     /// 【理由】Close ボタンや背景クリックごとに購読処理を繰り返し記述するとバグを生むため、共通化して再利用性を高める。
     /// </summary>
     /// <typeparam name="TContext">Presenter に注入されるダイアログコンテキスト型。</typeparam>
-    public abstract class DialogBase<TContext> : DisplayPresenterBase<ICommonDialogView, TContext>, IDialog
+    public abstract class DialogPresenterBase<TContext> : DisplayPresenterBase<ICommonDialogView, TContext>, IDialog
         where TContext : CommonDialogContext
     {
         /// <summary>
