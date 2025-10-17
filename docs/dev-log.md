@@ -93,3 +93,73 @@
 - ログフォーマットを本番環境では `json` に設定し、構造化ログで監視しやすくする
 
  
+## 2025-10-14 Unity: URL設定の外部化と集中管理
+
+### 目的
+- Unity側でハードコードされていた Backend/Frontend/WS のURLを外部設定に移し、保守性と環境切替（dev/stg/prod）の容易さを高める。
+
+### 実装概要
+- `Assets/Resources/ServerConfig.json` を追加し、`backendHttpBaseUrl` / `backendWsBaseUrl` / `frontendUrlFormat` を定義。
+- `WebsocketManager.cs` で `Resources.Load<TextAsset>("ServerConfig")` を用いて起動時に読込む。失敗時は現行運用中のURLをデフォルトとしてフォールバック。
+- フロントURL生成（`GetFrontUrlAsync`）は `frontendUrlFormat` を利用し、`roomId` を埋め込み。
+- WebSocket接続URLは `backendWsBaseUrl` + `/ws-unity`（`?room_id=` 付与）で組み立て。
+- ヘルスチェックは `backendHttpBaseUrl` + `/` を利用。
+
+### 変更ファイル
+- `Streamerio_unity/Assets/Resources/ServerConfig.json`（新規）
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/WebsocketManager.cs`
+
+### 意図・設計上の判断
+- 高凝集: URL組み立て責務を `WebsocketManager` に集約しつつ、可変要素（ベースURL）は外部設定に切り出し。
+- 低結合: 他スクリプトからURLを直接参照しない。将来は `AppConfig` などの共通ローダーへ移譲可能な構造。
+- フェイルセーフ: 設定ファイルが欠落/破損しても、既存の運用URLで動作継続。
+
+### 使い方/運用
+- 環境ごとに `Assets/Resources/ServerConfig.json` の内容を切替（例: CI で上書き、またはAddressables/ビルドパイプラインで差し替え）。
+- 形式:
+  ```json
+  {
+    "backendHttpBaseUrl": "https://example.com",
+    "backendWsBaseUrl": "wss://example.com",
+    "frontendUrlFormat": "https://front.example.com/?streamer_id={0}"
+  }
+  ```
+
+
+## 2025-10-17 Unity: URL設定をScriptableObjectへ移行
+
+### 目的
+- `Assets/Resources/ServerConfig.json` を廃止し、URL設定を ScriptableObject 化。
+- 環境切替（dev/stg/prod）をインスペクタで安全・容易に行えるようにする。
+- ビルド時の差し替えや CI 注入を簡素化し、保守性を向上。
+
+### 実装概要
+- `ApiConfigSO` を新規追加（CreateAssetMenu: `SO/Common/ApiConfigSO`）。
+- フィールド:
+  - `frontendUrlFormat`（例: `https://streamerio.vercel.app/?streamer_id={0}`）
+  - `backendWsUrl`（例: `wss://.../ws-unity`）
+  - `backendHttpUrl`（例: `https://.../`）
+- `WebsocketManager` に `ApiConfigSO` を `[SerializeField]` で参照し、`Awake` で読込む実装に統一。
+- 旧 `Resources.Load<TextAsset>("ServerConfig")` ベースの読込は廃止。
+- `Assets/Resources/ServerConfig.json` を削除。
+
+### 変更ファイル
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/ApiConfigSO.cs`（新規）
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/WebsocketManager.cs`（SO 読込に対応）
+- `Streamerio_unity/Assets/Resources/ServerConfig.json`（削除）
+
+### 意図・設計上の判断
+- 高凝集: URL 組み立ては `WebsocketManager` に集約し、可変値は `ApiConfigSO` に分離。
+- 低結合: 他スクリプトは URL 文字列に直接依存せず、`WebsocketManager` の API を利用。
+- 運用性: インスペクタで環境値を切替。アセットのデフォルト値は本番相当を設定。
+- フェイルセーフ: `ApiConfigSO` 未割当時はログで検知（誤った既定値で稼働しない）。
+
+### 使い方/運用
+- メニュー `SO/Common/ApiConfigSO` からアセットを作成。
+- シーンの `WebsocketManager`（`_apiConfigSO`）に作成したアセットを割当。
+- 環境ごとにアセットを分けるか、CI/ビルドパイプラインで値を上書き。
+- フロント URL 生成/WS 接続/HTTP ヘルスチェックはアセット値から自動で組み立て。
+
+### 移行メモ
+- 以前の `ServerConfig.json` は不要（Git からも削除済み）。
+- `ApiConfigSO` の未割当時は URL が空になり得るため、必ず参照を設定すること。
