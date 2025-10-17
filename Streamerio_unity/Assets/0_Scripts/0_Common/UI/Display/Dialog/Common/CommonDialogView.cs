@@ -38,7 +38,7 @@ namespace Common.UI.Dialog
     /// 【目的】共通ダイアログの表示ロジックをカプセル化し、背景フェードと移動アニメーションを同期させる。
     /// 【理由】各 Presenter が個別に演出を実装すると仕様がぶれやすいため、演出仕様を本クラスで統制する。
     /// </summary>
-    public class CommonCommonDialogView : DisplayViewBase, ICommonDialogView
+    public class CommonDialogView : DisplayViewBase, ICommonDialogView
     {
         /// <summary>
         /// 【目的】移動アニメーションの対象 RectTransform を保持する。
