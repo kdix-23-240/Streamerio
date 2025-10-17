@@ -43,7 +43,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
     else
     {
-      Debug.Log("ApiConfigSO is null!");
+      Debug.LogError("ApiConfigSO is not assigned. Please assign an ApiConfigSO asset in the Inspector.");
     }
     
     foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
