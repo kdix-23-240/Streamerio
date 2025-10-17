@@ -30,6 +30,11 @@ namespace Common.UI
         /// </para>
         /// </summary>
         void SetInteractable(bool interactable);
+        
+        /// <summary>
+        /// この UI の有効／無効を切り替える。
+        /// </summary>
+        void SetActive(bool active);
     }
 
     /// <summary>
@@ -43,6 +48,9 @@ namespace Common.UI
     [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
     public abstract class UIBehaviourBase : UIBehaviour, ICommonUIBehaviour
     {
+        [SerializeField, Alchemy.Inspector.ReadOnly]
+        private GameObject _gameObject;
+        public GameObject GameObject => _gameObject;
         [SerializeField, Alchemy.Inspector.ReadOnly]
         private RectTransform _rectTransform;
         public RectTransform RectTransform => _rectTransform;
@@ -59,6 +67,7 @@ namespace Common.UI
         protected override void OnValidate()
         {
             base.OnValidate();
+            _gameObject = gameObject;
             _rectTransform = GetComponent<RectTransform>();
             _canvasGroup = GetComponent<CanvasGroup>();
         }
@@ -69,6 +78,12 @@ namespace Common.UI
         {
             _canvasGroup.interactable = interactable;
             _canvasGroup.blocksRaycasts = interactable;
+        }
+
+        /// <inheritdoc/>
+        public virtual void SetActive(bool active)
+        {
+            _gameObject.SetActive(active);
         }
     }
 }

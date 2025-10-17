@@ -19,7 +19,6 @@ namespace Common.UI.Click
         /// <summary>
         /// 指定された Observable をクリックイベントとしてバインドする。
         /// </summary>
-        /// <typeparam name="T">Observable のイベント型</typeparam>
         void BindClickEvent();
     }
 
@@ -36,12 +35,11 @@ namespace Common.UI.Click
         private readonly IAudioFacade _audioFacade;
         private readonly SEType _seType;
         
-        private readonly Subject<Unit> _clickEvent;
-
         private Observable<T> _clickObservable;
 
         private CancellationTokenSource _cts;
 
+        private readonly Subject<Unit> _clickEvent;
         /// <inheritdoc/>
         public Observable<Unit> ClickEvent => _clickEvent;
 
@@ -49,7 +47,7 @@ namespace Common.UI.Click
         /// コンストラクタ。内部イベントストリームを初期化する。
         /// </summary>
         /// <param name="seType">クリック時に再生する SE の種類</param>
-        public ClickEventBinder(Observable<T> clickObservable, IAudioFacade audioFacade, SEType seType = SEType.SNESRPG01)
+        public ClickEventBinder(Observable<T> clickObservable, IAudioFacade audioFacade, SEType seType)
         {
             _clickEvent = new Subject<Unit>();
             _clickObservable = clickObservable;
