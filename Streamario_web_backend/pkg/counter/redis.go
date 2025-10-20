@@ -33,7 +33,7 @@ func (rc *redisCounter) keyViewers(roomID string) string {
 }
 
 // Increment: Redis INCR で+1し現在値返却
-func (rc *redisCounter) Increment(roomID, eventType string) (int64, error) {
+func (rc *redisCounter) Increment(roomID, eventType string, value int64) (int64, error) {
 	key := rc.keyCount(roomID, eventType)
 	logger := rc.logger.With(
 		slog.String("op", "increment"),
@@ -42,7 +42,7 @@ func (rc *redisCounter) Increment(roomID, eventType string) (int64, error) {
 		slog.String("key", key),
 	)
 	start := time.Now()
-	val, err := rc.rdb.Incr(context.Background(), key).Result()
+	val, err := rc.rdb.IncrBy(context.Background(), key, value).Result()
 	if err != nil {
 		logger.Error("redis.incr failed", slog.Any("error", err))
 		return 0, err

@@ -23,14 +23,14 @@ func NewMemoryCounter() Counter {
 }
 
 // Increment: カウントを+1して現在値返却
-func (m *memoryCounter) Increment(roomID, eventType string) (int64, error) {
+func (m *memoryCounter) Increment(roomID, eventType string, value int64) (int64, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if _, ok := m.counts[roomID]; !ok {
 		m.counts[roomID] = make(map[string]int64)
 	}
-	m.counts[roomID][eventType]++
-	return m.counts[roomID][eventType], nil
+	m.counts[roomID][eventType] += value
+	return m.counts[roomID][eventType] + value, nil
 }
 
 // Get: 現在カウント取得
