@@ -53,6 +53,17 @@ func (m *memoryCounter) Reset(roomID, eventType string) error {
 	return nil
 }
 
+// SetExcess: 閾値超過分をカウントに設定（超過分を捨てない）
+func (m *memoryCounter) SetExcess(roomID, eventType string, excess int64) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if _, ok := m.counts[roomID]; !ok {
+		m.counts[roomID] = make(map[string]int64)
+	}
+	m.counts[roomID][eventType] = excess
+	return nil
+}
+
 // UpdateViewerActivity: 視聴者最終アクセス時刻を更新
 func (m *memoryCounter) UpdateViewerActivity(roomID, viewerID string) error {
 	m.mu.Lock()
