@@ -92,6 +92,25 @@ func (rc *redisCounter) Reset(roomID, eventType string) error {
 	return nil
 }
 
+// SetExcess: 閾値超過分をカウントに設定（超過分を捨てない）
+func (rc *redisCounter) SetExcess(roomID, eventType string, excess int64) error {
+	key := rc.keyCount(roomID, eventType)
+	logger := rc.logger.With(
+		slog.String("op", "set_excess"),
+		slog.String("room_id", roomID),
+		slog.String("event_type", eventType),
+		slog.String("key", key),
+		slog.Int64("excess", excess),
+	)
+	start := time.Now()
+	if err := rc.rdb.Set(context.Background(), key, excess, 0).Err(); err != nil {
+		logger.Error("redis.set failed", slog.Any("error", err))
+		return err
+	}
+	logger.Debug("redis.set", slog.Int64("excess", excess), slog.Duration("elapsed", time.Since(start)))
+	return nil
+}
+
 // UpdateViewerActivity: ZSET に時刻をスコアとして追加し古い視聴者をクリーン
 func (rc *redisCounter) UpdateViewerActivity(roomID, viewerID string) error {
 	key := rc.keyViewers(roomID)
