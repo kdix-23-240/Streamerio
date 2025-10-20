@@ -92,10 +92,14 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, Ev
 			}
 		}
 
-		_ = s.counter.Reset(roomID, string(eventType))
+		// 閾値超過分をカウントに設定（超過分を捨てない）
+		excess := current - int64(threshold)
+		if err := s.counter.SetExcess(roomID, string(eventType), excess); err != nil {
+			s.logger.Error("set excess failed", slog.String("room_id", roomID), slog.String("event_type", string(eventType)), slog.Int64("excess", excess), slog.Any("error", err))
+		}
 		res.EffectTriggered = true
 		res.NextThreshold = s.calculateDynamicThreshold(cfg, s.getActiveViewerCount(roomID))
-		res.CurrentCount = 0
+		res.CurrentCount = int(excess)
 	}
 	return res, nil
 }
