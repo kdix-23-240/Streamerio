@@ -100,25 +100,40 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
 	}
-	var req struct {
-		EventType  string `json:"event_type"`
+
+	type PushEvent struct {
 		ButtonName string `json:"button_name"`
-		ViewerID   string `json:"viewer_id"`
+		PushCount  int64  `json:"push_count"`
 	}
+
+	var req struct {
+		EventType  string      `json:"event_type"`
+		ViewerID   string      `json:"viewer_id"`
+		PushEvents []PushEvent `json:"push_events"`
+	}
+
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid body"})
 	}
-	evTypeStr := req.EventType
-	if evTypeStr == "" {
-		evTypeStr = req.ButtonName
-	}
-	if evTypeStr == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "event_type is required"})
-	}
-	evType := model.EventType(evTypeStr)
+
 	var viewerID *string
 	if req.ViewerID != "" {
 		viewerID = &req.ViewerID
+	}
+
+	for _, event := range req.PushEvents {
+		evTypeStr := req.EventType
+		if evTypeStr == "" {
+			evTypeStr = event.ButtonName
+		}
+		if evTypeStr == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "event_type is required"})
+		}
+		evType := model.EventType(evTypeStr)
+
+		pushCount := int64(event.PushCount)
+
+		res, err := h.eventService.ProcessEvent(roomID, evType, pushCount, viewerID)
 	}
 
 	if room.Status == "ended" {
@@ -134,7 +149,7 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 			"viewer_summary": summary,
 		})
 	}
-	res, err := h.eventService.ProcessEvent(roomID, evType, 1, viewerID)
+
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
