@@ -121,6 +121,9 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		viewerID = &req.ViewerID
 	}
 
+	// ProcessEventの戻り値を格納する配列
+	var eventResults []*model.EventResult
+
 	for _, event := range req.PushEvents {
 		evTypeStr := req.EventType
 		if evTypeStr == "" {
@@ -134,6 +137,12 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		pushCount := int64(event.PushCount)
 
 		res, err := h.eventService.ProcessEvent(roomID, evType, pushCount, viewerID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+
+		// 結果を配列に追加
+		eventResults = append(eventResults, res)
 	}
 
 	if room.Status == "ended" {
@@ -150,10 +159,10 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		})
 	}
 
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	return c.JSON(http.StatusOK, res)
+	// 配列として結果を返す
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"event_results": eventResults,
+	})
 }
 
 // GetRoomStats: 現在のイベント種別ごとのカウントと閾値を返す
