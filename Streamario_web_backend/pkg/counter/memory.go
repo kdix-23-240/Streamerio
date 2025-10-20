@@ -30,7 +30,7 @@ func (m *memoryCounter) Increment(roomID, eventType string, value int64) (int64,
 		m.counts[roomID] = make(map[string]int64)
 	}
 	m.counts[roomID][eventType] += value
-	return m.counts[roomID][eventType] + value, nil
+	return m.counts[roomID][eventType], nil
 }
 
 // Get: 現在カウント取得
