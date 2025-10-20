@@ -134,7 +134,7 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 			"viewer_summary": summary,
 		})
 	}
-	res, err := h.eventService.ProcessEvent(roomID, evType, viewerID)
+	res, err := h.eventService.ProcessEvent(roomID, evType, 1, viewerID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

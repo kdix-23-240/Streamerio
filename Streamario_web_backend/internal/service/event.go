@@ -36,7 +36,7 @@ func NewEventService(counter counter.Counter, eventRepo repository.EventReposito
 }
 
 // ProcessEvent: 1イベント処理の本流 (DB保存→視聴者アクティビティ更新→カウント加算→閾値判定→発動通知/リセット)
-func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, viewerID *string) (*model.EventResult, error) {
+func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, EventButtonPushCount int64, viewerID *string) (*model.EventResult, error) {
 	// eventType が有効かチェック
 	if _, ok := s.configs[eventType]; !ok {
 		return nil, fmt.Errorf("invalid event type: %s", eventType)
@@ -54,7 +54,7 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, vi
 	}
 
 	// 3. Increment counter
-	current, err := s.counter.Increment(roomID, string(eventType))
+	current, err := s.counter.Increment(roomID, string(eventType), EventButtonPushCount)
 	if err != nil {
 		return nil, fmt.Errorf("increment failed: %w", err)
 	}
