@@ -1,141 +1,169 @@
 package counter
 
 import (
-	"context"
-	"fmt"
-	"log/slog"
-	"time"
+    "context"
+    "fmt"
+    "log/slog"
+    "time"
 
-	"github.com/redis/go-redis/v9"
+    "github.com/redis/go-redis/v9"
 )
 
-// redisCounter: Redis を利用した本番向けカウンタ実装
-// 各コマンドの遅延を計測しログへ記録する。
 type redisCounter struct {
-	rdb    *redis.Client
-	window time.Duration // アクティブ視聴判定窓 (デフォルト5分)
-	logger *slog.Logger
+    rdb    *redis.Client
+    window time.Duration
+    logger *slog.Logger
 }
 
-// NewRedisCounter: 実装生成 (5分窓)
 func NewRedisCounter(rdb *redis.Client, logger *slog.Logger) Counter {
-	if logger == nil {
-		logger = slog.Default()
-	}
-	return &redisCounter{rdb: rdb, window: 5 * time.Minute, logger: logger}
+    if logger == nil {
+        logger = slog.Default()
+    }
+    return &redisCounter{
+        rdb:    rdb,
+        window: 5 * time.Minute,
+        logger: logger,
+    }
 }
 
 func (rc *redisCounter) keyCount(roomID, eventType string) string {
-	return fmt.Sprintf("room:%s:cnt:%s", roomID, eventType)
+    return fmt.Sprintf("room:%s:cnt:%s", roomID, eventType)
 }
+
 func (rc *redisCounter) keyViewers(roomID string) string {
-	return fmt.Sprintf("room:%s:viewers", roomID)
+    return fmt.Sprintf("room:%s:viewers", roomID)
 }
 
-// Increment: Redis INCR で+1し現在値返却
 func (rc *redisCounter) Increment(roomID, eventType string) (int64, error) {
-	key := rc.keyCount(roomID, eventType)
-	logger := rc.logger.With(
-		slog.String("op", "increment"),
-		slog.String("room_id", roomID),
-		slog.String("event_type", eventType),
-		slog.String("key", key),
-	)
-	start := time.Now()
-	val, err := rc.rdb.Incr(context.Background(), key).Result()
-	if err != nil {
-		logger.Error("redis.incr failed", slog.Any("error", err))
-		return 0, err
-	}
-	logger.Debug("redis.incr", slog.Int64("value", val), slog.Duration("elapsed", time.Since(start)))
-	return val, nil
+    key := rc.keyCount(roomID, eventType)
+    logger := rc.logger.With(
+        slog.String("counter", "redis"),
+        slog.String("op", "increment"),
+        slog.String("room_id", roomID),
+        slog.String("event_type", eventType))
+
+    ctx := context.Background()
+    start := time.Now()
+    val, err := rc.rdb.Incr(ctx, key).Result()
+    elapsed := time.Since(start)
+
+    if err != nil {
+        logger.Error("Failed to increment", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return 0, fmt.Errorf("redis incr: %w", err)
+    }
+
+    logger.Debug("Counter incremented",
+        slog.Int64("value", val),
+        slog.Duration("elapsed", elapsed))
+
+    return val, nil
 }
 
-// Get: 現在カウント取得 (キー無ければ0)
 func (rc *redisCounter) Get(roomID, eventType string) (int64, error) {
-	key := rc.keyCount(roomID, eventType)
-	logger := rc.logger.With(
-		slog.String("op", "get"),
-		slog.String("room_id", roomID),
-		slog.String("event_type", eventType),
-		slog.String("key", key),
-	)
-	start := time.Now()
-	v, err := rc.rdb.Get(context.Background(), key).Int64()
-	if err == redis.Nil {
-		logger.Debug("redis.get", slog.Bool("hit", false), slog.Duration("elapsed", time.Since(start)))
-		return 0, nil
-	}
-	if err != nil {
-		logger.Error("redis.get failed", slog.Any("error", err))
-		return 0, err
-	}
-	logger.Debug("redis.get", slog.Bool("hit", true), slog.Int64("value", v), slog.Duration("elapsed", time.Since(start)))
-	return v, nil
+    key := rc.keyCount(roomID, eventType)
+    logger := rc.logger.With(
+        slog.String("counter", "redis"),
+        slog.String("op", "get"),
+        slog.String("room_id", roomID),
+        slog.String("event_type", eventType))
+
+    ctx := context.Background()
+    start := time.Now()
+    val, err := rc.rdb.Get(ctx, key).Int64()
+    elapsed := time.Since(start)
+
+    if err == redis.Nil {
+        logger.Debug("Counter not found, returning 0", slog.Duration("elapsed", elapsed))
+        return 0, nil
+    }
+
+    if err != nil {
+        logger.Error("Failed to get counter", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return 0, fmt.Errorf("redis get: %w", err)
+    }
+
+    logger.Debug("Counter retrieved",
+        slog.Int64("value", val),
+        slog.Duration("elapsed", elapsed))
+
+    return val, nil
 }
 
-// Reset: カウントキー削除
 func (rc *redisCounter) Reset(roomID, eventType string) error {
-	key := rc.keyCount(roomID, eventType)
-	logger := rc.logger.With(
-		slog.String("op", "reset"),
-		slog.String("room_id", roomID),
-		slog.String("event_type", eventType),
-		slog.String("key", key),
-	)
-	start := time.Now()
-	if err := rc.rdb.Del(context.Background(), key).Err(); err != nil {
-		logger.Warn("redis.del failed", slog.Any("error", err))
-		return err
-	}
-	logger.Debug("redis.del", slog.Duration("elapsed", time.Since(start)))
-	return nil
+    key := rc.keyCount(roomID, eventType)
+    logger := rc.logger.With(
+        slog.String("counter", "redis"),
+        slog.String("op", "reset"),
+        slog.String("room_id", roomID),
+        slog.String("event_type", eventType))
+
+    ctx := context.Background()
+    start := time.Now()
+    err := rc.rdb.Del(ctx, key).Err()
+    elapsed := time.Since(start)
+
+    if err != nil {
+        logger.Error("Failed to reset counter", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return fmt.Errorf("redis del: %w", err)
+    }
+
+    logger.Debug("Counter reset", slog.Duration("elapsed", elapsed))
+    return nil
 }
 
-// UpdateViewerActivity: ZSET に時刻をスコアとして追加し古い視聴者をクリーン
 func (rc *redisCounter) UpdateViewerActivity(roomID, viewerID string) error {
-	key := rc.keyViewers(roomID)
-	logger := rc.logger.With(
-		slog.String("op", "update_viewer_activity"),
-		slog.String("room_id", roomID),
-		slog.String("viewer_id", viewerID),
-		slog.String("key", key),
-	)
-	ctx := context.Background()
+    key := rc.keyViewers(roomID)
+    logger := rc.logger.With(
+        slog.String("counter", "redis"),
+        slog.String("op", "update_viewer"),
+        slog.String("room_id", roomID),
+        slog.String("viewer_id", viewerID))
 
-	start := time.Now()
-	if err := rc.rdb.ZAdd(ctx, key, redis.Z{Score: float64(time.Now().Unix()), Member: viewerID}).Err(); err != nil {
-		logger.Error("redis.zadd failed", slog.Any("error", err))
-		return err
-	}
-	logger.Debug("redis.zadd", slog.Duration("elapsed", time.Since(start)))
+    now := float64(time.Now().Unix())
+    ctx := context.Background()
+    start := time.Now()
 
-	cutoff := time.Now().Add(-rc.window).Unix()
-	pruneStart := time.Now()
-	if err := rc.rdb.ZRemRangeByScore(ctx, key, "-inf", fmt.Sprintf("%f", float64(cutoff-1))).Err(); err != nil {
-		logger.Warn("redis.zremrangebyscore failed", slog.Any("error", err))
-		return err
-	}
-	logger.Debug("redis.zremrangebyscore", slog.Duration("elapsed", time.Since(pruneStart)), slog.Int64("cutoff", cutoff))
-	return nil
+    // ZADDで視聴者のタイムスタンプを更新
+    if err := rc.rdb.ZAdd(ctx, key, redis.Z{Score: now, Member: viewerID}).Err(); err != nil {
+        elapsed := time.Since(start)
+        logger.Error("Failed to update viewer activity", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return fmt.Errorf("redis zadd: %w", err)
+    }
+
+    // 古い視聴者を削除
+    cutoff := float64(time.Now().Add(-rc.window).Unix())
+    if err := rc.rdb.ZRemRangeByScore(ctx, key, "-inf", fmt.Sprintf("%f", cutoff-1)).Err(); err != nil {
+        logger.Warn("Failed to clean old viewers", slog.Any("error", err))
+    }
+
+    elapsed := time.Since(start)
+    logger.Debug("Viewer activity updated", slog.Duration("elapsed", elapsed))
+
+    return nil
 }
 
-// GetActiveViewerCount: ZSET から窓内の要素数をカウント
 func (rc *redisCounter) GetActiveViewerCount(roomID string) (int64, error) {
-	key := rc.keyViewers(roomID)
-	logger := rc.logger.With(
-		slog.String("op", "get_active_viewer_count"),
-		slog.String("room_id", roomID),
-		slog.String("key", key),
-	)
-	cutoff := time.Now().Add(-rc.window).Unix()
-	ctx := context.Background()
-	start := time.Now()
-	count, err := rc.rdb.ZCount(ctx, key, fmt.Sprintf("%f", float64(cutoff)), "+inf").Result()
-	if err != nil {
-		logger.Error("redis.zcount failed", slog.Any("error", err))
-		return 0, err
-	}
-	logger.Debug("redis.zcount", slog.Int64("count", count), slog.Duration("elapsed", time.Since(start)), slog.Int64("cutoff", cutoff))
-	return count, nil
+    key := rc.keyViewers(roomID)
+    logger := rc.logger.With(
+        slog.String("counter", "redis"),
+        slog.String("op", "get_active_viewers"),
+        slog.String("room_id", roomID))
+
+    cutoff := float64(time.Now().Add(-rc.window).Unix())
+    ctx := context.Background()
+    start := time.Now()
+
+    count, err := rc.rdb.ZCount(ctx, key, fmt.Sprintf("%f", cutoff), "+inf").Result()
+    elapsed := time.Since(start)
+
+    if err != nil {
+        logger.Error("Failed to count active viewers", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return 0, fmt.Errorf("redis zcount: %w", err)
+    }
+
+    logger.Debug("Active viewers counted",
+        slog.Int64("count", count),
+        slog.Duration("elapsed", elapsed))
+
+    return count, nil
 }

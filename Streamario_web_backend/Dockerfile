@@ -11,7 +11,7 @@ COPY . .
 RUN go mod tidy
 
 # アプリケーションをビルド
-RUN go build -o main cmd/server/main.go 
+RUN go build -o main cmd/server/main.go
 
 # コンテナが起動時に実行するコマンド
 CMD ["./main"]

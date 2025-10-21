@@ -1,135 +1,141 @@
 package repository
 
 import (
-	"database/sql"
-	"log/slog"
-	"time"
+    "database/sql"
+    "fmt"
+    "log/slog"
+    "time"
 
-	"streamerrio-backend/internal/model"
+    "streamerrio-backend/internal/model"
 
-	"github.com/jmoiron/sqlx"
+    "github.com/jmoiron/sqlx"
 )
 
-// RoomRepository: ルーム永続化アクセス用インタフェース
-// 主要メソッドでクエリの所要時間と結果をログ出力する。
 type RoomRepository interface {
-	Create(room *model.Room) error                // 新規作成
-	Get(id string) (*model.Room, error)           // ID取得 (存在しなければ nil)
-	Delete(id string) error                       // ID削除
-	Update(id string, room *model.Room) error     // ID更新
-	MarkEnded(id string, endedAt time.Time) error // 終了状態に遷移
+    Create(room *model.Room) error
+    Get(id string) (*model.Room, error)
+    UpdateStatus(id, status string) error
+    MarkEnded(id string, endedAt time.Time) error
 }
 
 type roomRepository struct {
-	db     *sqlx.DB
-	logger *slog.Logger
+    db     *sqlx.DB
+    logger *slog.Logger
 }
 
-// NewRoomRepository: 実装生成
 func NewRoomRepository(db *sqlx.DB, logger *slog.Logger) RoomRepository {
-	if logger == nil {
-		logger = slog.Default()
-	}
-	return &roomRepository{db: db, logger: logger}
+    if logger == nil {
+        logger = slog.Default()
+    }
+    return &roomRepository{db: db, logger: logger}
 }
 
-// Create: rooms テーブルに挿入 (CreatedAt 未設定時は現在時刻)
 func (r *roomRepository) Create(room *model.Room) error {
-	if room.CreatedAt.IsZero() {
-		room.CreatedAt = time.Now()
-	}
-	q := `INSERT INTO rooms (id, streamer_id, created_at, expires_at, status, settings, ended_at)
-          VALUES ($1,$2,$3,$4,$5,$6,$7)`
-	logger := r.logger.With(
-		slog.String("repo", "room"),
-		slog.String("op", "create"),
-		slog.String("room_id", room.ID),
-	)
-	start := time.Now()
-	res, err := r.db.Exec(q, room.ID, room.StreamerID, room.CreatedAt, room.ExpiresAt, room.Status, room.Settings, room.EndedAt)
-	if err != nil {
-		logger.Error("db.exec failed", slog.Any("error", err))
-		return err
-	}
-	rows, _ := res.RowsAffected()
-	logger.Debug("db.exec", slog.Int64("rows_affected", rows), slog.Duration("elapsed", time.Since(start)))
-	return nil
+    if room.CreatedAt.IsZero() {
+        room.CreatedAt = time.Now()
+    }
+
+    logger := r.logger.With(
+        slog.String("repo", "room"),
+        slog.String("op", "create"),
+        slog.String("room_id", room.ID))
+
+    q := `INSERT INTO rooms (id, streamer_id, created_at, expires_at, status, settings)
+          VALUES ($1, $2, $3, $4, $5, $6)`
+
+    start := time.Now()
+    _, err := r.db.Exec(q, room.ID, room.StreamerID, room.CreatedAt, room.ExpiresAt, room.Status, room.Settings)
+    elapsed := time.Since(start)
+
+    if err != nil {
+        logger.Error("Failed to create room", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return fmt.Errorf("create room: %w", err)
+    }
+
+    logger.Info("Room created",
+        slog.String("streamer_id", room.StreamerID),
+        slog.Duration("elapsed", elapsed))
+
+    return nil
 }
 
-// Get: 指定IDのルームを取得 (存在しない場合 nil を返す)
 func (r *roomRepository) Get(id string) (*model.Room, error) {
-	var rm model.Room
-	q := `SELECT id, streamer_id, created_at, expires_at, status, settings, ended_at FROM rooms WHERE id=$1`
-	logger := r.logger.With(
-		slog.String("repo", "room"),
-		slog.String("op", "get"),
-		slog.String("room_id", id),
-	)
-	start := time.Now()
-	if err := r.db.Get(&rm, q, id); err != nil {
-		if err == sql.ErrNoRows {
-			logger.Debug("db.query", slog.Bool("found", false), slog.Duration("elapsed", time.Since(start)))
-			return nil, nil
-		}
-		logger.Error("db.query failed", slog.Any("error", err))
-		return nil, err
-	}
-	logger.Debug("db.query", slog.Bool("found", true), slog.Duration("elapsed", time.Since(start)))
-	return &rm, nil
+    logger := r.logger.With(
+        slog.String("repo", "room"),
+        slog.String("op", "get"),
+        slog.String("room_id", id))
+
+    var room model.Room
+    q := `SELECT id, streamer_id, created_at, expires_at, status, settings, ended_at
+          FROM rooms WHERE id = $1`
+
+    start := time.Now()
+    err := r.db.Get(&room, q, id)
+    elapsed := time.Since(start)
+
+    if err != nil {
+        if err == sql.ErrNoRows {
+            logger.Debug("Room not found", slog.Duration("elapsed", elapsed))
+            return nil, nil
+        }
+        logger.Error("Failed to get room", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return nil, fmt.Errorf("get room: %w", err)
+    }
+
+    logger.Debug("Room retrieved",
+        slog.String("status", room.Status),
+        slog.Duration("elapsed", elapsed))
+
+    return &room, nil
 }
 
-// Update: 指定IDのルームを更新
-func (r *roomRepository) Update(id string, room *model.Room) error {
-	q := `UPDATE rooms SET streamer_id=$1, created_at=$2, expires_at=$3, status=$4, settings=$5, ended_at=$6 WHERE id=$7`
-	logger := r.logger.With(
-		slog.String("repo", "room"),
-		slog.String("op", "update"),
-		slog.String("room_id", id),
-	)
-	start := time.Now()
-	res, err := r.db.Exec(q, room.StreamerID, room.CreatedAt, room.ExpiresAt, room.Status, room.Settings, room.EndedAt, id)
-	if err != nil {
-		logger.Error("db.exec failed", slog.Any("error", err))
-		return err
-	}
-	rows, _ := res.RowsAffected()
-	logger.Debug("db.exec", slog.Int64("rows_affected", rows), slog.Duration("elapsed", time.Since(start)))
-	return nil
-}
+func (r *roomRepository) UpdateStatus(id, status string) error {
+    logger := r.logger.With(
+        slog.String("repo", "room"),
+        slog.String("op", "update_status"),
+        slog.String("room_id", id),
+        slog.String("status", status))
 
-// Delete: 指定IDのルームを削除
-func (r *roomRepository) Delete(id string) error {
-	q := `DELETE FROM rooms WHERE id=$1`
-	logger := r.logger.With(
-		slog.String("repo", "room"),
-		slog.String("op", "delete"),
-		slog.String("room_id", id),
-	)
-	start := time.Now()
-	res, err := r.db.Exec(q, id)
-	if err != nil {
-		logger.Error("db.exec failed", slog.Any("error", err))
-		return err
-	}
-	rows, _ := res.RowsAffected()
-	logger.Debug("db.exec", slog.Int64("rows_affected", rows), slog.Duration("elapsed", time.Since(start)))
-	return nil
+    q := `UPDATE rooms SET status = $1 WHERE id = $2`
+
+    start := time.Now()
+    res, err := r.db.Exec(q, status, id)
+    elapsed := time.Since(start)
+
+    if err != nil {
+        logger.Error("Failed to update status", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return fmt.Errorf("update status: %w", err)
+    }
+
+    rows, _ := res.RowsAffected()
+    logger.Info("Room status updated",
+        slog.Int64("rows_affected", rows),
+        slog.Duration("elapsed", elapsed))
+
+    return nil
 }
 
 func (r *roomRepository) MarkEnded(id string, endedAt time.Time) error {
-	q := `UPDATE rooms SET status=$1, ended_at=$2 WHERE id=$3`
-	logger := r.logger.With(
-		slog.String("repo", "room"),
-		slog.String("op", "mark_ended"),
-		slog.String("room_id", id),
-	)
-	start := time.Now()
-	res, err := r.db.Exec(q, "ended", endedAt, id)
-	if err != nil {
-		logger.Error("db.exec failed", slog.Any("error", err))
-		return err
-	}
-	rows, _ := res.RowsAffected()
-	logger.Debug("db.exec", slog.Int64("rows_affected", rows), slog.Duration("elapsed", time.Since(start)))
-	return nil
+    logger := r.logger.With(
+        slog.String("repo", "room"),
+        slog.String("op", "mark_ended"),
+        slog.String("room_id", id))
+
+    q := `UPDATE rooms SET status = 'ended', ended_at = $1 WHERE id = $2`
+
+    start := time.Now()
+    res, err := r.db.Exec(q, endedAt, id)
+    elapsed := time.Since(start)
+
+    if err != nil {
+        logger.Error("Failed to mark room as ended", slog.Any("error", err), slog.Duration("elapsed", elapsed))
+        return fmt.Errorf("mark ended: %w", err)
+    }
+
+    rows, _ := res.RowsAffected()
+    logger.Info("Room marked as ended",
+        slog.Int64("rows_affected", rows),
+        slog.Duration("elapsed", elapsed))
+
+    return nil
 }

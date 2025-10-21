@@ -1,191 +1,179 @@
 package handler
 
 import (
-	"net/http"
-	"time"
+    "log/slog"
+    "net/http"
+    "time"
 
-	"streamerrio-backend/internal/model"
-	"streamerrio-backend/internal/service"
+    "streamerrio-backend/internal/service"
 
-	"github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4"
 )
 
-// APIHandler: REST エンドポイント集約 (ルーム取得 / イベント送信 / 統計取得)
+// APIHandler: REST APIエンドポイント集約
 type APIHandler struct {
-	roomService    *service.RoomService
-	eventService   *service.EventService
-	sessionService *service.GameSessionService
-	viewerService  *service.ViewerService
+    roomService    *service.RoomService
+    eventService   *service.EventService
+    viewerService  *service.ViewerService
+    sessionService *service.GameSessionService
+    logger         *slog.Logger
 }
 
-// NewAPIHandler: 依存するサービスを束ねて構築
-func NewAPIHandler(roomService *service.RoomService, eventService *service.EventService, sessionService *service.GameSessionService, viewerService *service.ViewerService) *APIHandler {
-	return &APIHandler{roomService: roomService, eventService: eventService, sessionService: sessionService, viewerService: viewerService}
+func NewAPIHandler(
+    roomService *service.RoomService,
+    eventService *service.EventService,
+    viewerService *service.ViewerService,
+    sessionService *service.GameSessionService,
+    logger *slog.Logger,
+) *APIHandler {
+    if logger == nil {
+        logger = slog.Default()
+    }
+    return &APIHandler{
+        roomService:    roomService,
+        eventService:   eventService,
+        viewerService:  viewerService,
+        sessionService: sessionService,
+        logger:         logger,
+    }
 }
 
-// GetOrCreateViewerID: 視聴者端末識別用の ID を払い出す
-func (h *APIHandler) GetOrCreateViewerID(c echo.Context) error {
-	var existing string
-	if cookie, err := c.Cookie("viewer_id"); err == nil {
-		existing = cookie.Value
-	}
-	viewerID, err := h.viewerService.EnsureViewerID(existing)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	viewer, err := h.viewerService.GetViewer(viewerID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	// クロスサイト（フロント: vercel.app, バックエンド: Cloud Run）で
-	// Cookie を送受信できるように SameSite=None; Secure を指定する。
-	// NOTE: Secure=true は HTTPS 前提。本番環境（Cloud Run/Vercel）は HTTPS なので問題なし。
-	cookie := &http.Cookie{
-		Name:     "viewer_id",
-		Value:    viewerID,
-		Path:     "/",
-		MaxAge:   365 * 24 * 60 * 60,
-		Secure:   true,
-		HttpOnly: false,
-		SameSite: http.SameSiteNoneMode,
-	}
-	c.SetCookie(cookie)
-	var name interface{}
-	if viewer != nil && viewer.Name != nil {
-		name = *viewer.Name
-	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"viewer_id": viewerID,
-		"name":      name,
-	})
-}
-
-// SetViewerName: 視聴者名を登録/更新する
-func (h *APIHandler) SetViewerName(c echo.Context) error {
-	var req struct {
-		ViewerID string `json:"viewer_id"`
-		Name     string `json:"name"`
-	}
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid body"})
-	}
-	viewer, err := h.viewerService.SetViewerName(req.ViewerID, req.Name)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
-	var name interface{}
-	if viewer != nil && viewer.Name != nil {
-		name = *viewer.Name
-	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"viewer_id": viewer.ID,
-		"name":      name,
-	})
-}
-
-// GetRoom: ルーム情報取得 (存在しない場合 404)
+// GetRoom: ルーム情報取得
 func (h *APIHandler) GetRoom(c echo.Context) error {
-	id := c.Param("id")
-	room, err := h.roomService.GetRoom(id)
-	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
-	}
-	return c.JSON(http.StatusOK, room)
+    roomID := c.Param("id")
+    logger := h.logger.With(slog.String("handler", "GetRoom"), slog.String("room_id", roomID))
+
+    logger.Debug("Fetching room")
+    room, err := h.roomService.GetRoom(roomID)
+    if err != nil {
+        logger.Warn("Room not found", slog.Any("error", err))
+        return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
+    }
+
+    logger.Info("Room retrieved successfully")
+    return c.JSON(http.StatusOK, room)
 }
 
-// SendEvent: イベントを受信し閾値チェックまで実施
+// SendEvent: イベント送信
 func (h *APIHandler) SendEvent(c echo.Context) error {
-	roomID := c.Param("id")
-	room, err := h.roomService.GetRoom(roomID)
-	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
-	}
-	var req struct {
-		EventType  string `json:"event_type"`
-		ButtonName string `json:"button_name"`
-		ViewerID   string `json:"viewer_id"`
-	}
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid body"})
-	}
-	evTypeStr := req.EventType
-	if evTypeStr == "" {
-		evTypeStr = req.ButtonName
-	}
-	if evTypeStr == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "event_type is required"})
-	}
-	evType := model.EventType(evTypeStr)
-	var viewerID *string
-	if req.ViewerID != "" {
-		viewerID = &req.ViewerID
-	}
+    roomID := c.Param("id")
+    logger := h.logger.With(slog.String("handler", "SendEvent"), slog.String("room_id", roomID))
 
-	if room.Status == "ended" {
-		if viewerID == nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "viewer_id is required after game end"})
-		}
-		summary, err := h.sessionService.GetViewerSummary(roomID, *viewerID)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-		}
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"game_over":      true,
-			"viewer_summary": summary,
-		})
-	}
-	res, err := h.eventService.ProcessEvent(roomID, evType, viewerID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	return c.JSON(http.StatusOK, res)
+    var req struct {
+        EventType string `json:"event_type"`
+        ViewerID  string `json:"viewer_id"`
+    }
+    if err := c.Bind(&req); err != nil {
+        logger.Warn("Invalid request body", slog.Any("error", err))
+        return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid body"})
+    }
+
+    logger.Debug("Processing event",
+        slog.String("event_type", req.EventType),
+        slog.String("viewer_id", req.ViewerID))
+
+    // ルーム存在確認
+    if _, err := h.roomService.GetRoom(roomID); err != nil {
+        logger.Warn("Room not found for event")
+        return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
+    }
+
+    var viewerID *string
+    if req.ViewerID != "" {
+        viewerID = &req.ViewerID
+    }
+
+    res, err := h.eventService.ProcessEvent(roomID, req.EventType, viewerID)
+    if err != nil {
+        logger.Error("Event processing failed", slog.Any("error", err))
+        return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+    }
+
+    logger.Info("Event processed",
+        slog.Int("current_count", res.CurrentCount),
+        slog.Bool("triggered", res.EffectTriggered))
+
+    return c.JSON(http.StatusOK, res)
 }
 
-// GetRoomStats: 現在のイベント種別ごとのカウントと閾値を返す
+// GetRoomStats: ルーム統計取得
 func (h *APIHandler) GetRoomStats(c echo.Context) error {
-	roomID := c.Param("id")
-	if _, err := h.roomService.GetRoom(roomID); err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
-	}
-	stats, err := h.eventService.GetRoomStats(roomID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"room_id": roomID,
-		"stats":   stats,
-		"time":    time.Now(),
-	})
+    roomID := c.Param("id")
+    logger := h.logger.With(slog.String("handler", "GetRoomStats"), slog.String("room_id", roomID))
+
+    logger.Debug("Fetching room stats")
+
+    if _, err := h.roomService.GetRoom(roomID); err != nil {
+        logger.Warn("Room not found")
+        return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
+    }
+
+    stats, err := h.eventService.GetRoomStats(roomID)
+    if err != nil {
+        logger.Error("Failed to get stats", slog.Any("error", err))
+        return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+    }
+
+    logger.Info("Stats retrieved", slog.Int("stat_count", len(stats)))
+
+    return c.JSON(http.StatusOK, map[string]interface{}{
+        "room_id": roomID,
+        "stats":   stats,
+        "time":    time.Now(),
+    })
 }
 
-// GetRoomResult: 終了後の集計結果を取得
-func (h *APIHandler) GetRoomResult(c echo.Context) error {
-	roomID := c.Param("id")
-	room, err := h.roomService.GetRoom(roomID)
-	if err != nil || room == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
-	}
-	if room.Status != "ended" {
-		return c.JSON(http.StatusConflict, map[string]string{"error": "room not ended"})
-	}
-	summary, err := h.sessionService.GetRoomResult(roomID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	var viewerSummary *model.ViewerSummary
-	if viewerID := c.QueryParam("viewer_id"); viewerID != "" {
-		if vs, err := h.sessionService.GetViewerSummary(roomID, viewerID); err == nil {
-			viewerSummary = vs
-		}
-	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"game_over":      true,
-		"room_id":        summary.RoomID,
-		"ended_at":       summary.EndedAt,
-		"top_by_event":   summary.TopByEvent,
-		"top_overall":    summary.TopOverall,
-		"event_totals":   summary.EventTotals,
-		"viewer_totals":  summary.ViewerTotals,
-		"viewer_summary": viewerSummary,
-	})
+// GetRoomResults: ゲーム終了結果取得
+func (h *APIHandler) GetRoomResults(c echo.Context) error {
+    roomID := c.Param("id")
+    logger := h.logger.With(slog.String("handler", "GetRoomResults"), slog.String("room_id", roomID))
+
+    logger.Debug("Fetching room results")
+
+    results, err := h.sessionService.GetRoomResult(roomID)
+    if err != nil {
+        logger.Error("Failed to get results", slog.Any("error", err))
+        return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+    }
+
+    logger.Info("Results retrieved")
+    return c.JSON(http.StatusOK, results)
+}
+
+// GetViewerSummary: 視聴者別サマリー取得
+func (h *APIHandler) GetViewerSummary(c echo.Context) error {
+    roomID := c.Param("id")
+    viewerID := c.Param("viewer_id")
+    logger := h.logger.With(
+        slog.String("handler", "GetViewerSummary"),
+        slog.String("room_id", roomID),
+        slog.String("viewer_id", viewerID))
+
+    logger.Debug("Fetching viewer summary")
+
+    summary, err := h.sessionService.GetViewerSummary(roomID, viewerID)
+    if err != nil {
+        logger.Error("Failed to get viewer summary", slog.Any("error", err))
+        return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+    }
+
+    logger.Info("Viewer summary retrieved", slog.Int("total", summary.Total))
+    return c.JSON(http.StatusOK, summary)
+}
+
+// EndGame: ゲーム終了処理
+func (h *APIHandler) EndGame(c echo.Context) error {
+    roomID := c.Param("id")
+    logger := h.logger.With(slog.String("handler", "EndGame"), slog.String("room_id", roomID))
+
+    logger.Info("Ending game")
+
+    summary, err := h.sessionService.EndGame(roomID)
+    if err != nil {
+        logger.Error("Failed to end game", slog.Any("error", err))
+        return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+    }
+
+    logger.Info("Game ended successfully")
+    return c.JSON(http.StatusOK, summary)
 }
