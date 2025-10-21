@@ -42,10 +42,18 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, Ev
 		return nil, fmt.Errorf("invalid event type: %s", eventType)
 	}
 
-	// 1. Record event
-	ev := &model.Event{RoomID: roomID, EventType: eventType, ViewerID: viewerID, Metadata: "{}"}
-	if err := s.eventRepo.CreateEvent(ev); err != nil {
-		return nil, fmt.Errorf("record event failed: %w", err)
+	// 1. Record events (バッチ挿入で効率化)
+	events := make([]*model.Event, EventButtonPushCount)
+	for i := int64(0); i < EventButtonPushCount; i++ {
+		events[i] = &model.Event{
+			RoomID:    roomID,
+			EventType: eventType,
+			ViewerID:  viewerID,
+			Metadata:  "{}",
+		}
+	}
+	if err := s.eventRepo.CreateEventsBatch(events); err != nil {
+		return nil, fmt.Errorf("record events failed: %w", err)
 	}
 
 	// 2. Update viewer activity (backend-agnostic)
