@@ -32,7 +32,7 @@ func (rc *redisCounter) keyViewers(roomID string) string {
 	return fmt.Sprintf("room:%s:viewers", roomID)
 }
 
-// Increment: Redis INCR で+1し現在値返却
+// Increment: Redis　IncrByでvalueだけ加算し現在値返却
 func (rc *redisCounter) Increment(roomID, eventType string, value int64) (int64, error) {
 	key := rc.keyCount(roomID, eventType)
 	logger := rc.logger.With(
