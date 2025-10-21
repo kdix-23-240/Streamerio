@@ -4,10 +4,6 @@ import (
     "fmt"
     "log/slog"
 
-	"streamerrio-backend/internal/model"
-	"streamerrio-backend/internal/repository"
-	"streamerrio-backend/pkg/counter"
-	"streamerrio-backend/pkg/pubsub"
     "streamerrio-backend/internal/config"
     "streamerrio-backend/internal/model"
     "streamerrio-backend/internal/repository"
