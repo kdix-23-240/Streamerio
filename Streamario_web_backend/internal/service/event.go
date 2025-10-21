@@ -1,182 +1,228 @@
 package service
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"log/slog"
-	"math"
+    "fmt"
+    "log/slog"
 
-	"streamerrio-backend/internal/model"
-	"streamerrio-backend/internal/repository"
-	"streamerrio-backend/pkg/counter"
-	"streamerrio-backend/pkg/pubsub"
+    "streamerrio-backend/internal/config"
+    "streamerrio-backend/internal/model"
+    "streamerrio-backend/internal/repository"
+    "streamerrio-backend/pkg/counter"
 )
 
-// WebSocket 送信用インタフェース (Unity へゲームイベント通知するための最小限)
-// NOTE: Pub/Sub導入後は下位互換のため残しているが、実際は使用しない
 type WebSocketSender interface {
-	SendEventToUnity(roomID string, payload map[string]interface{}) error
+    SendEventToUnity(roomID string, payload map[string]interface{}) error
 }
 
 type EventService struct {
-	counter   counter.Counter
-	eventRepo repository.EventRepository
-	pubsub    pubsub.PubSub // Pub/Sub経由でWebSocketサーバーに配信
-	configs   map[model.EventType]*model.EventConfig
-	logger    *slog.Logger
+    counter    counter.Counter
+    eventRepo  repository.EventRepository
+    wsHandler  WebSocketSender
+    gameConfig *config.GameConfig
+    logger     *slog.Logger
 }
 
-// NewEventService: 依存（カウンタ / リポジトリ / PubSub）を束ねてサービス生成
-func NewEventService(counter counter.Counter, eventRepo repository.EventRepository, ps pubsub.PubSub, logger *slog.Logger) *EventService {
-	if logger == nil {
-		logger = slog.Default()
-	}
-	return &EventService{counter: counter, eventRepo: eventRepo, pubsub: ps, configs: getDefaultEventConfigs(), logger: logger}
+func NewEventService(
+    counter counter.Counter,
+    eventRepo repository.EventRepository,
+    wsHandler WebSocketSender,
+    gameConfig *config.GameConfig,
+    logger *slog.Logger,
+) *EventService {
+    if logger == nil {
+        logger = slog.Default()
+    }
+    return &EventService{
+        counter:    counter,
+        eventRepo:  eventRepo,
+        wsHandler:  wsHandler,
+        gameConfig: gameConfig,
+        logger:     logger,
+    }
 }
 
-// ProcessEvent: 1イベント処理の本流 (DB保存→視聴者アクティビティ更新→カウント加算→閾値判定→発動通知/リセット)
-func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, viewerID *string) (*model.EventResult, error) {
-	// eventType が有効かチェック
-	if _, ok := s.configs[eventType]; !ok {
-		return nil, fmt.Errorf("invalid event type: %s", eventType)
-	}
+func (s *EventService) ProcessEvent(roomID, eventType string, viewerID *string) (*model.EventResult, error) {
+    logger := s.logger.With(
+        slog.String("service", "event"),
+        slog.String("op", "process"),
+        slog.String("room_id", roomID),
+        slog.String("event_type", eventType))
 
-	// 1. Record event
-	ev := &model.Event{RoomID: roomID, EventType: eventType, ViewerID: viewerID, Metadata: "{}"}
-	if err := s.eventRepo.CreateEvent(ev); err != nil {
-		return nil, fmt.Errorf("record event failed: %w", err)
-	}
+    if viewerID != nil {
+        logger = logger.With(slog.String("viewer_id", *viewerID))
+    }
 
-	// 2. Update viewer activity (backend-agnostic)
-	if viewerID != nil {
-		_ = s.counter.UpdateViewerActivity(roomID, *viewerID)
-	}
+    logger.Debug("Processing event started")
 
-	// 3. Increment counter
-	current, err := s.counter.Increment(roomID, string(eventType))
-	if err != nil {
-		return nil, fmt.Errorf("increment failed: %w", err)
-	}
+    // 1. イベント記録
+    ev := &model.Event{
+        RoomID:    roomID,
+        EventType: model.EventType(eventType),
+        ViewerID:  viewerID,
+        Metadata:  "{}",
+    }
+    if err := s.eventRepo.CreateEvent(ev); err != nil {
+        logger.Error("Failed to record event", slog.Any("error", err))
+        return nil, fmt.Errorf("record event: %w", err)
+    }
+    logger.Debug("Event recorded in DB")
 
-	// 4. Active viewer count
-	viewers := s.getActiveViewerCount(roomID)
+    // 2. 視聴者アクティビティ更新
+    if viewerID != nil {
+        if err := s.counter.UpdateViewerActivity(roomID, *viewerID); err != nil {
+            logger.Warn("Failed to update viewer activity", slog.Any("error", err))
+        } else {
+            logger.Debug("Viewer activity updated")
+        }
+    }
 
-	// 5. Threshold
-	cfg := s.configs[eventType]
-	threshold := s.calculateDynamicThreshold(cfg, viewers)
+    // 3. カウント増加
+    current, err := s.counter.Increment(roomID, eventType)
+    if err != nil {
+        logger.Error("Failed to increment counter", slog.Any("error", err))
+        return nil, fmt.Errorf("increment counter: %w", err)
+    }
+    logger.Debug("Counter incremented", slog.Int64("current", current))
 
-	res := &model.EventResult{EventType: eventType, CurrentCount: int(current), RequiredCount: threshold, ViewerCount: viewers, EffectTriggered: false, NextThreshold: threshold}
+    // 4. アクティブ視聴者数取得
+    viewers := s.getActiveViewerCount(roomID)
+    logger.Debug("Active viewers counted", slog.Int("count", viewers))
 
-	if int(current) >= threshold {
-		s.logger.Info("event triggered", slog.String("room_id", roomID), slog.String("event_type", string(eventType)), slog.Int("count", int(current)), slog.Int("threshold", threshold), slog.Int("active_viewers", viewers))
+    // 5. 閾値計算
+    threshold, err := s.gameConfig.CalculateThreshold(eventType, viewers)
+    if err != nil {
+        logger.Error("Failed to calculate threshold", slog.Any("error", err))
+        return nil, fmt.Errorf("calculate threshold: %w", err)
+    }
+    logger.Debug("Threshold calculated",
+        slog.Int("threshold", threshold),
+        slog.Int("viewers", viewers))
 
-		// Pub/Sub経由で全WebSocketサーバーにブロードキャスト
-		payload := map[string]interface{}{
-			"type":          "game_event",
-			"room_id":       roomID, // WebSocketサーバー側で配信先を特定するため必須
-			"event_type":    string(eventType),
-			"trigger_count": int(current),
-			"viewer_count":  viewers,
-		}
+    res := &model.EventResult{
+        EventType:       eventType,
+        CurrentCount:    int(current),
+        RequiredCount:   threshold,
+        ViewerCount:     viewers,
+        EffectTriggered: false,
+        NextThreshold:   threshold,
+    }
 
-		message, err := json.Marshal(payload)
-		if err != nil {
-			s.logger.Error("json marshal failed", slog.String("room_id", roomID), slog.Any("error", err))
-		} else {
-			ctx := context.Background()
-			if err := s.pubsub.Publish(ctx, pubsub.ChannelGameEvents, message); err != nil {
-				s.logger.Error("pubsub publish failed", slog.String("room_id", roomID), slog.String("event_type", string(eventType)), slog.Any("error", err))
-			} else {
-				s.logger.Info("event published to pubsub", slog.String("room_id", roomID), slog.String("event_type", string(eventType)))
-			}
-		}
+    // 6. 閾値判定と発動
+    if int(current) >= threshold {
+        logger.Info("🎯 Threshold reached - triggering effect",
+            slog.Int("current", int(current)),
+            slog.Int("threshold", threshold))
 
-		_ = s.counter.Reset(roomID, string(eventType))
-		res.EffectTriggered = true
-		res.NextThreshold = s.calculateDynamicThreshold(cfg, s.getActiveViewerCount(roomID))
-		res.CurrentCount = 0
-	}
-	return res, nil
+        payload := map[string]interface{}{
+            "type":          "game_event",
+            "event_type":    eventType,
+            "trigger_count": int(current),
+            "viewer_count":  viewers,
+        }
+
+        if err := s.wsHandler.SendEventToUnity(roomID, payload); err != nil {
+            logger.Error("Failed to send event to Unity", slog.Any("error", err))
+        } else {
+            logger.Info("✅ Effect triggered and sent to Unity")
+        }
+
+        // カウンタリセット
+        if err := s.counter.Reset(roomID, eventType); err != nil {
+            logger.Warn("Failed to reset counter", slog.Any("error", err))
+        } else {
+            logger.Debug("Counter reset")
+        }
+
+        res.EffectTriggered = true
+        res.CurrentCount = 0
+
+        // 次の閾値を再計算（視聴者数が変動している可能性があるため）
+        nextViewers := s.getActiveViewerCount(roomID)
+        nextThreshold, _ := s.gameConfig.CalculateThreshold(eventType, nextViewers)
+        res.NextThreshold = nextThreshold
+        logger.Debug("Next threshold calculated", slog.Int("next", nextThreshold))
+    }
+
+    logger.Debug("Event processing completed",
+        slog.Bool("triggered", res.EffectTriggered),
+        slog.Int("final_count", res.CurrentCount))
+
+    return res, nil
 }
 
-// calculateDynamicThreshold: 視聴者数に応じた動的閾値を算出し上下限でクランプ
-func (s *EventService) calculateDynamicThreshold(cfg *model.EventConfig, viewerCount int) int {
-	mult := s.getViewerMultiplier(viewerCount)
-	raw := float64(cfg.BaseThreshold) * mult
-	val := int(math.Ceil(raw))
-	if val < cfg.MinThreshold {
-		val = cfg.MinThreshold
-	}
-	if val > cfg.MaxThreshold {
-		val = cfg.MaxThreshold
-	}
-	return val
+func (s *EventService) GetRoomStats(roomID string) ([]model.RoomEventStat, error) {
+    logger := s.logger.With(
+        slog.String("service", "event"),
+        slog.String("op", "get_stats"),
+        slog.String("room_id", roomID))
+
+    logger.Debug("Fetching room stats")
+
+    viewers := s.getActiveViewerCount(roomID)
+    logger.Debug("Active viewers for stats", slog.Int("count", viewers))
+
+    eventTypes := s.gameConfig.ListEventTypes()
+    stats := make([]model.RoomEventStat, 0, len(eventTypes))
+
+    for _, et := range eventTypes {
+        current, err := s.counter.Get(roomID, et)
+        if err != nil {
+            logger.Error("Failed to get counter",
+                slog.String("event_type", et),
+                slog.Any("error", err))
+            return nil, fmt.Errorf("get counter for %s: %w", et, err)
+        }
+
+        threshold, err := s.gameConfig.CalculateThreshold(et, viewers)
+        if err != nil {
+            logger.Error("Failed to calculate threshold",
+                slog.String("event_type", et),
+                slog.Any("error", err))
+            return nil, fmt.Errorf("calculate threshold for %s: %w", et, err)
+        }
+
+        stats = append(stats, model.RoomEventStat{
+            EventType:     et,
+            CurrentCount:  int(current),
+            CurrentLevel:  1,
+            RequiredCount: threshold,
+            NextThreshold: threshold,
+            ViewerCount:   viewers,
+        })
+
+        logger.Debug("Stat collected",
+            slog.String("event_type", et),
+            slog.Int("current", int(current)),
+            slog.Int("threshold", threshold))
+    }
+
+    logger.Info("Room stats compiled", slog.Int("stat_count", len(stats)))
+    return stats, nil
 }
 
-// getViewerMultiplier: 視聴者数帯ごとの倍率テーブル
-func (s *EventService) getViewerMultiplier(v int) float64 {
-	switch {
-	case v <= 5:
-		return 1.0
-	case v <= 10:
-		return 1.2
-	case v <= 20:
-		return 1.5
-	case v <= 50:
-		return 2.0
-	default:
-		return 3.0
-	}
-}
-
-// getActiveViewerCount: アクティブ視聴者数取得 (0 やエラー時は 1 にフォールバック)
 func (s *EventService) getActiveViewerCount(roomID string) int {
-	c, err := s.counter.GetActiveViewerCount(roomID)
-	if err != nil || c < 1 {
-		return 1
-	}
-	if c > 1_000_000 { // safety clamp
-		return 1_000_000
-	}
-	return int(c)
-}
+    logger := s.logger.With(
+        slog.String("service", "event"),
+        slog.String("room_id", roomID))
 
-// Stats (simplified, no level)
-// RoomEventStat: 統計表示用の簡易集計構造体
-type RoomEventStat struct {
-	EventType     model.EventType `json:"event_type"`
-	CurrentCount  int             `json:"current_count"`
-	CurrentLevel  int             `json:"current_level"` // always 1
-	RequiredCount int             `json:"required_count"`
-	NextThreshold int             `json:"next_threshold"`
-	ViewerCount   int             `json:"viewer_count"`
-}
+    count, err := s.counter.GetActiveViewerCount(roomID)
+    if err != nil {
+        logger.Warn("Failed to get active viewer count, using default",
+            slog.Any("error", err))
+        return 1
+    }
 
-// GetRoomStats: 全イベント種別について現在カウントと閾値をまとめて返却
-func (s *EventService) GetRoomStats(roomID string) ([]RoomEventStat, error) {
-	viewers := s.getActiveViewerCount(roomID)
-	stats := make([]RoomEventStat, 0, len(s.configs))
-	for et, cfg := range s.configs {
-		cur, err := s.counter.Get(roomID, string(et))
-		if err != nil {
-			return nil, fmt.Errorf("get counter failed: %w", err)
-		}
-		th := s.calculateDynamicThreshold(cfg, viewers)
-		stats = append(stats, RoomEventStat{EventType: et, CurrentCount: int(cur), CurrentLevel: 1, RequiredCount: th, NextThreshold: th, ViewerCount: viewers})
-	}
-	return stats, nil
-}
+    if count < 1 {
+        logger.Debug("No active viewers, using minimum", slog.Int64("raw_count", count))
+        return 1
+    }
 
-// Default configs (unchanged thresholds foundation)
-// getDefaultEventConfigs: 初期閾値設定マップ生成
-func getDefaultEventConfigs() map[model.EventType]*model.EventConfig {
-	return map[model.EventType]*model.EventConfig{
-		model.SKILL1: {EventType: model.SKILL1, BaseThreshold: 5, MinThreshold: 3, MaxThreshold: 50, LevelMultiplier: 1.3},
-		model.SKILL2: {EventType: model.SKILL2, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 60, LevelMultiplier: 1.3},
-		model.SKILL3: {EventType: model.SKILL3, BaseThreshold: 12, MinThreshold: 8, MaxThreshold: 100, LevelMultiplier: 1.4},
-		model.ENEMY1: {EventType: model.ENEMY1, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 45, LevelMultiplier: 1.3},
-		model.ENEMY2: {EventType: model.ENEMY2, BaseThreshold: 7, MinThreshold: 5, MaxThreshold: 55, LevelMultiplier: 1.4},
-		model.ENEMY3: {EventType: model.ENEMY3, BaseThreshold: 10, MinThreshold: 6, MaxThreshold: 80, LevelMultiplier: 1.5},
-	}
+    if count > 1_000_000 {
+        logger.Warn("Viewer count exceeds safety limit, clamping",
+            slog.Int64("raw_count", count))
+        return 1_000_000
+    }
+
+    logger.Debug("Active viewer count retrieved", slog.Int("count", int(count)))
+    return int(count)
 }
