@@ -14,6 +14,7 @@ import (
 // 主要イベントクエリのトレースログを出力し、運用時の観測性を高める。
 type EventRepository interface {
 	CreateEvent(event *model.Event) error // 単一イベント挿入
+	CreateEventsBatch(events []*model.Event) error // バッチ挿入（効率的）
 	ListEventViewerCounts(roomID string) ([]model.EventAggregate, error)
 	ListEventTotals(roomID string) ([]model.EventTotal, error)
 	ListViewerTotals(roomID string) ([]model.ViewerTotal, error)
