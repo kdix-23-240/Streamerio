@@ -116,6 +116,15 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid body"})
 	}
 
+	// PushCount合計のバリデーション（連打攻撃防止）
+	totalPushCount := int64(0)
+	for _, event := range req.PushEvents {
+		totalPushCount += event.PushCount
+	}
+	if totalPushCount > 20 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "total push count exceeds limit (20)"})
+	}
+
 	var viewerID *string
 	if req.ViewerID != "" {
 		viewerID = &req.ViewerID
