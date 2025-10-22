@@ -116,6 +116,25 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid body"})
 	}
 
+	var viewerID *string
+	if req.ViewerID != "" {
+		viewerID = &req.ViewerID
+	}
+
+	if room.Status == "ended" {
+		if viewerID == nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "viewer_id is required after game end"})
+		}
+		summary, err := h.sessionService.GetViewerSummary(roomID, *viewerID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"game_over":      true,
+			"viewer_summary": summary,
+		})
+	}
+
 	// PushCount合計のバリデーション（連打攻撃防止）
 	totalPushCount := int64(0)
 	for _, event := range req.PushEvents {
@@ -125,10 +144,6 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "total push count exceeds limit (20)"})
 	}
 
-	var viewerID *string
-	if req.ViewerID != "" {
-		viewerID = &req.ViewerID
-	}
 
 	// ProcessEventの戻り値を格納する配列
 	var eventResults []*model.EventResult
@@ -152,20 +167,6 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 
 		// 結果を配列に追加
 		eventResults = append(eventResults, res)
-	}
-
-	if room.Status == "ended" {
-		if viewerID == nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "viewer_id is required after game end"})
-		}
-		summary, err := h.sessionService.GetViewerSummary(roomID, *viewerID)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-		}
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"game_over":      true,
-			"viewer_summary": summary,
-		})
 	}
 
 	// 配列として結果を返す
