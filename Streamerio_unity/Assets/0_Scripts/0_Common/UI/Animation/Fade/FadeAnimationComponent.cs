@@ -1,3 +1,9 @@
+// ============================================================================
+// モジュール概要: CanvasGroup の alpha を操作するフェードアニメーションを DOTween ベースで提供する。
+// 外部依存: Cysharp.Threading.Tasks（UniTask）、DG.Tweening（DOTween）、UnityEngine。
+// 使用例: Display 系 Presenter が FadeAnimationComponent を生成し、UI の表示/非表示演出を統一する。
+// ============================================================================
+
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -15,6 +21,11 @@ namespace Common.UI.Animation
         private readonly CanvasGroup _canvasGroup;
         private readonly FadeAnimationComponentParamSO _param;
 
+        /// <summary>
+        /// 【目的】演出対象の CanvasGroup とパラメータを束ね、再生時に都度依存を渡さなくて済むようにする。
+        /// </summary>
+        /// <param name="canvasGroup">【用途】アルファ値を補間する対象。</param>
+        /// <param name="param">【用途】目標アルファ値や再生時間を保持する ScriptableObject。</param>
         public FadeAnimationComponent(CanvasGroup canvasGroup, FadeAnimationComponentParamSO param)
         {
             _canvasGroup = canvasGroup;

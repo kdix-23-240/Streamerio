@@ -1,3 +1,9 @@
+// ============================================================================
+// モジュール概要: RectTransform のアンカー座標を DOTween で補間し、UI のスライド演出を統一提供する。
+// 外部依存: Cysharp.Threading.Tasks（UniTask）、DG.Tweening（DOTween）、UnityEngine。
+// 使用例: Overlay の進入演出で MoveAnimationComponent を利用し、任意方向へのスライドインを簡潔に実装する。
+// ============================================================================
+
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -15,6 +21,11 @@ namespace Common.UI.Animation
         private readonly RectTransform _rectTransform;
         private readonly MoveAnimationComponentParamSO _param;
         
+        /// <summary>
+        /// 【目的】移動対象とパラメータを関連付け、再生時に毎回依存を探し直さないようにする。
+        /// </summary>
+        /// <param name="rectTransform">【用途】DOAnchorPos で補間する RectTransform。</param>
+        /// <param name="param">【用途】目標座標や補間設定を保持する ScriptableObject。</param>
         public MoveAnimationComponent(RectTransform rectTransform, MoveAnimationComponentParamSO param)
         {
             _rectTransform = rectTransform;

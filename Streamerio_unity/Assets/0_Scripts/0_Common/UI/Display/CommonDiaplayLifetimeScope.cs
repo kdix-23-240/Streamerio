@@ -24,8 +24,10 @@ namespace Common.UI.Display
         /// 【理由】テスト用や開発中のリポジトリを容易に切り替え、生成対象を柔軟に管理するため。
         /// </summary>
         [SerializeField]
+        [Tooltip("ダイアログ UI を生成するためのリポジトリアセットと親 Transform。")]
         private DisplayServiceData _dialogServiceData;
         [SerializeField]
+        [Tooltip("オーバーレイ UI を生成するためのリポジトリアセットと親 Transform。")]
         private DisplayServiceData _overlayServiceData;
 
         /// <summary>
@@ -64,7 +66,13 @@ namespace Common.UI.Display
         [Serializable]
         private class DisplayServiceData
         {
+            /// <summary>
+            /// 【目的】生成先の Presenter を解決するリポジトリアセット。
+            /// </summary>
             public DisplayRepositorySOBase Repository;
+            /// <summary>
+            /// 【目的】生成した LifetimeScope をぶら下げる Transform。
+            /// </summary>
             public Transform ParentTransform;
         }
     }

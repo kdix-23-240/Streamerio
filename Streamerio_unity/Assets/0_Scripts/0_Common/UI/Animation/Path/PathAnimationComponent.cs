@@ -1,3 +1,9 @@
+// ============================================================================
+// モジュール概要: RectTransform を任意の経路に沿って移動させるアニメーションを DOTween で提供する。
+// 外部依存: Cysharp.Threading.Tasks（UniTask）、DG.Tweening、UnityEngine。
+// 使用例: チュートリアル矢印を PathAnimationComponent で移動させ、視線誘導を演出する。
+// ============================================================================
+
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -17,6 +23,11 @@ namespace Common.UI.Animation
         private readonly RectTransform _rectTransform;
         private readonly PathAnimationComponentParamSO _param;
 
+        /// <summary>
+        /// 【目的】対象 RectTransform とパス設定を束ね、再生ロジックから分離する。
+        /// </summary>
+        /// <param name="rectTransform">【用途】経路移動させたい UI 要素。</param>
+        /// <param name="param">【用途】通過点や補間方法を保持する ScriptableObject。</param>
         public PathAnimationComponent(RectTransform rectTransform, PathAnimationComponentParamSO param)
         {
             _rectTransform = rectTransform;

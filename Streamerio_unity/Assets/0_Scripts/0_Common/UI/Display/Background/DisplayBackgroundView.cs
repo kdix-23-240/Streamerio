@@ -26,6 +26,7 @@ namespace Common.UI.Display.Background
         /// 【理由】演出速度やイージングをデザイナーが調整できるようにするため。
         /// </summary>
         [SerializeField]
+        [Tooltip("表示時のフェードアニメーション設定。速度やイージングを調整する。")]
         private FadeAnimationComponentParamSO _showAnimationParam;
 
         /// <summary>
@@ -33,6 +34,7 @@ namespace Common.UI.Display.Background
         /// 【理由】非表示時も印象を揃えられるよう、表示時とは別の設定を渡せるようにする。
         /// </summary>
         [SerializeField]
+        [Tooltip("非表示時のフェードアニメーション設定。表示時とは別にチューニングできる。")]
         private FadeAnimationComponentParamSO _hideAnimationParam;
 
         /// <summary>

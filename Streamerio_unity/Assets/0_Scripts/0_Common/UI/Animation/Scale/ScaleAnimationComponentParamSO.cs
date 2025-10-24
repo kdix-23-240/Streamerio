@@ -1,3 +1,9 @@
+// ============================================================================
+// モジュール概要: スケールアニメーションのパラメータを ScriptableObject として管理し、UI 演出の調整を容易にする。
+// 外部依存: UnityEngine（ScriptableObject）。
+// 使用例: ボタンのホバー演出で ScaleAnimationComponentParamSO を差し替え、拡大率をデザイナーが調整する。
+// ============================================================================
+
 using UnityEngine;
 
 namespace Common.UI.Animation
@@ -11,8 +17,12 @@ namespace Common.UI.Animation
     [CreateAssetMenu(fileName = "ScaleAnimationSO", menuName = "SO/UI/Animation/Scale")]
     public class ScaleAnimationComponentParamSO : UIAnimationComponentParamSO
     {
+        /// <summary>
+        /// 【目的】アニメーション終了時の拡大率を指定し、クリック演出などで大きさ変化を制御できるようにする。
+        /// </summary>
         [Header("最終的な大きさ (1 = 等倍)")]
         [SerializeField, Range(0f, 2f)]
+        [Tooltip("アニメーション完了時の RectTransform.localScale 値。1 で等倍、0.5 で半分、2 で 2 倍。")]
         public float Scale = 1f;
     }
 }

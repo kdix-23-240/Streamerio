@@ -25,6 +25,7 @@ namespace Common.UI.Part.Button
         /// 【理由】テキストボタンの個性となる装飾表示を View 内で切り替えるため。
         /// </summary>
         [SerializeField, LabelText("羽")]
+        [Tooltip("ホバー時に表示する羽アイコン。")]
         private Image _featherImage;
 
         /// <summary>
@@ -32,6 +33,7 @@ namespace Common.UI.Part.Button
         /// 【理由】カーソルオーバー時の視覚的な強調を提供するため。
         /// </summary>
         [SerializeField, LabelText("下線")]
+        [Tooltip("ホバー時に表示する下線装飾。")]
         private Image _lineImage;
         
         /// <summary>
@@ -39,6 +41,7 @@ namespace Common.UI.Part.Button
         /// 【理由】押下フィードバックの速度や縮小量を ScriptableObject で容易に差し替えられるようにするため。
         /// </summary>
         [SerializeField, LabelText("ボタンを押した時のアニメーション")]
+        [Tooltip("押下した瞬間に適用するスケールアニメーション設定。")]
         private ScaleAnimationComponentParamSO _pushDownAnimParam;
 
         /// <summary>
@@ -46,6 +49,7 @@ namespace Common.UI.Part.Button
         /// 【理由】離した瞬間に元のスケールへ戻し、連続操作時にも自然な見た目を維持するため。
         /// </summary>
         [SerializeField, LabelText("ボタンを離した時のアニメーション")]
+        [Tooltip("指を離した瞬間に適用するスケールアニメーション設定。")]
         private ScaleAnimationComponentParamSO _pushUpAnimParam;
         
         /// <summary>

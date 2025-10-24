@@ -45,6 +45,7 @@ namespace Common.UI.Dialog
         /// 【理由】アニメーション再生のたびに GetComponent を呼ぶコストを避け、演出の初期位置制御を即座に行うため。
         /// </summary>
         [SerializeField, LabelText("動かすオブジェクト")]
+        [Tooltip("ダイアログ本体となる RectTransform。表示/非表示時に移動させる。")]
         private RectTransform _moveRectTransform;
 
         [Header("アニメーション")]
@@ -53,12 +54,14 @@ namespace Common.UI.Dialog
         /// 【理由】演出パラメータを Play しやすい形で保持し、デザイナーがパラメータ差し替えできるようにするため。
         /// </summary>
         [SerializeField, LabelText("表示アニメーション")]
+        [Tooltip("表示時に辿る PathAnimation 設定。")]
         private PathAnimationComponentParamSO _showAnimationParam;
         /// <summary>
         /// 【目的】ダイアログ非表示時の移動経路と補間設定を保持する。
         /// 【理由】表示と対になる演出を同一ファイルで管理し、挙動差異が発生しないようにするため。
         /// </summary>
         [SerializeField, LabelText("非表示アニメーション")]
+        [Tooltip("非表示時に辿る PathAnimation 設定。")]
         private PathAnimationComponentParamSO _hideAnimationParam;
 
         /// <summary>

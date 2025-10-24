@@ -23,6 +23,7 @@ namespace Common.UI.Part.Button
         /// 【理由】縮小量やイージングを ScriptableObject で調整し、ボタン毎に演出を差し替えられるようにするため。
         /// </summary>
         [SerializeField, LabelText("ボタンを押した時のアニメーション")]
+        [Tooltip("押下時に利用する Scale アニメーション設定。")]
         private ScaleAnimationComponentParamSO _pushDownAnimParam;
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace Common.UI.Part.Button
         /// 【理由】押下前のサイズに戻す演出を制御し、ボタンのフィードバックを安定させるため。
         /// </summary>
         [SerializeField, LabelText("ボタンを離した時のアニメーション")]
+        [Tooltip("ボタンを離したときに利用する Scale アニメーション設定。")]
         private ScaleAnimationComponentParamSO _pushUpAnimParam;
 
         /// <summary>
@@ -37,6 +39,7 @@ namespace Common.UI.Part.Button
         /// 【理由】マウスオーバーの視認性を向上させ、操作状態を明確にするため。
         /// </summary>
         [SerializeField, LabelText("ボタンにカーソルがあった時のアニメーション")]
+        [Tooltip("ホバー時に利用する Fade アニメーション設定。")]
         private FadeAnimationComponentParamSO _enterAnimParam;
 
         /// <summary>
@@ -44,6 +47,7 @@ namespace Common.UI.Part.Button
         /// 【理由】通常状態への復帰を滑らかにし、残像を残さないようにするため。
         /// </summary>
         [SerializeField, LabelText("ボタンにカーソルが離れた時のアニメーション")]
+        [Tooltip("ホバー解除時に利用する Fade アニメーション設定。")]
         private FadeAnimationComponentParamSO _exitAnimParam;
 
         /// <summary>

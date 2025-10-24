@@ -1,3 +1,9 @@
+// ============================================================================
+// モジュール概要: UI のスライド演出で使用する座標パラメータを ScriptableObject として管理する。
+// 外部依存: UnityEngine（ScriptableObject）。
+// 使用例: MoveAnimationComponentParamSO アセットを画面サイズごとに用意し、スライドの終点座標を調整する。
+// ============================================================================
+
 using UnityEngine;
 
 namespace Common.UI.Animation
@@ -11,8 +17,12 @@ namespace Common.UI.Animation
     [CreateAssetMenu(fileName = "MoveAnimationSO", menuName = "SO/UI/Animation/Move")]
     public class MoveAnimationComponentParamSO : UIAnimationComponentParamSO
     {
+        /// <summary>
+        /// 【目的】RectTransform.anchoredPosition の目標値を指定し、演出後の位置をデータ側で制御する。
+        /// </summary>
         [Header("移動先座標")]
         [SerializeField]
+        [Tooltip("アニメーション完了時に到達してほしい AnchoredPosition。")]
         public Vector2 AnchoredPosition;
     }
 }

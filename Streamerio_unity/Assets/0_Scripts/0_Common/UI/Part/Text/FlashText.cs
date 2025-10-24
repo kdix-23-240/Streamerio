@@ -23,6 +23,7 @@ namespace Common.UI.Part.Text
         /// 【理由】点滅速度や強度をデザイナーが調整できるようにし、他テキストと演出を揃えるため。
         /// </summary>
         [SerializeField, LabelText("テキストの点滅アニメーション設定")]
+        [Tooltip("FlashAnimationComponent が参照する点滅設定アセット。")]
         private FlashAnimationComponentParamSO _flashAnimationParam;
         
         /// <summary>
@@ -68,9 +69,22 @@ namespace Common.UI.Part.Text
         }
     }
     
+    /// <summary>
+    /// 点滅演出の開始/停止 API を提供するインターフェース。
+    /// <para>
+    /// 【理由】Presenter から演出制御を抽象化し、別実装へ差し替え可能にする。
+    /// </para>
+    /// </summary>
     public interface IFlashText
     {
+        /// <summary>
+        /// 【目的】点滅演出を開始する。
+        /// </summary>
         void PlayTextAnimation();
+
+        /// <summary>
+        /// 【目的】点滅演出を停止する。
+        /// </summary>
         void StopTextAnimation();
     }
 }

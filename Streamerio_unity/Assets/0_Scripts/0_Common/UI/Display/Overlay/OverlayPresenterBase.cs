@@ -1,5 +1,14 @@
+// ============================================================================
+// モジュール概要: オーバーレイ UI の Presenter 基盤とコンテキストを提供し、DisplayPresenterBase を拡張する。
+// 外部依存: DisplayPresenterBase。
+// 使用例: 各オーバーレイ Presenter が OverlayPresenterBase を継承し、共通の Attach 処理を再利用する。
+// ============================================================================
+
 namespace Common.UI.Display.Overlay
 {
+    /// <summary>
+    /// オーバーレイ UI 共通の契約。
+    /// </summary>
     public interface IOverlay : IDisplay
     {
         
@@ -15,15 +24,24 @@ namespace Common.UI.Display.Overlay
         where TView : IOverlayView
         where TContext : CommonOverlayContext<TView>
     {
+        /// <summary>
+        /// 【目的】コンテキストから View を受け取り、基底クラスの View フィールドへ割り当てる。
+        /// </summary>
         protected override void AttachContext(TContext context)
         {
             View = context.View;
         }
     }
     
+    /// <summary>
+    /// オーバーレイ Presenter へ渡す共通コンテキスト。
+    /// </summary>
     public class CommonOverlayContext<TView>
         where TView : IOverlayView
     {
+        /// <summary>
+        /// 【目的】Presenter が操作対象とする View を保持する。
+        /// </summary>
         public TView View;
     }
 }

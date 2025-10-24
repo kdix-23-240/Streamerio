@@ -1,3 +1,9 @@
+// ============================================================================
+// モジュール概要: UI アニメーション共通のインターフェースと DOTween ベースの基底クラス、およびパラメータ ScriptableObject を提供する。
+// 外部依存: Cysharp.Threading.Tasks、DG.Tweening、UnityEngine。
+// 使用例: 各種 UI 演出コンポーネントが IUIAnimationComponent を実装し、SequenceAnimationComponentBase で再生ロジックを共有する。
+// ============================================================================
+
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System.Threading;
@@ -9,6 +15,9 @@ namespace Common.UI.Animation
     /// UI アニメーションの基底インターフェース。
     /// - 各種 UI アニメーションコンポーネントが実装する
     /// - 非同期でアニメーションを実行し、キャンセル対応も可能
+    /// <para>
+    /// 【理由】演出処理を統一 API で扱い、Presenter から await 可能にするため。
+    /// </para>
     /// </summary>
     public interface IUIAnimationComponent
     {
@@ -16,6 +25,9 @@ namespace Common.UI.Animation
         /// アニメーションを再生する。
         /// - UniTask を返すので await 可能
         /// - CancellationToken による中断に対応
+        /// <para>
+        /// 【理由】演出完了後に処理を進めたいケースに対応し、キャンセルも考慮する共通契約とする。
+        /// </para>
         /// </summary>
         UniTask PlayAsync(CancellationToken ct);
     }
@@ -32,6 +44,9 @@ namespace Common.UI.Animation
         /// 管理対象の DOTween Sequence。
         /// - SetAutoKill(false) により一度完了しても破棄されず、再利用可能
         /// - Pause() により生成直後は停止状態
+        /// <para>
+        /// 【理由】都度 Sequence を生成すると GC が増えるため、再利用可能な形で保持する。
+        /// </para>
         /// </summary>
         protected Sequence Sequence;
         
@@ -68,12 +83,20 @@ namespace Common.UI.Animation
     /// </summary>
     public class UIAnimationComponentParamSO: ScriptableObject
     {
+        /// <summary>
+        /// 【目的】アニメーションの再生時間を秒指定で設定する。
+        /// </summary>
         [Header("アニメーションの時間(秒)")]
         [SerializeField, Min(0.01f)]
+        [Tooltip("アニメーションにかける時間。最小 0.01 秒。")]
         public float DurationSec = 0.5f;
 
+        /// <summary>
+        /// 【目的】補間のカーブ形状を指定し、演出の印象を左右する Ease 設定を制御する。
+        /// </summary>
         [Header("イージング種類")]
         [SerializeField]
+        [Tooltip("DOTween の Ease 種類。Linear/OutQuad などから選択。")]
         public Ease Ease = Ease.Linear;
     }
 }

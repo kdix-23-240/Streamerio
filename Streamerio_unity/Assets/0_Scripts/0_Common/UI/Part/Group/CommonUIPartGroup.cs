@@ -24,7 +24,8 @@ namespace Common.UI.Part.Group
         /// 【理由】Inspector から順序付きで設定し、フェードの遅延演出に利用するため。
         /// </summary>
         [SerializeField, LabelText("アニメーションさせるオブジェクト群")]
-        private CanvasGroup[] _uiParts =new CanvasGroup[]{};
+        [Tooltip("順番にフェード表示する CanvasGroup 群。配列の並び順が演出順になる。")]
+        private CanvasGroup[] _uiParts = new CanvasGroup[] { };
         
         [Header("アニメーション")]
         /// <summary>
@@ -32,6 +33,7 @@ namespace Common.UI.Part.Group
         /// 【理由】演出速度や遅延を ScriptableObject で管理し、デザイナーが差し替えやすくするため。
         /// </summary>
         [SerializeField, LabelText("表示アニメーション (フェード + 遅延)")]
+        [Tooltip("表示時に利用する FadePartsAnimation 設定。")]
         private FadePartsAnimationComponentParamSO _showFadeAnimationParam;
         
         /// <summary>
@@ -39,6 +41,7 @@ namespace Common.UI.Part.Group
         /// 【理由】表示とは異なるアルファ値・遅延を設定できるようにし、撤退時の印象を調整する。
         /// </summary>
         [SerializeField, LabelText("非表示アニメーション (フェード + 遅延)")]
+        [Tooltip("非表示時に利用する FadePartsAnimation 設定。")]
         private FadePartsAnimationComponentParamSO _hideFadeAnimationParam;  
         
         /// <summary>
@@ -116,11 +119,26 @@ namespace Common.UI.Part.Group
         }
     }
     
+    /// <summary>
+    /// 複数 UI パーツのフェード表示/非表示を制御する契約。
+    /// </summary>
     public interface ICommonUIPartGroup
     {
+        /// <summary>
+        /// 【目的】フェード演出付きで表示する。
+        /// </summary>
         UniTask ShowAsync(CancellationToken ct);
+        /// <summary>
+        /// 【目的】即時に表示する。
+        /// </summary>
         void Show();
+        /// <summary>
+        /// 【目的】フェード演出付きで非表示にする。
+        /// </summary>
         UniTask HideAsync(CancellationToken ct);
+        /// <summary>
+        /// 【目的】即時に非表示にする。
+        /// </summary>
         void Hide();
     }
 }

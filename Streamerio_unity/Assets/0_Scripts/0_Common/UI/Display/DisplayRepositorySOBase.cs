@@ -23,6 +23,7 @@ namespace Common.UI.Display
         /// 【理由】VContainer スコープをプレハブ化しておき、生成元をコード変更なく差し替えられるようにするため。
         /// </summary>
         [SerializeField, LabelText("UIのプレファブ")]
+        [Tooltip("Presenter ごとに対応する LifetimeScope プレハブ。シーン外から複製して利用する。")]
         private LifetimeScope[] _displayLifetimeScopes;
 
         /// <summary>

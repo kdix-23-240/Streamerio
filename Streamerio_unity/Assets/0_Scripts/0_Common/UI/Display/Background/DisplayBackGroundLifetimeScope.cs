@@ -25,15 +25,16 @@ namespace Common.UI.Display.Background
         /// 【理由】ClickEventBinder が購読するストリームを安全に提供するため。
         /// </summary>
         [SerializeField, ReadOnly]
+        [Tooltip("PointerEventData を流す ObservableEventTrigger。OnValidate で自動補完される。")]
         private ObservableEventTrigger _clickTrigger;
 
         [Header("Settings")]
-        [Tooltip("背景クリック時に再生する SE")]
-        [SerializeField]
         /// <summary>
         /// 【目的】背景クリック時に再生する SE を指定する。
         /// 【理由】UI 操作フィードバックを統一し、UX を向上させるため。
         /// </summary>
+        [Tooltip("背景をクリックした際に再生する効果音。")]
+        [SerializeField]
         private SEType _clickSE = SEType.NESRPG0112;
 
 #if UNITY_EDITOR

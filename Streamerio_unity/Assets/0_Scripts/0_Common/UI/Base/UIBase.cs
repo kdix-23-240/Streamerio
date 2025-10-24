@@ -1,3 +1,9 @@
+// ============================================================================
+// モジュール概要: UI 共通のインターフェースと基底クラスを定義し、RectTransform/CanvasGroup 操作を標準化する。
+// 外部依存: UnityEngine、UnityEngine.EventSystems。
+// 使用例: すべての UI View が UIBehaviourBase を継承し、共通の SetActive/SetInteractable 実装を再利用する。
+// ============================================================================
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -40,22 +46,35 @@ namespace Common.UI
     /// <summary>
     /// すべての UI コンポーネントの基底クラス。
     /// <para>
-    /// - RectTransform / CanvasGroup を必須コンポーネントとして持つ  
-    /// - インタラクション制御用のメソッドを提供  
+    /// - RectTransform / CanvasGroup を必須コンポーネントとして持つ<br/>
+    /// - インタラクション制御用のメソッドを提供<br/>
     /// - 共通の初期化／参照補完処理を集約
     /// </para>
     /// </summary>
     [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
     public abstract class UIBehaviourBase : UIBehaviour, ICommonUIBehaviour
     {
+        /// <summary>
+        /// 【目的】自身の GameObject 参照をキャッシュし、SetActive などで即座に操作できるようにする。
+        /// </summary>
         [SerializeField, Alchemy.Inspector.ReadOnly]
+        [Tooltip("このコンポーネントがアタッチされている GameObject。OnValidate で自動補完される。")]
         private GameObject _gameObject;
         public GameObject GameObject => _gameObject;
+
+        /// <summary>
+        /// 【目的】RectTransform をキャッシュし、レイアウト操作時の GetComponent コストを無くす。
+        /// </summary>
         [SerializeField, Alchemy.Inspector.ReadOnly]
+        [Tooltip("UI のレイアウト制御に利用する RectTransform。OnValidate で自動補完される。")]
         private RectTransform _rectTransform;
         public RectTransform RectTransform => _rectTransform;
 
+        /// <summary>
+        /// 【目的】CanvasGroup をキャッシュし、フェードや操作制御を高速に行う。
+        /// </summary>
         [SerializeField, Alchemy.Inspector.ReadOnly]
+        [Tooltip("フェード・操作有効化に利用する CanvasGroup。OnValidate で自動補完される。")]
         private CanvasGroup _canvasGroup;
         public CanvasGroup CanvasGroup => _canvasGroup;
 

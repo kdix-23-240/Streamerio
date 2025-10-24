@@ -26,12 +26,14 @@ namespace Common.UI.Part.Button
         /// 【理由】Wiring 時に Button を Resolver へ渡し、Presenter が直接アクセスできるようにするため。
         /// </summary>
         [SerializeField, ReadOnly]
+        [Tooltip("ユーザー入力を受け付ける UnityEngine.UI.Button。")]
         private UnityEngine.UI.Button _button;
         /// <summary>
         /// 【目的】ボタンの GameObject 自体をキャッシュする。
         /// 【理由】Presenter から SetActive など GameObject 操作を行う際に即座に参照できるようにするため。
         /// </summary>
         [SerializeField, ReadOnly]
+        [Tooltip("ボタン本体の GameObject。アクティブ状態の切り替えに使用する。")]
         private GameObject _gameObject;
         
         /// <summary>
@@ -39,8 +41,13 @@ namespace Common.UI.Part.Button
         /// 【理由】IClickEventBinder と Presenter が購読し、押下/ホバーを非同期で扱えるようにするため。
         /// </summary>
         [SerializeField, ReadOnly]
+        [Tooltip("Pointer イベントを Observable へ変換する R3 Triggers。")]
         private ObservableEventTrigger _eventTrigger;
+        /// <summary>
+        /// 【目的】ボタン識別用のキーを指定し、DI で該当 Presenter を解決できるようにする。
+        /// </summary>
         [SerializeField]
+        [Tooltip("DI で解決するボタン Presenter を識別するキー。")]
         private ButtonType _buttonType = ButtonType.Default;
         /// <summary>
         /// 【目的】ボタン押下時に再生する効果音を指定する。
