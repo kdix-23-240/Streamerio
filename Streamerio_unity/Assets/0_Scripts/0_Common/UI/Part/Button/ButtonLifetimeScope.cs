@@ -40,6 +40,8 @@ namespace Common.UI.Part.Button
         /// </summary>
         [SerializeField, ReadOnly]
         private ObservableEventTrigger _eventTrigger;
+        [SerializeField]
+        private ButtonType _buttonType = ButtonType.Default;
         /// <summary>
         /// 【目的】ボタン押下時に再生する効果音を指定する。
         /// 【理由】UI フィードバックを統一し、コンポーネント再利用時にも SE 設定が引き継がれるようにするため。
@@ -85,6 +87,7 @@ namespace Common.UI.Part.Button
             
             builder
                 .RegisterEntryPoint<Wiring<ICommonButton, CommonButtonContext>>()
+                .WithParameter(resolver => resolver.Resolve<ICommonButton>(key: _buttonType))
                 .WithParameter(resolver =>
                 {
                     var audioFacade = resolver.Resolve<IAudioFacade>();

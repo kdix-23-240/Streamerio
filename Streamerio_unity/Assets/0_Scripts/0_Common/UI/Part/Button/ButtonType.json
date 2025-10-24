@@ -1,0 +1,18 @@
+[
+  {
+    "Name": "Default",
+    "Num": 5
+  },
+  {
+    "Name": "Close",
+    "Num": 2
+  },
+  {
+    "Name": "Restart",
+    "Num": 3
+  },
+  {
+    "Name": "Title",
+    "Num": 4
+  }
+]
