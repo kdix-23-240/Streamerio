@@ -7,7 +7,6 @@ using System.Threading;
 using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VContainer.Unity;
@@ -18,14 +17,14 @@ namespace Common.UI.Part.Group
     /// 【目的】複数の UI パーツを統一挙動でフェード制御できるようにする。
     /// 【理由】パーツごとに個別演出を組むと同期ズレが発生しやすいため、まとめて制御して一貫した画面演出を維持する。
     /// </summary>
-    public class CommonUIPartGroup : UIBehaviour, IInitializable
+    public class CommonUIPartGroup : UIBehaviour, ICommonUIPartGroup, IInitializable
     {
         /// <summary>
         /// 【目的】演出対象となる CanvasGroup 群を指定する。
         /// 【理由】Inspector から順序付きで設定し、フェードの遅延演出に利用するため。
         /// </summary>
         [SerializeField, LabelText("アニメーションさせるオブジェクト群")]
-        private CanvasGroup[] _uiParts;
+        private CanvasGroup[] _uiParts =new CanvasGroup[]{};
         
         [Header("アニメーション")]
         /// <summary>
@@ -115,5 +114,13 @@ namespace Common.UI.Part.Group
                 part.alpha = alpha;
             }
         }
+    }
+    
+    public interface ICommonUIPartGroup
+    {
+        UniTask ShowAsync(CancellationToken ct);
+        void Show();
+        UniTask HideAsync(CancellationToken ct);
+        void Hide();
     }
 }
