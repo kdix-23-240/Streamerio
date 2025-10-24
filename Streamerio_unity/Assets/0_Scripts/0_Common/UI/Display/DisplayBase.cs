@@ -101,7 +101,7 @@ namespace Common.UI.Display
         /// 【目的】Presenter が操作対象とする View インスタンスを保持する。
         /// 【理由】派生クラスが直接 View にアクセスできるよう参照を共有する。
         /// </summary>
-        protected TView CommonView;
+        protected TView View;
 
         /// <summary>
         /// 【目的】Presenter 内の非同期処理をまとめてキャンセルするためのトークンソースを保持する。
@@ -167,9 +167,10 @@ namespace Common.UI.Display
         /// <returns>【戻り値】表示演出が完了したことを示す UniTask。</returns>
         public virtual async UniTask ShowAsync(CancellationToken ct)
         {
+            Debug.Log(typeof(TView).Name + " ShowAsync");
             _isShow = true;
-            await CommonView.ShowAsync(ct);
-            CommonView.SetInteractable(true);
+            await View.ShowAsync(ct);
+            View.SetInteractable(true);
         }
 
         /// <summary>
@@ -179,8 +180,8 @@ namespace Common.UI.Display
         public virtual void Show()
         {
             _isShow = true;
-            CommonView.Show();
-            CommonView.SetInteractable(true);
+            View.Show();
+            View.SetInteractable(true);
         }
 
         /// <summary>
@@ -191,9 +192,9 @@ namespace Common.UI.Display
         /// <returns>【戻り値】非表示演出が完了したことを示す UniTask。</returns>
         public virtual async UniTask HideAsync(CancellationToken ct)
         {
-            CommonView.SetInteractable(false);
+            View.SetInteractable(false);
             _isShow = false;
-            await CommonView.HideAsync(ct);
+            await View.HideAsync(ct);
         }
 
         /// <summary>
@@ -202,9 +203,9 @@ namespace Common.UI.Display
         /// </summary>
         public virtual void Hide()
         {
-            CommonView.SetInteractable(false);
+            View.SetInteractable(false);
             _isShow = false;
-            CommonView.Hide();
+            View.Hide();
         }
 
         /// <summary>
@@ -222,8 +223,13 @@ namespace Common.UI.Display
     /// 【目的】View 側の標準基底を定義し、UIBehaviourBase と IDisplayView を結び付ける。
     /// 【提供機能】表示/非表示メソッドを抽象化し、派生クラスが演出実装に専念できるようにする。
     /// </summary>
-    public abstract class DisplayViewBase : UIBehaviourBase, IDisplayView
+    public abstract class DisplayViewBase : UIBehaviourBase, IDisplayView, IInitializable
     {
+        public virtual void Initialize()
+        {
+            
+        }
+        
         /// <summary>
         /// 【目的】アニメーション付きで表示する処理を派生クラスへ委譲する。
         /// 【理由】表示演出の具体的な実装は各 View ごとに異なるため、抽象メソッドとして表現する。

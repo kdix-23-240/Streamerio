@@ -3,8 +3,11 @@
 // 依存関係: DisplayRepositorySOBase から UI プレハブを解決し、DisplaySpawner/DisplayCache と連携させる。
 // 使用例: UI ルートに本スコープを配置し、Dialog 系画面を開閉するインフラを提供する。
 
+using System;
 using Common.UI.Dialog;
+using Common.UI.Display.Overlay;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -14,21 +17,16 @@ namespace Common.UI.Display
     /// 【目的】Display 系サービスを起動するための DI コンテナ構成を担う。
     /// 【理由】UI プレハブの生成とキャッシュ化をまとめ、IDialogService を一貫した方法で提供するため。
     /// </summary>
-    public class DisplayLifetimeScope : LifetimeScope
+    public class CommonDiaplayLifetimeScope : LifetimeScope
     {
         /// <summary>
         /// 【目的】UI プレハブ解決に利用するリポジトリを Inspector で差し替え可能に保持する。
         /// 【理由】テスト用や開発中のリポジトリを容易に切り替え、生成対象を柔軟に管理するため。
         /// </summary>
         [SerializeField]
-        private DisplayRepositorySOBase _repository;
-
-        /// <summary>
-        /// 【目的】生成した UI プレハブの親 Transform を指定し、階層構造とワールド座標を安定させる。
-        /// 【理由】Canvas 配下へ正しく配置しないと描画順やスクリーン位置が乱れるため、親を明示的に管理する。
-        /// </summary>
+        private DisplayServiceData _dialogServiceData;
         [SerializeField]
-        private Transform _parentTransform;
+        private DisplayServiceData _overlayServiceData;
 
         /// <summary>
         /// 【目的】DI コンテナへ DisplayServiceContext を登録し、IDialogService のエントリポイントを起動する。
@@ -42,13 +40,32 @@ namespace Common.UI.Display
                 .RegisterEntryPoint<Wiring<IDialogService, DisplayServiceContext>>()
                 .WithParameter(resolver =>
                 {
-                    var spawner = new DisplaySpawner(_repository, _parentTransform, this);
+                    var spawner = new DisplaySpawner(_dialogServiceData.Repository, _dialogServiceData.ParentTransform, this);
 
                     return new DisplayServiceContext
                     {
                         Cache = new DisplayCache(spawner)
                     };
                 });
+            
+            builder
+                .RegisterEntryPoint<Wiring<IOverlayService, DisplayServiceContext>>()
+                .WithParameter(resolver =>
+                {
+                    var spawner = new DisplaySpawner(_overlayServiceData.Repository, _overlayServiceData.ParentTransform, this);
+
+                    return new DisplayServiceContext
+                    {
+                        Cache = new DisplayCache(spawner)
+                    };
+                });
+        }
+
+        [Serializable]
+        private class DisplayServiceData
+        {
+            public DisplayRepositorySOBase Repository;
+            public Transform ParentTransform;
         }
     }
 }

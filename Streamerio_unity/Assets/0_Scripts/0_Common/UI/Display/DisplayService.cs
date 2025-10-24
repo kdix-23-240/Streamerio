@@ -227,6 +227,9 @@ namespace Common.UI.Display
         {
             TDisplay display = _displayCache.GetDisplay<TDisplay>();
             _displayStack.Push(display);
+            
+            display.Hide();
+            
             return display;
         }
 
