@@ -3,23 +3,20 @@
 // 依存関係: Common.QRCode.IQRCodeService で Sprite を生成し、Common.UI.Dialog.DialogPresenterBase の機能で共通ダイアログ挙動を利用する。
 // 使用例: QRCodeDialogLifetimeScope が本 Presenter を登録し、表示時に UpdateSprite を呼び出して UI に QR コードを表示する。
 
+using Common;
 using Common.QRCode;
 using Common.UI.Dialog;
 using R3;
 
-namespace InGame.UI.Display.Dialog.QRCode
+namespace InGame.QRCode.UI
 {
+    
     /// <summary>
     /// 【目的】QR コード表示ダイアログの View とサービスを接続し、生成された Sprite をリアクティブに適用する。
     /// 【理由】生成ロジックをサービスへ委譲しつつ、UI 更新のみを Presenter で担うことで責務を明確に分離するため。
     /// </summary>
-    public class QRCodeDialogPresenter:DialogPresenterBase<QRCodeDialogContext>
+    public class QRCodeDialogPresenter:DialogPresenterBase<IQRCodeDialogView, QRCodeDialogContext>, IQRCodeDialog
     {
-        /// <summary>
-        /// 【目的】Sprite を適用する View を保持する。
-        /// 【理由】AttachContext 以降で何度もアクセスするため、フィールドにキャッシュして高速化する。
-        /// </summary>
-        private QRCodeDialogView _view;
         /// <summary>
         /// 【目的】QR コード画像を生成・管理するサービスを保持する。
         /// 【理由】SpriteProp を購読して View を更新し、サービス側の生成ロジック再利用を可能にするため。
@@ -35,7 +32,6 @@ namespace InGame.UI.Display.Dialog.QRCode
         {
             base.AttachContext(context);
             
-            _view = context.View;
             _qrCodeService = context.QRCodeService;
         }
 
@@ -52,23 +48,20 @@ namespace InGame.UI.Display.Dialog.QRCode
                 .Where(sprite => sprite != null)
                 .Subscribe(sprite =>
                 {
-                    _view.SetQRCodeSprite(sprite);
+                    View.SetQRCodeSprite(sprite);
                 })
                 .RegisterTo(GetCt());
         }
     }
     
+    public interface IQRCodeDialog: IDialog, IAttachable<QRCodeDialogContext> { }
+    
     /// <summary>
     /// 【目的】QRCodeDialogPresenter が利用する依存をまとめたコンテキスト。
     /// 【理由】LifetimeScope から Presenter へ一括で渡し、AttachContext 内で抽出できるようにするため。
     /// </summary>
-    public class QRCodeDialogContext: CommonDialogContext
+    public class QRCodeDialogContext: CommonDialogContext<IQRCodeDialogView>
     {
-        /// <summary>
-        /// 【目的】QR コード画像を表示する View を保持する。
-        /// 【理由】Presenter が Sprite 適用先を参照する際に必要になるため。
-        /// </summary>
-        public QRCodeDialogView View;
         /// <summary>
         /// 【目的】QR コード Sprite を生成・保持するサービスを提供する。
         /// 【理由】Presenter が SpriteProp を購読し、UI 更新を行うため。

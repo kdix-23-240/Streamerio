@@ -3,17 +3,22 @@
 // 依存関係: UnityEngine.UI.Image を使用し、Common.UI.UIBehaviourBase を継承して共通 UI 機能を利用する。
 // 使用例: QRCodeDialogPresenter が SetQRCodeSprite を呼び出し、生成した Sprite を UI へ反映する。
 
-using Common.UI;
+using Common.UI.Dialog;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace InGame.UI.Display.Dialog.QRCode
+namespace InGame.QRCode.UI
 {
+    public interface IQRCodeDialogView : IDialogView
+    {
+        void SetQRCodeSprite(Sprite sprite);
+    }
+    
     /// <summary>
     /// 【目的】QR コードを表示するダイアログの View として、Image への Sprite 適用を担当する。
     /// 【理由】Presenter が生成した Sprite を即座に表示し、UI 側で追加処理を持たないシンプルな責務へ限定するため。
     /// </summary>
-    public class QRCodeDialogView : UIBehaviourBase
+    public class QRCodeDialogView : DialogViewBase
     {
         /// <summary>
         /// 【目的】表示対象となる Image コンポーネントを Inspector から設定する。
