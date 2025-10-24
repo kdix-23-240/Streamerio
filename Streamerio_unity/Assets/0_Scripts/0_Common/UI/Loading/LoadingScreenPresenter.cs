@@ -4,15 +4,25 @@ using UnityEngine;
 
 namespace Common.UI.Loading
 {
+    public interface ILoadingScreen : IAttachable<LoadingScreenPresenterContext>
+    {
+        UniTask ShowAsync();
+        UniTask ShowAsync(Vector3 centerCirclePosition);
+        void Show();
+        UniTask HideAsync();
+        UniTask TitleToLoadingAsync();
+        UniTask LoadingToInGameAsync();
+    }
+    
     /// <summary>
     /// ローディング画面のプレゼンター（シングルトン）。
     /// - 外部コードからの呼び出し窓口
     /// - View の表示/非表示/遷移アニメーションを操作
     /// - 表示中は UI の操作を無効化し、演出が終わると再度制御を戻す
     /// </summary>
-    public class LoadingScreenPresenter: IAttachable<LoadingScreenPresenterContext>
+    public class LoadingScreenPresenter: ILoadingScreen
     {
-        private LoadingScreenView _view;
+        private ILoadingScreenView _view;
         private CancellationTokenSource _cts;
         
         /// <summary>
@@ -91,6 +101,6 @@ namespace Common.UI.Loading
     
     public class LoadingScreenPresenterContext
     {
-        public LoadingScreenView View;
+        public ILoadingScreenView View;
     }
 }

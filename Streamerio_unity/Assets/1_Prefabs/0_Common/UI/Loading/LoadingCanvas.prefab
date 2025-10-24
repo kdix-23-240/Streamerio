@@ -102,49 +102,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2310ea20a5164d35bf1edd6d2486d3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameObject: {fileID: 2946619780781935292}
   _rectTransform: {fileID: 2682838244002474396}
   _canvasGroup: {fileID: 8066417646364474472}
   _image: {fileID: 6513916331779527677}
-  _loadingInAnimationParam:
-    DurationSec: 1
-    Ease: 3
-    CenterPropertyName: _CenterUV
-    RadiusPropertyName: _Radius
-    Center: {x: 0.5, y: 0.5}
-    MinRadius: 0
-    MaxRadius: 1.5
-  _loadingOutAnimationParam:
-    DurationSec: 1
-    Ease: 2
-    CenterPropertyName: _CenterUV
-    RadiusPropertyName: _Radius
-    Center: {x: 0.5, y: 0.5}
-    MinRadius: 0
-    MaxRadius: 1.5
-  _titleToLoadingAnimationParam:
-    DurationSec: 1
-    Ease: 3
-    CenterPropertyName: _CenterUV
-    RadiusPropertyName: _Radius
-    Center: {x: 0.73, y: 0.73}
-    MinRadius: 0
-    MaxRadius: 1.8
-  _loadingToInGameAnimationParam:
-    DurationSec: 1
-    Ease: 2
-    CenterPropertyName: _CenterUV
-    RadiusPropertyName: _Radius
-    Center: {x: 0.5, y: 0.73}
-    MinRadius: 0
-    MaxRadius: 1.3
-  _cheiceIrisAnimationParam:
-    DurationSec: 1.5
-    Ease: 1
-    CenterPropertyName: _CenterUV
-    RadiusPropertyName: _Radius
-    Center: {x: 0.5, y: 0.5}
-    MinRadius: 0
-    MaxRadius: 2
+  _loadingInAnimationParam: {fileID: 11400000, guid: a30e6c4b2157a477b8baf78c3266bd54, type: 2}
+  _loadingOutAnimationParam: {fileID: 11400000, guid: 1354061583b3e4abca28bc65b85b39bb, type: 2}
+  _titleToLoadingAnimationParam: {fileID: 0}
+  _loadingToInGameAnimationParam: {fileID: 0}
+  _cheiceIrisAnimationParam: {fileID: 11400000, guid: a30e6c4b2157a477b8baf78c3266bd54, type: 2}
 --- !u!114 &6968772182867010546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,10 +124,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: 
+    TypeName: GlobalLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
-  _view: {fileID: 0}
 --- !u!1001 &6158916701073076904
 PrefabInstance:
   m_ObjectHideFlags: 0

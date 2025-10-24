@@ -13,7 +13,7 @@ namespace Common.UI.Loading
     /// - Image に専用マテリアルを割り当て、シェーダプロパティを書き換えてイリス演出を実現
     /// - IrisIn/IrisOut コンポーネントを用いて表示/非表示/シーン遷移をアニメーション制御
     /// </summary>
-    public class LoadingScreenView : UIBehaviourBase, IInitializable
+    public class LoadingScreenView : UIBehaviourBase, ILoadingScreenView, IInitializable
     {
         [SerializeField, ReadOnly]
         private Image _image;
@@ -128,5 +128,16 @@ namespace Common.UI.Loading
         {
             await _loadingToInGameAnimation.PlayAsync(ct);
         }
+    }
+    
+    public interface ILoadingScreenView: ICommonUIBehaviour
+    {
+        UniTask ShowAsync(CancellationToken ct);
+        UniTask ShowAsync(Vector3 centerCirclePosition, CancellationToken ct);
+        void Show();
+        UniTask HideAsync(CancellationToken ct);
+        UniTask TitleToLoadingAsync(CancellationToken ct);
+        UniTask LoadingToInGameAsync(CancellationToken ct);
+        void SetInteractable(bool interactable);
     }
 }

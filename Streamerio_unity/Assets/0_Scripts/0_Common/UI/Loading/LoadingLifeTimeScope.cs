@@ -1,5 +1,3 @@
-using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -7,21 +5,20 @@ namespace Common.UI.Loading
 {
     public class LoadingLifeTimeScope: LifetimeScope
     {
-        [SerializeField]
-        private LoadingScreenView _view;
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponent(_view)
-                .AsSelf()
+            var view = GetComponent<ILoadingScreenView>();
+            builder.RegisterComponent(view)
+                .As<ILoadingScreenView>()
                 .As<IInitializable>();
 
             builder
-                .RegisterEntryPoint<Wiring<LoadingScreenPresenter, LoadingScreenPresenterContext>>()
+                .RegisterEntryPoint<Wiring<ILoadingScreen, LoadingScreenPresenterContext>>()
                 .WithParameter(resolver =>
                 {
                     return new LoadingScreenPresenterContext
                     {
-                        View = resolver.Resolve<LoadingScreenView>()
+                        View = resolver.Resolve<ILoadingScreenView>()
                     };
                 });
         }
