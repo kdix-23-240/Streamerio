@@ -13,13 +13,13 @@ namespace Common.UI.Display.Background
     /// <summary>
     /// 【目的】背景 View の専用インターフェースを表すマーカー。
     /// </summary>
-    public interface IDisplayBackgroundView : IDisplayView { }
+    public interface IDisplayBackgroundView : IDisplayView, IInitializable { }
     
     /// <summary>
     /// 【目的】背景のフェードイン/アウト演出を実装する View。
     /// 【理由】Presenter 側が演出詳細を意識せず、見た目制御のみを委譲できるようにするため。
     /// </summary>
-    public class DisplayBackgroundView : DisplayViewBase, IInitializable, IDisplayBackgroundView
+    public class DisplayBackgroundView : DisplayViewBase, IDisplayBackgroundView
     {
         /// <summary>
         /// 【目的】フェードイン演出に使用するパラメータを Inspector から受け取る。

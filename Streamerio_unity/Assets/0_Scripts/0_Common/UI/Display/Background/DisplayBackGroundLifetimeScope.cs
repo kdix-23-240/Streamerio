@@ -17,17 +17,9 @@ namespace Common.UI.Display.Background
     /// 【目的】背景クリック UI に必要な依存を登録し、Presenter を配線する。
     /// 【理由】背景だけを独立モジュール化して動的生成しても、依存解決が破綻しないようにするため。
     /// </summary>
-    [RequireComponent(typeof(ObservableEventTrigger), typeof(DisplayBackgroundView))]
-    public class DisplayBackGroundLifetimeScope : LifetimeScope
+    [RequireComponent(typeof(ObservableEventTrigger))]
+    public class DisplayBackGroundLifetimeScope : DisplayLifetimeScopeBase<IDisplayBackground, DisplayBackgroundPresenter, IDisplayBackgroundView, DisplayBackgroundContext>
     {
-        [Header("References")]
-        /// <summary>
-        /// 【目的】背景 View コンポーネントを Inspector から参照し、DI 登録へ利用する。
-        /// 【理由】LifetimeScope が生成された瞬間に必須参照が埋まっていることを保証するため。
-        /// </summary>
-        [SerializeField, ReadOnly]
-        private DisplayBackgroundView _view;
-
         /// <summary>
         /// 【目的】背景クリック検知用の ObservableEventTrigger を保持する。
         /// 【理由】ClickEventBinder が購読するストリームを安全に提供するため。
@@ -51,44 +43,30 @@ namespace Common.UI.Display.Background
         /// </summary>
         private void OnValidate()
         {
-            _view ??= GetComponent<DisplayBackgroundView>();
             _clickTrigger ??= GetComponent<ObservableEventTrigger>();
         }
 #endif
 
-        /// <summary>
-        /// 【目的】背景 UI の依存を DI コンテナへ登録する。
-        /// 【処理概要】
-        ///   1. View を IDisplayBackgroundView / IInitializable として登録。
-        ///   2. ClickEventBinder を生成し、Wiring 経由で Presenter に渡す。
-        ///   3. AudioFacade を利用してクリック時の SE 再生を組み込む。
-        /// 【理由】背景モジュールを単独で生成しても、Presenter が必要な依存を確実に得られるようにするため。
-        /// </summary>
-        /// <param name="builder">【用途】依存登録を構築する VContainer のビルダー。</param>
-        protected override void Configure(IContainerBuilder builder)
+        protected override void BindPresenter(IContainerBuilder builder)
         {
-            builder
-                .RegisterComponent(_view)
-                .As<IDisplayBackgroundView>()
-                .As<IInitializable>();
+            builder.RegisterEntryPoint<Wiring<IDisplayBackground, DisplayBackgroundContext>>()
+                .WithParameter(CreateContext);
+        }
 
-            builder
-                .RegisterEntryPoint<Wiring<DisplayBackgroundPresenter, DisplayBackgroundContext>>()
-                .WithParameter(resolver =>
-                {
-                    var audioFacade = resolver.Resolve<IAudioFacade>();
-                    var binder = new ClickEventBinder<PointerEventData>(
-                        _clickTrigger.OnPointerClickAsObservable(),
-                        audioFacade,
-                        _clickSE
-                    );
-
-                    return new DisplayBackgroundContext
-                    {
-                        ClickEventBinder = binder,
-                        View = _view
-                    };
-                });
+        protected override DisplayBackgroundContext CreateContext(IObjectResolver resolver)
+        {
+            var audioFacade = resolver.Resolve<IAudioFacade>();
+            var binder = new ClickEventBinder<PointerEventData>(
+                _clickTrigger.OnPointerClickAsObservable(),
+                audioFacade,
+                _clickSE
+            );
+            
+            return new DisplayBackgroundContext
+            {
+                ClickEventBinder = binder,
+                View = resolver.Resolve<IDisplayBackgroundView>()
+            };
         }
     }
 }

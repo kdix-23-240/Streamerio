@@ -7,11 +7,16 @@ using R3;
 
 namespace Common.UI.Display.Background
 {
+    public interface IDisplayBackground : IDisplay, IAttachable<DisplayBackgroundContext>
+    {
+        Observable<Unit> OnClickAsObservable { get; }
+    }
+    
     /// <summary>
     /// 【目的】背景の表示制御とクリックイベント配信を担当する。
     /// 【理由】各ダイアログで同様の処理を重複記述せず、共通 Presenter として共有するため。
     /// </summary>
-    public class DisplayBackgroundPresenter : DisplayPresenterBase<IDisplayBackgroundView, DisplayBackgroundContext>
+    public class DisplayBackgroundPresenter : DisplayPresenterBase<IDisplayBackgroundView, DisplayBackgroundContext>, IDisplayBackground
     {
         /// <summary>
         /// 【目的】背景クリック検出を担うバインダーを保持する。
@@ -33,7 +38,7 @@ namespace Common.UI.Display.Background
         /// <param name="context">【用途】View と ClickBinder を束ねたコンテキスト。</param>
         protected override void AttachContext(DisplayBackgroundContext context)
         {
-            CommonView = context.View;
+            View = context.View;
             _clickEventBinder = context.ClickEventBinder;
             _clickEventBinder.BindClickEvent();
         }
