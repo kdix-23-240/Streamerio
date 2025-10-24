@@ -1,66 +1,44 @@
 using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using System.Threading;
-using Common.UI.Display.Background;
 using Common.UI.Part.Group;
 using UnityEngine;
+using VContainer;
 
 namespace Common.UI.Display.Overlay
 {
+    public interface IOverlayView : IDisplayView
+    {
+    }
+    
     /// <summary>
     /// Overlay 系 UI の見た目をフェードアニメーションで制御する基底クラス。
     /// - 複数のパーツを順番にフェード表示
     /// - 非表示は CanvasGroup をまとめてフェード
     /// - 即時表示/非表示も可能
     /// </summary>
-    [RequireComponent(typeof(CommonUIPartGroup))]
-    public class CommonOverlayView : DisplayViewBase
+    public abstract class OverlayViewBase : DisplayViewBase, IOverlayView
     {
-        [SerializeField, ReadOnly]
-        private DisplayBackgroundPresenter _background;
-        public DisplayBackgroundPresenter Background => _background;
+        private ICommonUIPartGroup _partGroup;
         
-        [SerializeField, ReadOnly]
-        private CommonUIPartGroup _partGroup;
-        
-        [SerializeField]
-        private float _showAlpha = 1f;
-        
-        [Header("アニメーション")]
+        [Header("アニメーション")] 
         [SerializeField, LabelText("非表示アニメーション")]
-        private FadeAnimationComponentParam _hideFadeAnimationParam = new ()
-        {
-            Alpha = 0f,
-            DurationSec = 0.5f,
-            Ease = Ease.OutSine,
-        };
+        private FadeAnimationComponentParamSO _hideAnimationParam;
         
         private FadeAnimationComponent _hideAnimation;
 
-#if UNITY_EDITOR
-        protected override void OnValidate()
+        [Inject]
+        public virtual void Construct(ICommonUIPartGroup partGroup)
         {
-            base.OnValidate();
-            _partGroup ??= GetComponent<CommonUIPartGroup>();
-            _background ??= GetComponentInChildren<DisplayBackgroundPresenter>();
+            _partGroup = partGroup;
         }
-#endif
-        
-        /// <summary>
-        /// 初期化処理。
-        /// - 各パーツに対応する表示用フェードアニメーションを構築
-        /// - 全体の非表示用アニメーションを構築
-        /// </summary>
+
         public override void Initialize()
         {
             base.Initialize();
             
-            _partGroup.Initialize();
-            _background.Initialize();
-            
-            _hideAnimation = new (CanvasGroup, _hideFadeAnimationParam);
+            _hideAnimation = new (CanvasGroup, _hideAnimationParam);
         }
         
         /// <summary>
@@ -70,10 +48,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            CanvasGroup.alpha = _showAlpha;
+            CanvasGroup.alpha = UIUtil.DEFAULT_SHOW_ALPHA;
 
-            await _background.ShowAsync(ct);
-            
             await _partGroup.ShowAsync(ct);
         }
         
@@ -84,9 +60,7 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override void Show()
         {
-            CanvasGroup.alpha = _showAlpha;
-            
-            _background.Show();
+            CanvasGroup.alpha = UIUtil.DEFAULT_SHOW_ALPHA;
             
             _partGroup.Show();
         }
@@ -100,7 +74,6 @@ namespace Common.UI.Display.Overlay
         {
             await _hideAnimation.PlayAsync(ct);
             
-            _background.Hide();
             _partGroup.Hide();
         }
 
@@ -111,9 +84,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override void Hide()
         {
-            CanvasGroup.alpha = _hideFadeAnimationParam.Alpha;
+            CanvasGroup.alpha = _hideAnimationParam.Alpha;
             
-            _background.Hide();
             _partGroup.Hide();
         }
     }
