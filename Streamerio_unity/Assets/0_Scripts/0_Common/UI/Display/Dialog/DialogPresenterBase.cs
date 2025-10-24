@@ -20,8 +20,9 @@ namespace Common.UI.Dialog
     /// 【理由】Close ボタンや背景クリックごとに購読処理を繰り返し記述するとバグを生むため、共通化して再利用性を高める。
     /// </summary>
     /// <typeparam name="TContext">Presenter に注入されるダイアログコンテキスト型。</typeparam>
-    public abstract class DialogPresenterBase<TContext> : DisplayPresenterBase<ICommonDialogView, TContext>, IDialog
-        where TContext : CommonDialogContext
+    public abstract class DialogPresenterBase<TView, TContext> : DisplayPresenterBase<TView, TContext>, IDialog
+        where TView : IDialogView
+        where TContext : CommonDialogContext<TView>
     {
         /// <summary>
         /// 【目的】ダイアログの開閉を制御するサービス参照を保持する。
@@ -36,7 +37,7 @@ namespace Common.UI.Dialog
         /// <param name="context">View と Service を内包したダイアログコンテキスト。</param>
         protected override void AttachContext(TContext context)
         {
-            CommonView = context.CommonView;
+            View = context.View;
             Service = context.Service;
         }
 
@@ -49,11 +50,11 @@ namespace Common.UI.Dialog
         {
             base.Bind();
 
-            CommonView.CloseButton.OnClickAsObservable
+            View.CloseButton.OnClickAsObservable
                 .Subscribe(_ => CloseEvent())
                 .RegisterTo(GetCt());
 
-            CommonView.Background.OnClickAsObservable
+            View.Background.OnClickAsObservable
                 .Subscribe(_ => CloseEvent())
                 .RegisterTo(GetCt());
         }
@@ -73,13 +74,14 @@ namespace Common.UI.Dialog
     /// 【目的】DialogBase が必要とする依存をひとまとめにした文脈クラス。
     /// 【拡張性】新たに依存が増えた場合はプロパティを追加することで対応する。
     /// </summary>
-    public class CommonDialogContext
+    public class CommonDialogContext<TView>
+        where TView : IDialogView
     {
         /// <summary>
         /// 【目的】Presenter が操作する共通 View を格納する。
         /// 【理由】ダイアログ生成時に依存をまとめて渡し、各 Presenter が同じ View 契約へアクセスできるようにするため。
         /// </summary>
-        public ICommonDialogView CommonView;
+        public TView View;
 
         /// <summary>
         /// 【目的】スタック管理を担うダイアログサービスを格納する。

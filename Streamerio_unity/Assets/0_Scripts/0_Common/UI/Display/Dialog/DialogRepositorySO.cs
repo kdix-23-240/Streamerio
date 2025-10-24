@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 using Common.UI.Display;
-using InGame.UI.Display.Dialog.QRCode;
+using InGame.QRCode.UI;
 using UnityEngine;
 
 namespace Common.UI.Dialog
@@ -27,9 +27,6 @@ namespace Common.UI.Dialog
         {
             return new Dictionary<Type, Type>
             {
-                { typeof(TestDialogPresenter), typeof(TestDialogLifetimeScope) },
-                { typeof(TestDialog2), typeof(TestDialogLifetimeScope2) },
-                { typeof(TestDialog3), typeof(TestDialogLifetimeScope3) },
                 {typeof(QRCodeDialogPresenter), typeof(QRCodeDialogLifetimeScope)},
             };
         }

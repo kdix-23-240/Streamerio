@@ -19,13 +19,13 @@ namespace Common.UI.Dialog
     /// 【目的】共通ダイアログ View が備えるべき公開契約を定義する。
     /// 【理由】Presenter 層が背景演出や閉じるボタンを一貫した手順で扱えるようにするため。
     /// </summary>
-    public interface ICommonDialogView : IDisplayView
+    public interface IDialogView : IDisplayView
     {
         /// <summary>
         /// 【目的】背景のフェード制御とクリック検知を提供する Presenter を公開する。
         /// 【補足】Presenter が ShowAsync/HideAsync を順序制御する際に利用する。
         /// </summary>
-        DisplayBackgroundPresenter Background { get; }
+        IDisplayBackground Background { get; }
 
         /// <summary>
         /// 【目的】ユーザーの閉じる操作を受け取る共通ボタン Presenter を公開する。
@@ -38,7 +38,7 @@ namespace Common.UI.Dialog
     /// 【目的】共通ダイアログの表示ロジックをカプセル化し、背景フェードと移動アニメーションを同期させる。
     /// 【理由】各 Presenter が個別に演出を実装すると仕様がぶれやすいため、演出仕様を本クラスで統制する。
     /// </summary>
-    public class CommonDialogView : DisplayViewBase, ICommonDialogView
+    public abstract class DialogViewBase : DisplayViewBase, IDialogView
     {
         /// <summary>
         /// 【目的】移動アニメーションの対象 RectTransform を保持する。
@@ -65,7 +65,7 @@ namespace Common.UI.Dialog
         /// 【目的】背景 Presenter の参照を保持し、表示/非表示時に即座に呼び出せるようにする。
         /// 【理由】依存注入を通じて受け取った後もメソッド内で繰り返し解決せずに済ませるため。
         /// </summary>
-        private DisplayBackgroundPresenter _background;
+        private IDisplayBackground _background;
         /// <summary>
         /// 【目的】閉じるボタン Presenter の参照を保持する。
         /// 【理由】Construct 以降でイベント購読を行う際に、解決済みインスタンスへ直接アクセスするため。
@@ -86,7 +86,7 @@ namespace Common.UI.Dialog
         /// 【目的】背景 Presenter を公開し、Presenter 層がフェード制御やクリック検知を扱えるようにする。
         /// 【補足】Construct 時に注入された参照を返却するだけで追加処理は行わない。
         /// </summary>
-        public DisplayBackgroundPresenter Background => _background;
+        public IDisplayBackground Background => _background;
 
         /// <summary>
         /// 【目的】閉じるボタン Presenter を公開し、Presenter 層がイベント購読できるようにする。
@@ -101,15 +101,20 @@ namespace Common.UI.Dialog
         /// <param name="background">フェードおよび入力ブロックを担当する背景 Presenter。</param>
         /// <param name="closeButton">ユーザーへ閉じる操作を提供する共通ボタン Presenter。</param>
         [Inject]
-        public void Construct(DisplayBackgroundPresenter background, ICommonButton closeButton)
+        public void Construct(IDisplayBackground background, [Key(ButtonType.Close)]ICommonButton closeButton)
         {
             _background = background;
             _closeButton = closeButton;
+        }
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            
             _showAnimation = new PathAnimationComponent(_moveRectTransform, _showAnimationParam);
             _hideAnimation = new PathAnimationComponent(_moveRectTransform, _hideAnimationParam);
         }
-
+        
         /// <summary>
         /// 【目的】ダイアログを非同期アニメーションで表示する。
         /// 【処理概要】経路の始点へ配置 → 背景フェードイン → 移動アニメーション再生。

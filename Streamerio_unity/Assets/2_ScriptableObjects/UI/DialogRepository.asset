@@ -13,6 +13,4 @@ MonoBehaviour:
   m_Name: DialogRepository
   m_EditorClassIdentifier: 
   _displayLifetimeScopes:
-  - {fileID: 2803951875755768700, guid: 62aeff3234fef49f0acc653de6375fc2, type: 3}
-  - {fileID: 1355894281346304504, guid: 16c783cd364f2484080a8dc0b8015a11, type: 3}
-  - {fileID: 1008884444231939829, guid: acbea485da5ec4119adaa0570dbe49a6, type: 3}
+  - {fileID: 7121334482047994004, guid: de25ff0dee8cb49bf8610fe416d89016, type: 3}

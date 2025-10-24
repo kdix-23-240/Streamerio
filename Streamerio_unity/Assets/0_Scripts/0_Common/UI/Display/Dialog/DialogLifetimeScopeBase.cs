@@ -6,7 +6,6 @@
 using Common.UI.Display;
 using Common.UI.Display.Background;
 using Common.UI.Part.Button;
-using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -16,22 +15,12 @@ namespace Common.UI.Dialog
     /// 【目的】ダイアログ Presenter を起動するための共通 LifetimeScope 構成を提供する。
     /// 【理由】背景や閉じるボタンの依存登録を各ダイアログで重複記述しないようにするため。
     /// </summary>
-    public abstract class DialogLifetimeScopeBase : LifetimeScope
+    public abstract class DialogLifetimeScopeBase<TDialog, TPresenter, TView, TContext> : DisplayLifetimeScopeBase<TDialog, TPresenter, TView, TContext>
+        where TDialog : IDialog, IAttachable<TContext>
+        where TPresenter : TDialog, IStartable
+        where TView : IDialogView
+        where TContext: CommonDialogContext<TView>
     {
-        /// <summary>
-        /// 【目的】背景 Presenter 用の子 LifetimeScope をインスペクタで関連付ける。
-        /// 【補足】直接参照はしていないが、Hierarchy 上に存在することを保証するために保持する。
-        /// </summary>
-        [SerializeField]
-        private DisplayBackGroundLifetimeScope _background;
-
-        /// <summary>
-        /// 【目的】閉じるボタン Presenter 用の子 LifetimeScope をインスペクタで関連付ける。
-        /// 【補足】背景と同様に存在保証のために保持する。
-        /// </summary>
-        [SerializeField]
-        private ButtonLifetimeScope _closeButton;
-
         /// <summary>
         /// 【目的】ダイアログで共通的に必要となる依存登録を実行する。
         /// 【処理概要】コンポーネントから View を取得して登録し、背景 Presenter と共通ボタン Presenter をシングルトンとして登録する。
@@ -40,12 +29,12 @@ namespace Common.UI.Dialog
         /// <param name="builder">【用途】依存登録とコンポーネント登録を行う VContainer のコンテナビルダー。</param>
         protected override void Configure(IContainerBuilder builder)
         {
-            var view = GetComponent<ICommonDialogView>();
-            builder.RegisterComponent(view)
-                .As<ICommonDialogView>();
-
-            builder.Register<DisplayBackgroundPresenter>(Lifetime.Singleton).AsSelf();
-            builder.Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton);
+            builder.Register<IDisplayBackground, DisplayBackgroundPresenter>(Lifetime.Singleton);
+            builder
+                .Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
+                .Keyed(ButtonType.Close);
+            
+            base.Configure(builder);
         }
     }
 }
