@@ -16,7 +16,7 @@ namespace Common.UI.Part.Text
     /// 【目的】テキストの点滅演出を抽象化し、開始/停止 API を提供する。
     /// 【理由】複数箇所で同じ点滅挙動を使い回せるようにし、アニメーション設定を ScriptableObject で共有するため。
     /// </summary>
-    public class FlashText : UIBehaviourBase, IInitializable
+    public class FlashText : UIBehaviourBase, IFlashText, IInitializable
     {
         /// <summary>
         /// 【目的】点滅アニメーションの設定を Inspector から受け取る。
@@ -66,5 +66,11 @@ namespace Common.UI.Part.Text
             
             CanvasGroup.alpha = _flashAnimationParam.MinAlpha;
         }
+    }
+    
+    public interface IFlashText
+    {
+        void PlayTextAnimation();
+        void StopTextAnimation();
     }
 }
