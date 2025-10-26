@@ -1,3 +1,4 @@
+using R3;
 using UnityEngine;
 
 namespace Common.UI.Display.Window
@@ -9,9 +10,31 @@ namespace Common.UI.Display.Window
     /// - 共通処理は DisplayPresenterBase に集約されているため、
     ///   ここでは特に追加実装はせず「マーカー的役割」を担う
     /// </summary>
-    [RequireComponent(typeof(CommonWindowView))]
-    public abstract class WindowPresenterBase : DisplayPresenterBase<CommonWindowView>
+    [RequireComponent(typeof(WindowViewBase))]
+    public abstract class WindowPresenterBase<TView, TContext> : DisplayPresenterBase<TView, TContext>
+        where TView : IWindowView
+        where TContext : WindowContext<TView>
     {
-        
+        protected override void AttachContext(TContext context)
+        {
+            View = context.View;
+        }
+
+        protected override void Bind()
+        {
+            base.Bind();
+            
+            View.CloseButton.OnClickAsObservable
+                .Subscribe(_ => { CloseEvent(); })
+                .RegisterTo(GetCt());
+        }
+
+        protected abstract void CloseEvent();
+    }
+
+    public class WindowContext<TView>
+        where TView : IWindowView
+    {
+        public TView View;
     }
 }

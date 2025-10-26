@@ -73,6 +73,10 @@ namespace Common.UI.Part.Group
         /// <returns>【戻り値】全パーツの表示演出が完了したことを示す UniTask。</returns>
         public async UniTask ShowAsync(CancellationToken ct)
         {
+            foreach (var c in _showAnimations.CanvasGroups)
+            {
+                Debug.Log($"[CommonUIPartGroup] ShowAsync CanvasGroup alpha before show: {c.gameObject.name}    alpha={c.alpha}");
+            }
             await _showAnimations.PlayAsync(ct);
         }
 
@@ -82,7 +86,7 @@ namespace Common.UI.Part.Group
         /// </summary>
         public void Show()
         {
-            SetAlphaParts(_showFadeAnimationParam.Alpha);
+            SetAlphaParts(UIUtil.DEFAULT_SHOW_ALPHA);
         }
         
         /// <summary>
@@ -102,7 +106,7 @@ namespace Common.UI.Part.Group
         /// </summary>
         public void Hide()
         {
-            SetAlphaParts(_hideFadeAnimationParam.Alpha);
+            SetAlphaParts(UIUtil.DEFAULT_HIDE_ALPHA);
         }
         
         /// <summary>

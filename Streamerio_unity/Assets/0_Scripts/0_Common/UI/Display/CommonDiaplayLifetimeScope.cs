@@ -6,8 +6,8 @@
 using System;
 using Common.UI.Dialog;
 using Common.UI.Display.Overlay;
+using Common.UI.Display.Window;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -24,11 +24,13 @@ namespace Common.UI.Display
         /// 【理由】テスト用や開発中のリポジトリを容易に切り替え、生成対象を柔軟に管理するため。
         /// </summary>
         [SerializeField]
-        [Tooltip("ダイアログ UI を生成するためのリポジトリアセットと親 Transform。")]
-        private DisplayServiceData _dialogServiceData;
+        private DisplayServiceData _windowServiceData;
         [SerializeField]
         [Tooltip("オーバーレイ UI を生成するためのリポジトリアセットと親 Transform。")]
         private DisplayServiceData _overlayServiceData;
+        [SerializeField]
+        [Tooltip("ダイアログ UI を生成するためのリポジトリアセットと親 Transform。")]
+        private DisplayServiceData _dialogServiceData;
 
         /// <summary>
         /// 【目的】DI コンテナへ DisplayServiceContext を登録し、IDialogService のエントリポイントを起動する。
@@ -39,28 +41,26 @@ namespace Common.UI.Display
         protected override void Configure(IContainerBuilder builder)
         {
             builder
-                .RegisterEntryPoint<Wiring<IDialogService, DisplayServiceContext>>()
-                .WithParameter(resolver =>
-                {
-                    var spawner = new DisplaySpawner(_dialogServiceData.Repository, _dialogServiceData.ParentTransform, this);
-
-                    return new DisplayServiceContext
-                    {
-                        Cache = new DisplayCache(spawner)
-                    };
-                });
+                .RegisterEntryPoint<Wiring<IWindowService, DisplayServiceContext>>()
+                .WithParameter(resolver => CreateContext(_windowServiceData));
             
             builder
                 .RegisterEntryPoint<Wiring<IOverlayService, DisplayServiceContext>>()
-                .WithParameter(resolver =>
-                {
-                    var spawner = new DisplaySpawner(_overlayServiceData.Repository, _overlayServiceData.ParentTransform, this);
+                .WithParameter(resolver => CreateContext(_overlayServiceData));
+            
+            builder
+                .RegisterEntryPoint<Wiring<IDialogService, DisplayServiceContext>>()
+                .WithParameter(resolver => CreateContext(_dialogServiceData));
+        }
+        
+        private DisplayServiceContext CreateContext(DisplayServiceData data)
+        {
+            var spawner = new DisplayFactory(data.Repository, data.ParentTransform, this);
 
-                    return new DisplayServiceContext
-                    {
-                        Cache = new DisplayCache(spawner)
-                    };
-                });
+            return new DisplayServiceContext
+            {
+                Cache = new DisplayCache(spawner)
+            };
         }
 
         [Serializable]

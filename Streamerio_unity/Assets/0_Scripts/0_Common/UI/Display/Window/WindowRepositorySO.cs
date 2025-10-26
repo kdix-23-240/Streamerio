@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using Common.UI.Display.Window.Book;
 using UnityEngine;
 
 namespace Common.UI.Display.Window
@@ -9,8 +12,14 @@ namespace Common.UI.Display.Window
     /// - Unity メニューから「SO/UI/WindowRepository」として作成可能
     /// </summary>
     [CreateAssetMenu(fileName = "WindowRepository", menuName = "SO/UI/WindowRepository")]
-    public class WindowRepositorySO : DisplayRepositorySOBase<WindowPresenterBase>
+    public class WindowRepositorySO : DisplayRepositorySOBase
     {
-        // WindowPresenterBase を管理対象とするだけなので特別な処理は不要。
+        protected override Dictionary<Type, Type> CreateTypeMap()
+        {
+            return new Dictionary<Type, Type>
+            {
+                {typeof(IBookWindow), typeof(BookWindowLifetimeScope)},
+            };
+        }
     }
 }

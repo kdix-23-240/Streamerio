@@ -34,7 +34,7 @@ namespace Common.UI.Display
         /// 【目的】Display を生成するためのスパナーを保持する。
         /// 【理由】生成手順を委譲し、キャッシュ側は生成タイミングの制御に集中するため。
         /// </summary>
-        private readonly IDisplaySpawner _spawner;
+        private readonly IDisplayFactory _factory;
 
         /// <summary>
         /// 【目的】Presenter を型ごとに保持し、再度の生成を避ける。
@@ -46,10 +46,10 @@ namespace Common.UI.Display
         /// 【目的】DisplaySpawner を受け取り、キャッシュを初期化する。
         /// 【理由】生成手順を外部に委譲しつつ、キャッシュの初期状態を空にしておく。
         /// </summary>
-        /// <param name="spawner">【用途】Display プレハブを生成するスパナー。</param>
-        public DisplayCache(IDisplaySpawner spawner)
+        /// <param name="factory">【用途】Display プレハブを生成するスパナー。</param>
+        public DisplayCache(IDisplayFactory factory)
         {
-            _spawner = spawner;
+            _factory = factory;
             _displayCache = new();
         }
         
@@ -68,7 +68,7 @@ namespace Common.UI.Display
                 return (TDisplay)existDisplay;
             }
             
-            var display = _spawner.Spawn<TDisplay>();
+            var display = _factory.Create<TDisplay>();
             _displayCache.Add(typeof(TDisplay), display);
             
             return display;

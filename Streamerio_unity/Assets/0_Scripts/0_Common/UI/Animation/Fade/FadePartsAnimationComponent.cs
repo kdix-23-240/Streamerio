@@ -16,6 +16,7 @@ namespace Common.UI.Animation
     /// </summary>
     public class FadePartsAnimationComponent : SequenceAnimationComponentBase
     {
+        public CanvasGroup[] CanvasGroups;
         /// <summary>
         /// 【目的】対象パーツ群とパラメータを受け取り、再利用可能な DOTween Sequence を組み立てる。
         /// 【理由】コンストラクタ内でセットアップしておくことで、PlayAsync 呼び出し時に余計な GC を発生させないため。
@@ -23,6 +24,7 @@ namespace Common.UI.Animation
         public FadePartsAnimationComponent(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParamSO param)
         {
             SetSequence(canvasGroups, param);
+            CanvasGroups = canvasGroups;
         }
 
         /// <summary>
@@ -32,13 +34,16 @@ namespace Common.UI.Animation
         /// </summary>
         private void SetSequence(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParamSO param)
         {
-            foreach (var canvasGroup in canvasGroups)
+            for(int i = 0; i < canvasGroups.Length-1; i++)
             {
-                Sequence.Join(canvasGroup
+                Sequence.Append(canvasGroups[i]
                     .DOFade(param.Alpha, param.DurationSec)
                     .SetEase(param.Ease));
                 Sequence.AppendInterval(param.ShowDelaySec);
             }
+            Sequence.Append(canvasGroups[^1]
+                .DOFade(param.Alpha, param.DurationSec)
+                .SetEase(param.Ease));
         }
     }
 }
