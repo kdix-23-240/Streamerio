@@ -364,51 +364,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d6ca0b122c66496a8a81fc15421a0c8, type: 3}
---- !u!1 &609424944
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 609424945}
-  - component: {fileID: 609424946}
-  m_Layer: 0
-  m_Name: TitleBooster
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &609424945
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 609424944}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &609424946
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 609424944}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eff062c741a6e43d684a4b139f56587d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _titleScreen: {fileID: 1992900965}
 --- !u!1 &1479045038
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,17 +506,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8177999816988538307, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
   m_PrefabInstance: {fileID: 6841607293659894833}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1992900965 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5468571624533860983, guid: 461223af76b5f4ceda4f5c830b1f7908, type: 3}
-  m_PrefabInstance: {fileID: 6841607293659894833}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3a7444d105d43c09995d72913531d3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &4576140279803416498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -768,5 +712,4 @@ SceneRoots:
   - {fileID: 559657953}
   - {fileID: 4576140279803416498}
   - {fileID: 409849901}
-  - {fileID: 609424945}
   - {fileID: 591562568}

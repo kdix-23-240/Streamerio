@@ -1,22 +1,27 @@
-using Common.Audio;
 using Common.Scene;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
 namespace Common.Booster
 {
-    /// <summary>
-    /// ゲームの初期設定
-    /// </summary>
-    public class Booster: MonoBehaviour
+    public class Booster: IStartable
     {
-        private void Start()
+        private ILoadingScreen _loadingScreen;
+        private ISceneManager _sceneManager;
+        
+        [Inject]
+        public Booster(ILoadingScreen loadingScreen, ISceneManager sceneManager)
         {
-            LoadingScreenPresenter.Instance.Initialize();
-            LoadingScreenPresenter.Instance.Show();
-            AudioManager.Instance.Initialize();
-            SceneManager.Instance.LoadSceneAsync(SceneType.Title).Forget();
+            _loadingScreen = loadingScreen;
+            _sceneManager = sceneManager;
+        }
+        
+        public void Start()
+        {
+            _loadingScreen.Show();
+            _sceneManager.LoadSceneAsync(SceneType.Title).Forget();
         }
     }
 }

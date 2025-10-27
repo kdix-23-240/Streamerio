@@ -1,8 +1,10 @@
 using Common.Audio;
+using Common.Booster;
 using Common.QRCode;
 using Common.Save;
 using Common.Scene;
 using Common.UI.Dialog;
+using Common.UI.Dialog.Test;
 using Common.UI.Display.Overlay;
 using Common.UI.Display.Overlay.Test;
 using Common.UI.Display.Window;
@@ -15,6 +17,8 @@ public class GlobalLifetimeScope : LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
+        builder.RegisterEntryPoint<Booster>();
+        
         builder.Register<IVolumeSaveFacade, IPlayDataSaveFacade, SaveManager>(Lifetime.Singleton);
 
         builder.Register<IAudioFacade, AudioFacade>(Lifetime.Singleton);
@@ -31,7 +35,9 @@ public class GlobalLifetimeScope : LifetimeScope
         builder.Register<IOverlayService, OverlayService>(Lifetime.Singleton);
         builder.Register<IDialogService, DialogService>(Lifetime.Singleton);
 
-        builder.RegisterEntryPoint<TestWindow>();
+        //builder.RegisterEntryPoint<TestWindow>();
         //builder.RegisterEntryPoint<TestOverlay>();
+        //builder.RegisterEntryPoint<DialogTest>();
+        //builder.RegisterEntryPoint<LoadingTest>();
     }
 }
