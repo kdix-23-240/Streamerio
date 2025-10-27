@@ -8,6 +8,7 @@ using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 using VContainer.Unity;
 
 namespace Common.UI.Part.Button
@@ -16,71 +17,39 @@ namespace Common.UI.Part.Button
     /// 【目的】共通ボタンのビジュアル挙動を抽象化し、Presenter からアニメーション操作を受け付ける。
     /// 【理由】各ボタンで同様の演出を共有するため、View 側でアニメーション組み立てを一元化する。
     /// </summary>
-    public class CommonButtonView : UIBehaviourBase, IButtonView, IInitializable
+    public class CommonButtonView : UIBehaviourBase, IButtonView
     {
-        /// <summary>
-        /// 【目的】押下時に利用するスケールアニメーションの設定を保持する。
-        /// 【理由】縮小量やイージングを ScriptableObject で調整し、ボタン毎に演出を差し替えられるようにするため。
-        /// </summary>
-        [SerializeField, LabelText("ボタンを押した時のアニメーション")]
-        [Tooltip("押下時に利用する Scale アニメーション設定。")]
-        private ScaleAnimationComponentParamSO _pushDownAnimParam;
-
-        /// <summary>
-        /// 【目的】離した瞬間に使用するスケールアニメーションの設定を保持する。
-        /// 【理由】押下前のサイズに戻す演出を制御し、ボタンのフィードバックを安定させるため。
-        /// </summary>
-        [SerializeField, LabelText("ボタンを離した時のアニメーション")]
-        [Tooltip("ボタンを離したときに利用する Scale アニメーション設定。")]
-        private ScaleAnimationComponentParamSO _pushUpAnimParam;
-
-        /// <summary>
-        /// 【目的】ホバー時のフェード演出設定を保持する。
-        /// 【理由】マウスオーバーの視認性を向上させ、操作状態を明確にするため。
-        /// </summary>
-        [SerializeField, LabelText("ボタンにカーソルがあった時のアニメーション")]
-        [Tooltip("ホバー時に利用する Fade アニメーション設定。")]
-        private FadeAnimationComponentParamSO _enterAnimParam;
-
-        /// <summary>
-        /// 【目的】ホバー解除時に使用するフェード演出設定を保持する。
-        /// 【理由】通常状態への復帰を滑らかにし、残像を残さないようにするため。
-        /// </summary>
-        [SerializeField, LabelText("ボタンにカーソルが離れた時のアニメーション")]
-        [Tooltip("ホバー解除時に利用する Fade アニメーション設定。")]
-        private FadeAnimationComponentParamSO _exitAnimParam;
-
         /// <summary>
         /// 【目的】押下時に再生するスケールアニメーションをキャッシュする。
         /// 【理由】毎回生成すると GC が発生し、連打時にパフォーマンスが落ちるため。
         /// </summary>
-        private ScaleAnimationComponent _pushDownAnim;
+        private IUIAnimation _pushDownAnim;
         /// <summary>
         /// 【目的】離した瞬間に再生するスケールアニメーションをキャッシュする。
         /// 【理由】押下解除のたびにコンポーネントを作り直さず、スムーズに演出したいため。
         /// </summary>
-        private ScaleAnimationComponent _pushUpAnim;
+        private IUIAnimation _pushUpAnim;
         /// <summary>
         /// 【目的】ホバー時に再生するフェードアニメーションをキャッシュする。
         /// 【理由】カーソル移動に即応できるようにし、演出ラグを抑えるため。
         /// </summary>
-        private FadeAnimationComponent _enterAnim;
+        private IUIAnimation _enterAnim;
         /// <summary>
         /// 【目的】ホバー解除時に再生するフェードアニメーションをキャッシュする。
         /// 【理由】ホバー状態からの戻りが滑らかになるよう初期化時に準備しておく。
         /// </summary>
-        private FadeAnimationComponent _exitAnim;
+        private IUIAnimation _exitAnim;
         
-        /// <summary>
-        /// 【目的】各種アニメーションコンポーネントを生成し、再生準備を整える。
-        /// 【理由】Pointer 操作が発生した瞬間に演出を即座に開始できるようにするため。
-        /// </summary>
-        public void Initialize()
+        [Inject]
+        public void Construct([Key(AnimationType.PushDown)] IUIAnimation pushDownAnim,
+            [Key(AnimationType.PushUp)] IUIAnimation pushUpAnim,
+            [Key(AnimationType.Enter)] IUIAnimation enterAnim,
+            [Key(AnimationType.Exit)] IUIAnimation exitAnim)
         {
-            _pushDownAnim = new ScaleAnimationComponent(RectTransform, _pushDownAnimParam);
-            _pushUpAnim = new ScaleAnimationComponent(RectTransform, _pushUpAnimParam);
-            _enterAnim = new FadeAnimationComponent(CanvasGroup, _enterAnimParam);
-            _exitAnim = new FadeAnimationComponent(CanvasGroup, _exitAnimParam);
+            _pushDownAnim = pushDownAnim;
+            _pushUpAnim = pushUpAnim;
+            _enterAnim = enterAnim;
+            _exitAnim = exitAnim;
         }
 
         /// <summary>
@@ -137,8 +106,8 @@ namespace Common.UI.Part.Button
         /// </summary>
         public void ResetButtonState()
         {
-            CanvasGroup.alpha = _exitAnimParam.Alpha;
-            RectTransform.localScale = _pushUpAnimParam.Scale * Vector3.one;
+            _exitAnim.PlayImmediate();
+            _pushUpAnim.PlayImmediate();
         }
     }
 }

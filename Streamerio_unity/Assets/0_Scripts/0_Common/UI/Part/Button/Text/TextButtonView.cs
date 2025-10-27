@@ -9,6 +9,7 @@ using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 using VContainer.Unity;
 
 namespace Common.UI.Part.Button
@@ -17,7 +18,7 @@ namespace Common.UI.Part.Button
     /// 【目的】テキストボタンの装飾表示とスケール演出を抽象化し、Presenter から簡潔に制御できるようにする。
     /// 【理由】羽・下線など複数の見た目要素を View 内へ閉じ込め、再利用時の演出差異を減らすため。
     /// </summary>
-    public class TextCommonButton : UIBehaviourBase, IButtonView, IInitializable
+    public class TextButtonView : UIBehaviourBase, IButtonView
     {
         [Header("装飾画像")]
         /// <summary>
@@ -37,45 +38,25 @@ namespace Common.UI.Part.Button
         private Image _lineImage;
         
         /// <summary>
-        /// 【目的】押下時に使用するスケールアニメーション設定を保持する。
-        /// 【理由】押下フィードバックの速度や縮小量を ScriptableObject で容易に差し替えられるようにするため。
-        /// </summary>
-        [SerializeField, LabelText("ボタンを押した時のアニメーション")]
-        [Tooltip("押下した瞬間に適用するスケールアニメーション設定。")]
-        private ScaleAnimationComponentParamSO _pushDownAnimParam;
-
-        /// <summary>
-        /// 【目的】解放時に使用するスケールアニメーション設定を保持する。
-        /// 【理由】離した瞬間に元のスケールへ戻し、連続操作時にも自然な見た目を維持するため。
-        /// </summary>
-        [SerializeField, LabelText("ボタンを離した時のアニメーション")]
-        [Tooltip("指を離した瞬間に適用するスケールアニメーション設定。")]
-        private ScaleAnimationComponentParamSO _pushUpAnimParam;
-        
-        /// <summary>
         /// 【目的】押下時に再生するスケールアニメーションをキャッシュする。
         /// 【理由】連打時にコンポーネント生成が発生しないよう初期化時に準備するため。
         /// </summary>
-        private ScaleAnimationComponent _pushDownAnim;
+        private IUIAnimation _pushDownAnim;
         /// <summary>
         /// 【目的】解放時に再生するスケールアニメーションをキャッシュする。
         /// 【理由】連続操作時にも滑らかにサイズ復元できるようにするため。
         /// </summary>
-        private ScaleAnimationComponent _pushUpAnim;
-
-        /// <summary>
-        /// 【目的】装飾を初期化し、スケールアニメーションコンポーネントを生成する。
-        /// 【理由】初期表示で装飾が点灯しないようにしつつ、Pointer イベントへ即応できる準備を整えるため。
-        /// </summary>
-        public void Initialize()
+        private IUIAnimation _pushUpAnim;
+        
+        [Inject]
+        public void Construct(
+            [Key(AnimationType.PushDown)] IUIAnimation pushDownAnim,
+            [Key(AnimationType.PushUp)] IUIAnimation pushUpAnim)
         {
-            _featherImage.enabled = false;
-            _lineImage.enabled = false;
-            
-            _pushDownAnim = new ScaleAnimationComponent(RectTransform, _pushDownAnimParam);
-            _pushUpAnim = new ScaleAnimationComponent(RectTransform, _pushUpAnimParam);
+            _pushDownAnim = pushDownAnim;
+            _pushUpAnim = pushUpAnim;
         }
-
+        
         /// <summary>
         /// 【目的】ボタン押下時に縮小アニメーションを再生する。
         /// 【理由】クリックフィードバックを視覚へ伝え、操作体験を高めるため。
@@ -119,10 +100,9 @@ namespace Common.UI.Part.Button
         /// <returns>【戻り値】解除演出が完了したことを示す UniTask。</returns>
         public async UniTask PlayPointerExitAsync(CancellationToken ct)
         {
-            await _pushUpAnim.PlayAsync(ct);
-            
             _featherImage.enabled = false;
             _lineImage.enabled = false;
+            await _pushUpAnim.PlayAsync(ct, false);
         }
         
         /// <summary>
@@ -131,7 +111,7 @@ namespace Common.UI.Part.Button
         /// </summary>
         public void ResetButtonState()
         {
-            RectTransform.localScale = _pushDownAnimParam.Scale * Vector3.one;
+            _pushUpAnim.PlayImmediate();
             _featherImage.enabled = false;
             _lineImage.enabled = false;
         }

@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 7462383762858712857}
   - component: {fileID: 8265293665626389431}
   - component: {fileID: 7013316544094048540}
-  - component: {fileID: 6647498333362681110}
+  - component: {fileID: 5010429538601831527}
   m_Layer: 5
   m_Name: TextButton
   m_TagString: Untagged
@@ -425,7 +425,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd253e17d14ec9346b4e8ec0b1ecf277, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6647498333362681110
+--- !u!114 &5010429538601831527
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -434,7 +434,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6178945486548579912}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5b5a92d0ab748df8ca73008444cc784, type: 3}
+  m_Script: {fileID: 11500000, guid: 8bb55e046f394006bc5872ae9a2d1ea0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
@@ -442,7 +442,9 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   _button: {fileID: 1588439244446064372}
-  _gameObject: {fileID: 6178945486548579912}
   _eventTrigger: {fileID: 7013316544094048540}
   _buttonType: 5
   _clickSE: 29
+  _rectTransform: {fileID: 8216791150846653309}
+  _pushDownAnimParam: {fileID: 11400000, guid: 074f80ad137834388969a515f78218e3, type: 2}
+  _pushUpAnimParam: {fileID: 11400000, guid: 8e261b4e484834da8b31bed4e19ab4a6, type: 2}

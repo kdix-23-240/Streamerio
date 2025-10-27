@@ -88,6 +88,7 @@ namespace Common.UI.Part.Button
             _cts = new CancellationTokenSource();
 
             Bind(context.EventTrigger);
+            _view.ResetButtonState();
         }
 
         /// <summary>

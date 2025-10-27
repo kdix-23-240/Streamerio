@@ -1,9 +1,3 @@
-// モジュール概要:
-// 共通ボタンの LifetimeScope を構築し、ボタン View と Presenter の依存を VContainer に登録する。
-// 依存関係: UnityEngine.UI.Button/ObservableEventTrigger による入力、ClickEventBinder 経由の SE 再生、IAudioFacade を使用。
-// 使用例: ボタンプレハブに本スコープを付与し、Dialog やメニュー画面の子スコープとして生成する。
-
-using Alchemy.Inspector;
 using Common.Audio;
 using Common.UI.Click;
 using R3;
@@ -11,15 +5,12 @@ using R3.Triggers;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using Alchemy.Inspector;
 
 namespace Common.UI.Part.Button
 {
-    /// <summary>
-    /// 【目的】共通ボタンに必要な依存を登録し、Presenter と View を配線する。
-    /// 【理由】プレハブ化したボタンを生成した際に、DI コンテナが即座に入力処理とアニメーションを利用できるようにするため。
-    /// </summary>
     [RequireComponent(typeof(UnityEngine.UI.Button), typeof(ObservableEventTrigger))]
-    public class ButtonLifetimeScope: LifetimeScope
+    public abstract class ButtonLifetimeScopeBase: LifetimeScope
     {
         /// <summary>
         /// 【目的】入力イベントの発生源となる Unity ボタンを Inspector で参照する。
@@ -28,13 +19,6 @@ namespace Common.UI.Part.Button
         [SerializeField, ReadOnly]
         [Tooltip("ユーザー入力を受け付ける UnityEngine.UI.Button。")]
         private UnityEngine.UI.Button _button;
-        /// <summary>
-        /// 【目的】ボタンの GameObject 自体をキャッシュする。
-        /// 【理由】Presenter から SetActive など GameObject 操作を行う際に即座に参照できるようにするため。
-        /// </summary>
-        [SerializeField, ReadOnly]
-        [Tooltip("ボタン本体の GameObject。アクティブ状態の切り替えに使用する。")]
-        private GameObject _gameObject;
         
         /// <summary>
         /// 【目的】Pointer イベントを Observable として提供するトリガーを保持する。
@@ -55,23 +39,16 @@ namespace Common.UI.Part.Button
         /// </summary>
         [SerializeField, Tooltip("ボタン押下時に再生するSE")]
         private SEType _clickSE = SEType.NESRPG0112;
-        
-        /// <summary>
-        /// 【目的】DI 登録した View インスタンスをキャッシュする。
-        /// 【理由】Configure 内で二度取得するコストを避け、Wiring で渡す参照を明示的に保持する。
-        /// </summary>
-        private IButtonView _view;
 
 #if UNITY_EDITOR
         /// <summary>
         /// 【目的】エディタ上で必須参照を自動設定し、設定漏れを防ぐ。
         /// 【理由】プレハブ複製時にフィールドが外れても OnValidate で補完し、実行時例外を避けるため。
         /// </summary>
-        private void OnValidate()
+        protected virtual void OnValidate()
         {
             _button ??= GetComponent<UnityEngine.UI.Button>();
             _eventTrigger ??= GetComponent<ObservableEventTrigger>();
-            _gameObject = gameObject;
         }
 #endif
         /// <summary>
@@ -86,11 +63,8 @@ namespace Common.UI.Part.Button
         protected override void Configure(IContainerBuilder builder)
         {
             // Viewの登録
-            _view = GetComponent<IButtonView>();
-            builder
-                .RegisterComponent(_view)
-                .As<IButtonView>()
-                .As<IInitializable>();
+            var view = GetComponent<IButtonView>();
+            builder.RegisterComponent(view);
             
             builder
                 .RegisterEntryPoint<Wiring<ICommonButton, CommonButtonContext>>()
@@ -105,7 +79,7 @@ namespace Common.UI.Part.Button
                         Button = _button,
                         EventTrigger = _eventTrigger,
                         ClickEventBinder = binder,
-                        View = _view
+                        View = view
                     };
                 });
         }
