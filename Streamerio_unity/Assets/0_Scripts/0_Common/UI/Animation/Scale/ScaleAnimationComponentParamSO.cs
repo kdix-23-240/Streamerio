@@ -21,7 +21,8 @@ namespace Common.UI.Animation
         /// 【目的】アニメーション終了時の拡大率を指定し、クリック演出などで大きさ変化を制御できるようにする。
         /// </summary>
         [Header("最終的な大きさ (1 = 等倍)")]
-        [SerializeField, Range(0f, 2f)]
+        public float InitialScale = 1f;
+        [SerializeField, Min(0)]
         [Tooltip("アニメーション完了時の RectTransform.localScale 値。1 で等倍、0.5 で半分、2 で 2 倍。")]
         public float Scale = 1f;
     }

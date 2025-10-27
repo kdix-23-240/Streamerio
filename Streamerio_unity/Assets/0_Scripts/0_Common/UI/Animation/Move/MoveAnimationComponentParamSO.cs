@@ -20,6 +20,7 @@ namespace Common.UI.Animation
         /// <summary>
         /// 【目的】RectTransform.anchoredPosition の目標値を指定し、演出後の位置をデータ側で制御する。
         /// </summary>
+        public Vector2 InitialAnchoredPosition;
         [Header("移動先座標")]
         [SerializeField]
         [Tooltip("アニメーション完了時に到達してほしい AnchoredPosition。")]

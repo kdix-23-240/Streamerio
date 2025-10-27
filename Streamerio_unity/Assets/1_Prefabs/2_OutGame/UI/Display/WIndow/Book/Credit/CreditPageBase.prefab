@@ -115,11 +115,11 @@ PrefabInstance:
     - target: {fileID: 8317097911988549691, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
       propertyPath: _hideFadeAnimationParam
       value: 
-      objectReference: {fileID: 11400000, guid: eae61f453b5804763b3fd4dc6474fd79, type: 2}
+      objectReference: {fileID: 11400000, guid: 926dc35022d8648598b96f89f6b73327, type: 2}
     - target: {fileID: 8317097911988549691, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
       propertyPath: _showFadeAnimationParam
       value: 
-      objectReference: {fileID: 11400000, guid: a6f69a937597049f2a8c6ee86c2a0dd8, type: 2}
+      objectReference: {fileID: 11400000, guid: 6d3828e2e43144ff6bf3c5f9d16d7986, type: 2}
     - target: {fileID: 8875090064194179525, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100

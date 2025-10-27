@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DurationSec: 0.5
   Ease: 3
+  InitialAlpha: 1
   Alpha: 0
   ShowDelaySec: 0.2

@@ -127,7 +127,7 @@ namespace Common.UI.Part.Button
         {
             await UniTask.WhenAll(
                 _exitAnim.PlayAsync(ct),
-                _pushUpAnim.PlayAsync(ct)
+                _pushUpAnim.PlayAsync(ct, false)
             );
         }
         

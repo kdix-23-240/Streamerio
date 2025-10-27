@@ -73,10 +73,6 @@ namespace Common.UI.Part.Group
         /// <returns>【戻り値】全パーツの表示演出が完了したことを示す UniTask。</returns>
         public async UniTask ShowAsync(CancellationToken ct)
         {
-            foreach (var c in _showAnimations.CanvasGroups)
-            {
-                Debug.Log($"[CommonUIPartGroup] ShowAsync CanvasGroup alpha before show: {c.gameObject.name}    alpha={c.alpha}");
-            }
             await _showAnimations.PlayAsync(ct);
         }
 

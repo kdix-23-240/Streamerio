@@ -24,7 +24,7 @@ namespace Common.UI.Animation
             : base(material, param) { }
 
         /// <inheritdoc/>
-        public override async UniTask PlayAsync(CancellationToken ct)
+        public override async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
             await PlayIrisAsync(Param.MaxRadius, Param.MinRadius, ct);
         }
@@ -42,7 +42,7 @@ namespace Common.UI.Animation
             : base(material, param) { }
 
         /// <inheritdoc/>
-        public override async UniTask PlayAsync(CancellationToken ct)
+        public override async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
             await PlayIrisAsync(Param.MinRadius, Param.MaxRadius, ct);
         }
@@ -75,7 +75,7 @@ namespace Common.UI.Animation
         /// 【目的】派生クラスで演出方向に応じた再生処理を実装させる抽象メソッド。
         /// 【理由】共通処理は基底に残しつつ、開始/終了半径を差し替えられるようにするため。
         /// </summary>
-        public abstract UniTask PlayAsync(CancellationToken ct);
+        public abstract UniTask PlayAsync(CancellationToken ct, bool useInitial = true);
         
         /// <summary>
         /// 【目的】イリスアニメーションを共通ロジックで再生し、中心や半径の設定を一箇所に集約する。
@@ -86,13 +86,18 @@ namespace Common.UI.Animation
         {
             // 中心位置と初期半径をシェーダに適用
             _material.SetVector(Param.CenterPropertyName, Param.Center);
-            _material.SetFloat(Param.RadiusPropertyName, startRadius);
             
             // Tweenで半径を補間しつつシェーダに反映
             await _material
                 .DOFloat(endRadius, Param.RadiusPropertyName, Param.DurationSec)
+                .From(startRadius)
                 .SetEase(Param.Ease)
                 .ToUniTask(cancellationToken: ct);
+        }
+
+        public void Skip()
+        {
+            _material.DOComplete();
         }
     }
 }

@@ -39,12 +39,22 @@ namespace Common.UI.Animation
         /// - Path: 通過する座標の配列
         /// - Duration / Ease / PathType はパラメータで制御
         /// </summary>
-        public async UniTask PlayAsync(CancellationToken ct)
+        public async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
+            if (useInitial)
+            {
+                _rectTransform.localPosition = _param.InitialPosition;
+            }
+            
             await _rectTransform
                 .DOLocalPath(_param.Path, _param.DurationSec, _param.PathType)
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
         }  
+        
+        public void Skip()
+        {
+            _rectTransform.DOComplete();
+        }
     }
 }

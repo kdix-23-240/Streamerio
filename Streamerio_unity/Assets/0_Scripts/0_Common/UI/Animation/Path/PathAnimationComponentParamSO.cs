@@ -19,6 +19,7 @@ namespace Common.UI.Animation
     [CreateAssetMenu(fileName = "PathAnimationSO", menuName = "SO/UI/Animation/Path")]
     public class PathAnimationComponentParamSO : UIAnimationComponentParamSO
     {
+        public Vector3 InitialPosition; 
         /// <summary>
         /// 【目的】RectTransform がたどる経路の制御点をローカル座標系で指定する。
         /// </summary>

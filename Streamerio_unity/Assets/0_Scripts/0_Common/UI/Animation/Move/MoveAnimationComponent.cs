@@ -37,12 +37,20 @@ namespace Common.UI.Animation
         /// - 目標座標へ補間移動
         /// - Duration と Ease はパラメータで制御
         /// </summary>
-        public async UniTask PlayAsync(CancellationToken ct)
+        public async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
+            var initialPos = useInitial ? _param.InitialAnchoredPosition : _rectTransform.anchoredPosition;
+            
             await _rectTransform
                 .DOAnchorPos(_param.AnchoredPosition, _param.DurationSec)
+                .From(initialPos)
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
+        }
+        
+        public void Skip()
+        {
+            _rectTransform.DOComplete();
         }
     }
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DurationSec: 0.5
   Ease: 2
+  InitialPosition: {x: 1920, y: 0, z: 0}
   Path:
-  - {x: 1920, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
   PathType: 1

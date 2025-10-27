@@ -38,12 +38,20 @@ namespace Common.UI.Animation
         /// - Duration と Ease はパラメータで制御
         /// - CancellationToken により中断可能
         /// </summary>
-        public async UniTask PlayAsync(CancellationToken ct)
+        public async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
+            var initialAlpha = useInitial ? _param.InitialAlpha : _canvasGroup.alpha;
+            
             await _canvasGroup
                 .DOFade(_param.Alpha, _param.DurationSec)
+                .From(initialAlpha)
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
+        }
+        
+        public void Skip()
+        {
+            _canvasGroup.DOComplete();
         }
     }
 }

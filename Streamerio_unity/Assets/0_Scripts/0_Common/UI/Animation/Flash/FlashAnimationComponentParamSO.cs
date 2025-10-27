@@ -22,6 +22,8 @@ namespace Common.UI.Animation
         /// 【目的】点滅時の最小透明度を指定し、どの程度まで暗くなるかを制御する。
         /// </summary>
         [Header("透明度設定")]
+        [Range(0f,1f)]
+        public float InitialAlpha = 0f;
         [SerializeField, LabelText("最小の透明度"), Range(0f, 1f)]
         [Tooltip("点滅で最も暗くなるときの CanvasGroup.alpha。0 で完全に消える。")]
         public float MinAlpha = 0f;

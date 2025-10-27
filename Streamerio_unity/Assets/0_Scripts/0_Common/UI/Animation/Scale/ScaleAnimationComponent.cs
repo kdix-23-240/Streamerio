@@ -38,12 +38,20 @@ namespace Common.UI.Animation
         /// - 指定された Scale 値まで拡縮
         /// - Duration と Ease はパラメータ依存
         /// </summary>
-        public async UniTask PlayAsync(CancellationToken ct)
+        public async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
+            var initialScale = useInitial ? _param.InitialScale : _rectTransform.localScale.x;
+            
             await _rectTransform
                 .DOScale(_param.Scale, _param.DurationSec)
+                .From(initialScale)
                 .SetEase(_param.Ease)
                 .ToUniTask(cancellationToken: ct);
+        }
+        
+        public void Skip()
+        {
+            _rectTransform.DOComplete();
         }
     }
 }

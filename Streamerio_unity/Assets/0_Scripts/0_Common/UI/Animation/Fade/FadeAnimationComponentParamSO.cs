@@ -25,6 +25,8 @@ namespace Common.UI.Animation
         /// </summary>
         [Header("透明度")]
         [SerializeField, Range(0f, 1f)]
+        public float InitialAlpha;
+        [SerializeField, Range(0f, 1f)]
         [Tooltip("フェード後に到達したい CanvasGroup.alpha の値。")]
         public float Alpha;
     }

@@ -4,6 +4,7 @@
 // 使用例: 各種 UI 演出コンポーネントが IUIAnimationComponent を実装し、SequenceAnimationComponentBase で再生ロジックを共有する。
 // ============================================================================
 
+using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System.Threading;
@@ -29,7 +30,9 @@ namespace Common.UI.Animation
         /// 【理由】演出完了後に処理を進めたいケースに対応し、キャンセルも考慮する共通契約とする。
         /// </para>
         /// </summary>
-        UniTask PlayAsync(CancellationToken ct);
+        UniTask PlayAsync(CancellationToken ct, bool useInitial = true);
+
+        void Skip();
     }
     
     /// <summary>
@@ -38,7 +41,7 @@ namespace Common.UI.Animation
     /// - 派生クラスはコンストラクタ内で Sequence にアニメーションを組み立てる
     /// - PlayAsync で Restart して最初から再生し、完了まで待機できる
     /// </summary>
-    public abstract class SequenceAnimationComponentBase : IUIAnimationComponent
+    public abstract class SequenceAnimationComponentBase : IUIAnimationComponent, IDisposable
     {
         /// <summary>
         /// 管理対象の DOTween Sequence。
@@ -63,7 +66,7 @@ namespace Common.UI.Animation
         /// - UniTask.WaitUntil で再生完了まで待機
         /// - キャンセルが来たら途中で停止可能
         /// </summary>
-        public async UniTask PlayAsync(CancellationToken ct)
+        public virtual async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
             Sequence.Restart();
 
@@ -72,6 +75,17 @@ namespace Common.UI.Animation
                 () => !Sequence.IsActive() || !Sequence.IsPlaying(),
                 cancellationToken: ct
             );
+        }
+        
+        public void Skip()
+        {
+            Sequence.Complete();
+        }
+        
+        public void Dispose()
+        {
+            Sequence.Kill();
+            Sequence = null;
         }
     }
 

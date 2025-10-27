@@ -4,6 +4,8 @@
 // 使用例: チュートリアル UI の段階的表示などで FadePartsAnimationComponent を利用し、パーツ単位の演出を統一する。
 // ============================================================================
 
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
@@ -16,15 +18,31 @@ namespace Common.UI.Animation
     /// </summary>
     public class FadePartsAnimationComponent : SequenceAnimationComponentBase
     {
-        public CanvasGroup[] CanvasGroups;
+        private readonly CanvasGroup[] _canvasGroups;
+        private readonly FadePartsAnimationComponentParamSO _param;
         /// <summary>
         /// 【目的】対象パーツ群とパラメータを受け取り、再利用可能な DOTween Sequence を組み立てる。
         /// 【理由】コンストラクタ内でセットアップしておくことで、PlayAsync 呼び出し時に余計な GC を発生させないため。
         /// </summary>
         public FadePartsAnimationComponent(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParamSO param)
         {
-            SetSequence(canvasGroups, param);
-            CanvasGroups = canvasGroups;
+            _canvasGroups = canvasGroups;
+            _param = param;
+            
+            SetSequence();
+        }
+
+        public override async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
+        {
+            if (useInitial)
+            {
+                foreach (var canvasGroup in _canvasGroups)
+                {
+                    canvasGroup.alpha = _param.InitialAlpha;
+                }   
+            }
+            
+            await base.PlayAsync(ct);
         }
 
         /// <summary>
@@ -32,18 +50,18 @@ namespace Common.UI.Animation
         /// - 各 CanvasGroup に対してフェードを追加
         /// - パーツ間にインターバルを挿入して「順番に」アニメーションする
         /// </summary>
-        private void SetSequence(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParamSO param)
+        private void SetSequence()
         {
-            for(int i = 0; i < canvasGroups.Length-1; i++)
+            for(int i = 0; i < _canvasGroups.Length-1; i++)
             {
-                Sequence.Append(canvasGroups[i]
-                    .DOFade(param.Alpha, param.DurationSec)
-                    .SetEase(param.Ease));
-                Sequence.AppendInterval(param.ShowDelaySec);
+                Sequence.Append(_canvasGroups[i]
+                    .DOFade(_param.Alpha, _param.DurationSec)
+                    .SetEase(_param.Ease));
+                Sequence.AppendInterval(_param.ShowDelaySec);
             }
-            Sequence.Append(canvasGroups[^1]
-                .DOFade(param.Alpha, param.DurationSec)
-                .SetEase(param.Ease));
+            Sequence.Append(_canvasGroups[^1]
+                .DOFade(_param.Alpha, _param.DurationSec)
+                .SetEase(_param.Ease));
         }
     }
 }
