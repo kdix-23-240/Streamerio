@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Common.UI.Display.Window.Book;
+using OutGame.Result.UI;
 using UnityEngine;
 
 namespace Common.UI.Display.Window
@@ -19,6 +20,7 @@ namespace Common.UI.Display.Window
             return new Dictionary<Type, Type>
             {
                 {typeof(IBookWindow), typeof(BookWindowLifetimeScope)},
+                {typeof(IResultWindow), typeof(ResultWindowLifetimeScope)},
             };
         }
     }

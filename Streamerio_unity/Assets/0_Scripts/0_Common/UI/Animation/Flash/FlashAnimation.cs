@@ -20,7 +20,7 @@ namespace Common.UI.Animation
     {
         private readonly CanvasGroup _canvasGroup;
         private readonly FlashAnimationParamSO _param;
-        
+
         /// <summary>
         /// 【目的】点滅対象とパラメータを受け取り、即座に再生可能な Sequence を構築する。
         /// 【理由】PlayAsync 呼び出し前にシーケンスを準備し、実行時 GC を避けるため。
@@ -46,6 +46,12 @@ namespace Common.UI.Animation
         public override void PlayImmediate()
         {
             _canvasGroup.alpha = _param.MaxAlpha;
+        }
+
+        public override void Skip()
+        {
+            Sequence.Pause();
+            PlayImmediate();
         }
 
         /// <summary>

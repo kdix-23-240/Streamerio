@@ -81,7 +81,7 @@ namespace Common.UI.Animation
         
         public abstract void PlayImmediate();
         
-        public void Skip()
+        public virtual void Skip()
         {
             Sequence.Complete();
         }

@@ -11,6 +11,7 @@ namespace Common.UI.Animation
 		PushUp = 6,
 		Enter = 7,
 		Exit = 8,
+		FlashText = 9,
 
     }
 }
