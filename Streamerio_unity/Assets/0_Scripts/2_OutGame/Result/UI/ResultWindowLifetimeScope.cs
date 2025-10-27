@@ -1,13 +1,7 @@
-using Common.UI.Animation;
-using Common.UI.Display;
-using Common.UI.Display.Background;
-using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Part.Text;
-using TMPro;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 namespace OutGame.Result.UI
 {

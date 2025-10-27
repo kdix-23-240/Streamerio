@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Alchemy.Inspector;
-using Common.UI.Display.Background;
 using Common.UI.Display.Window.Book.Chapter;
 using Common.UI.Display.Window.Book.Page;
 using Common.UI.Part.Button;
@@ -72,6 +71,7 @@ namespace Common.UI.Display.Window.Book
                 BookWindowModel = resolver.Resolve<IBookWindowModel>(),
                 InitialChapterType = _initialChapterType,
                 BookAnimation = resolver.Resolve<IBookAnimation>(),
+                WindowService = resolver.Resolve<IWindowService>(),
             };
         }
 

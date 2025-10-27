@@ -79,7 +79,7 @@ namespace Common.UI.Display.Window.Book.Chapter
             else
             {
                 _isEmptyProp.Value = true;
-                _currentPagePanelIteratorProp = null;
+                _currentPagePanelIteratorProp.Value = null;
                 _previousPagePanelIterator = null;
             }
         }

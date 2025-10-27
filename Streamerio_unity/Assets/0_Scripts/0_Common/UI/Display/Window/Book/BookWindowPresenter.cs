@@ -23,6 +23,8 @@ namespace Common.UI.Display.Window.Book
         private ChapterType _initialChapterType;
         
         private IBookAnimation _bookAnimation;
+        
+        private IWindowService _windowService;
 
         private CancellationTokenSource _windowCts;
         private CancellationTokenSource _chapterCts;
@@ -42,6 +44,7 @@ namespace Common.UI.Display.Window.Book
             _bookWindowModel = context.BookWindowModel;
             _initialChapterType = context.InitialChapterType;
             _bookAnimation = context.BookAnimation;
+            _windowService = context.WindowService;
         }
         
         protected override void CloseEvent()
@@ -111,15 +114,16 @@ namespace Common.UI.Display.Window.Book
         
         private void InitializePage()
         {
+            DisposeWindowEvent();
+            DisposeChapterEvent();
+
             while(!_bookWindowModel.IsEmptyProp.CurrentValue)
             {
                 _bookWindowModel.CurrentPagePanelIterator.GetCurrentPage().Hide();
                 _bookWindowModel.PopTopChapter();
             }
-            
+
             _bookWindowModel.PushChapter(_initialChapterType);
-            _bookWindowModel.CurrentPagePanelIterator.GetCurrentPage().Show();
-            
             BindWindowEvent();
         }
         
@@ -128,6 +132,7 @@ namespace Common.UI.Display.Window.Book
             _windowCts = CancellationTokenSource.CreateLinkedTokenSource(GetCt());
             
             _bookWindowModel.CurrentPagePanelIteratorProp
+                .DistinctUntilChanged()
                 .Where(_ => !_bookWindowModel.IsEmptyProp.CurrentValue)
                 .SubscribeAwait(async (_, ct) =>
                 {
@@ -152,7 +157,7 @@ namespace Common.UI.Display.Window.Book
                 .Where(isEmpty => isEmpty)
                 .SubscribeAwait(async (_, ct) =>
                 {
-                    await HideAsync(ct);
+                    await _windowService.CloseTopAsync(ct);
                 })
                 .RegisterTo(_windowCts.Token);
         }
@@ -206,5 +211,6 @@ namespace Common.UI.Display.Window.Book
         public IBookWindowModel BookWindowModel;
         public ChapterType InitialChapterType;
         public IBookAnimation BookAnimation;
+        public IWindowService WindowService;
     }
 }

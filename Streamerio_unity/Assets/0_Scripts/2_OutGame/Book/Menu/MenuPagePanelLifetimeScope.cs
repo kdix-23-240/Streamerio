@@ -1,5 +1,7 @@
+using Common.Scene;
 using Common.UI.Display.Window.Book.Chapter;
 using Common.UI.Display.Window.Book.Page;
+using Common.UI.Loading;
 using Common.UI.Part.Button;
 using VContainer;
 
@@ -31,6 +33,8 @@ namespace OutGame.Book.Menu
             {
                 View = resolver.Resolve<IMenuPagePanelView>(),
                 BookWindowModel = resolver.Resolve<IBookWindowModel>(),
+                LoadingScreen = resolver.Resolve<ILoadingScreen>(),
+                SceneManager = resolver.Resolve<ISceneManager>(),
             };
         }
     }

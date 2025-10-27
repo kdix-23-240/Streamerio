@@ -1,6 +1,8 @@
 using Common;
+using Common.Scene;
 using Common.UI.Display.Window.Book.Chapter;
 using Common.UI.Display.Window.Book.Page;
+using Common.UI.Loading;
 using R3;
 
 namespace OutGame.Book.Menu
@@ -18,11 +20,15 @@ namespace OutGame.Book.Menu
     public class MenuPagePanelPresenter : PagePanelPresenterBase<IMenuPagePanelView, MenuPagePanelContext>, IMenuPagePanel
     {
         private IBookWindowModel _bookWindowModel;
+        private ILoadingScreen _loadingScreen;
+        private ISceneManager _sceneManager;
 
         protected override void AttachContext(MenuPagePanelContext context)
         {
             base.AttachContext(context);
             _bookWindowModel = context.BookWindowModel;
+            _loadingScreen = context.LoadingScreen;
+            _sceneManager = context.SceneManager;
         }
 
         /// <summary>
@@ -35,9 +41,10 @@ namespace OutGame.Book.Menu
 
             // ゲーム開始ボタン
             View.StartButton.OnClickAsObservable
-                .Subscribe(_ =>
+                .SubscribeAwait(async (_, ct) =>
                 {
-                    Debug.Log("ゲームスタート");
+                    await _loadingScreen.ShowAsync(ct);
+                    await _sceneManager.LoadSceneAsync(SceneType.GameScene);
                 }).RegisterTo(GetCt());
             
             // 遊び方ボタン
@@ -66,5 +73,7 @@ namespace OutGame.Book.Menu
     public class MenuPagePanelContext : PagePanelContext<IMenuPagePanelView>
     {
         public IBookWindowModel BookWindowModel;
+        public ILoadingScreen LoadingScreen;
+        public ISceneManager SceneManager;
     }
 }
