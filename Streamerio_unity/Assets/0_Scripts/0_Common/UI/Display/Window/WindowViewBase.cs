@@ -17,13 +17,8 @@ namespace Common.UI.Display.Window
     /// </summary>
     public abstract class WindowViewBase : DisplayViewBase, IWindowView
     {
-        [SerializeField, LabelText("本体のRectTransform")]
-        private RectTransform _displayRectTransform; // ウィンドウ本体の RectTransform
-
         private IDisplayBackground _background;
-        
-        private ICommonButton _closeButton;
-        public ICommonButton CloseButton => _closeButton;
+        public IDisplayBackground Background => _background;
 
         private IUIAnimation _showAnim; // 表示アニメーション
         private IUIAnimation _hideAnim; // 非表示アニメーション
@@ -33,14 +28,12 @@ namespace Common.UI.Display.Window
         
         [Inject]
         public void Construct(IDisplayBackground background, 
-            [Key(ButtonType.Close)] ICommonButton closeButton,
             [Key(AnimationType.Show)] IUIAnimation showAnim,
             [Key(AnimationType.Hide)] IUIAnimation hideAnim,
             [Key(AnimationType.ShowParts)] IUIAnimation showPartsAnim,
             [Key(AnimationType.HideParts)] IUIAnimation hidePartsAnim)
         {
             _background = background;
-            _closeButton = closeButton;
             
             _showAnim = showAnim;
             _hideAnim = hideAnim;
@@ -100,6 +93,6 @@ namespace Common.UI.Display.Window
     
     public interface IWindowView : IDisplayView
     {
-        ICommonButton CloseButton { get; }
+        IDisplayBackground Background { get; }
     }
 }

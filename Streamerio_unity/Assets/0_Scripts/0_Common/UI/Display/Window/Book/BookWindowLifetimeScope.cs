@@ -33,17 +33,15 @@ namespace Common.UI.Display.Window.Book
         
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<IDisplayBackground, DisplayBackgroundPresenter>(Lifetime.Singleton);
-            
+            builder
+                .Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
+                .Keyed(ButtonType.Close);
             builder
                 .Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
                 .Keyed(ButtonType.NextPage);
             builder
                 .Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
                 .Keyed(ButtonType.BackPage);
-            builder
-                .Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
-                .Keyed(ButtonType.Close);
             
             builder.RegisterComponent<IBookAnimation>(_bookAnimation);
             

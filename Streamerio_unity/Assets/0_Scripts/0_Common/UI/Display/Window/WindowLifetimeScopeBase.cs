@@ -1,4 +1,5 @@
 using Common.UI.Animation;
+using Common.UI.Display.Background;
 using Common.UI.Part;
 using UnityEngine;
 using VContainer;
@@ -24,6 +25,8 @@ namespace Common.UI.Display.Window
         
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.Register<IDisplayBackground, DisplayBackgroundPresenter>(Lifetime.Singleton);
+            
             var showAnim = new MoveAnimation(_displayRectTransform, _showAnimParam);
             var hideAnim = new MoveAnimation(_displayRectTransform, _hideAnimParam);
 

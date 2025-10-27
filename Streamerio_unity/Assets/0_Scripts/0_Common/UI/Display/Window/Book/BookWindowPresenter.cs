@@ -27,6 +27,15 @@ namespace Common.UI.Display.Window.Book
         private CancellationTokenSource _windowCts;
         private CancellationTokenSource _chapterCts;
 
+        protected override void Bind()
+        {
+            base.Bind();
+            
+            View.CloseButton.OnClickAsObservable
+                .Subscribe(_ => { CloseEvent(); })
+                .RegisterTo(GetCt());
+        }
+
         protected override void AttachContext(BookWindowContext context)
         {
             base.AttachContext(context);

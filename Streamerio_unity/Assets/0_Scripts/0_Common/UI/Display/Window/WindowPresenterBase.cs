@@ -24,15 +24,6 @@ namespace Common.UI.Display.Window
             View = context.View;
         }
 
-        protected override void Bind()
-        {
-            base.Bind();
-            
-            View.CloseButton.OnClickAsObservable
-                .Subscribe(_ => { CloseEvent(); })
-                .RegisterTo(GetCt());
-        }
-
         protected abstract void CloseEvent();
     }
 
