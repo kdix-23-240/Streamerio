@@ -103,10 +103,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af9cc557f05343889194d679d4ad1b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameObject: {fileID: 3411413333985420157}
   _rectTransform: {fileID: 5703924959444502392}
   _canvasGroup: {fileID: 5650579027399127566}
-  _showAnimationParam: {fileID: 11400000, guid: 6ea2943fb386c4f6abe72be09ac52c2a, type: 2}
-  _hideAnimationParam: {fileID: 11400000, guid: 5ac7f87e8e8fa426fb49c00158b11276, type: 2}
 --- !u!114 &8957841177701401010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,11 +131,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: Common.GlobalLifeTimeScope
+    TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _view: {fileID: 9005919754493262024}
   _clickTrigger: {fileID: 8957841177701401010}
+  _canvasGroup: {fileID: 5650579027399127566}
+  _showAnimationParam: {fileID: 11400000, guid: 6d3828e2e43144ff6bf3c5f9d16d7986, type: 2}
+  _hideAnimationParam: {fileID: 11400000, guid: 926dc35022d8648598b96f89f6b73327, type: 2}
   _clickSE: 29
-  _showFadeAnimationParam: {fileID: 11400000, guid: 6ea2943fb386c4f6abe72be09ac52c2a, type: 2}
-  _hideFadeAnimationParam: {fileID: 11400000, guid: 5ac7f87e8e8fa426fb49c00158b11276, type: 2}
