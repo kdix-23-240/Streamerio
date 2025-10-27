@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8059553062183026569}
   - component: {fileID: 8419144815408443971}
-  - component: {fileID: 8317097911988549691}
   - component: {fileID: 7183743001128555129}
   m_Layer: 5
   m_Name: Page
@@ -53,22 +52,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &8317097911988549691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 107595907621414477}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 508f4b030fa84666a71486b6227f8ff9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _uiParts:
-  - {fileID: 428073072868286300}
-  _showFadeAnimationParam: {fileID: 11400000, guid: a6f69a937597049f2a8c6ee86c2a0dd8, type: 2}
-  _hideFadeAnimationParam: {fileID: 11400000, guid: eae61f453b5804763b3fd4dc6474fd79, type: 2}
 --- !u!114 &7183743001128555129
 MonoBehaviour:
   m_ObjectHideFlags: 0

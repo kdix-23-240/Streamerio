@@ -1,5 +1,5 @@
 using System.Threading;
-using Common.UI.Part.Group;
+using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using VContainer;
 
@@ -13,12 +13,16 @@ namespace Common.UI.Display.Window.Book.Page
     /// </summary>
     public class CommonPagePanelView : DisplayViewBase, IPagePanelView
     {
-        private ICommonUIPartGroup _partGroup;
+        private IUIAnimation _showAnim;
+        private IUIAnimation _hideAnim;
 
         [Inject]
-        public void Construct(ICommonUIPartGroup partGroup)
+        public void Construct(
+            [Key(AnimationType.ShowParts)] IUIAnimation showAnim,
+            [Key(AnimationType.HideParts)] IUIAnimation hideAnim)
         {
-            _partGroup = partGroup;
+            _showAnim = showAnim;
+            _hideAnim = hideAnim;
         }
 
         /// <summary>
@@ -29,7 +33,7 @@ namespace Common.UI.Display.Window.Book.Page
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             CanvasGroup.alpha = UIUtil.DEFAULT_SHOW_ALPHA;
-            await _partGroup.ShowAsync(ct);
+            await _showAnim.PlayAsync(ct);
         }
 
         /// <summary>
@@ -40,7 +44,7 @@ namespace Common.UI.Display.Window.Book.Page
         public override void Show()
         {
             CanvasGroup.alpha = UIUtil.DEFAULT_SHOW_ALPHA;
-            _partGroup.Show();
+            _showAnim.PlayImmediate();
         }
 
         /// <summary>
@@ -50,7 +54,7 @@ namespace Common.UI.Display.Window.Book.Page
         /// </summary>
         public override async UniTask HideAsync(CancellationToken ct)
         {
-            _partGroup.Hide();
+            _hideAnim.PlayImmediate();
             CanvasGroup.alpha = UIUtil.DEFAULT_HIDE_ALPHA;
             await UniTask.WaitForEndOfFrame(cancellationToken: ct);
         }
@@ -62,7 +66,7 @@ namespace Common.UI.Display.Window.Book.Page
         /// </summary>
         public override void Hide()
         {
-            _partGroup.Hide();
+            _hideAnim.PlayImmediate();
             CanvasGroup.alpha = UIUtil.DEFAULT_HIDE_ALPHA;
         }
     }

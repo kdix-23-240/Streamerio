@@ -3,7 +3,6 @@ using Alchemy.Inspector;
 using Common.UI.Animation;
 using Common.UI.Display.Background;
 using Common.UI.Part.Button;
-using Common.UI.Part.Group;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
@@ -20,40 +19,36 @@ namespace Common.UI.Display.Window
     {
         [SerializeField, LabelText("本体のRectTransform")]
         private RectTransform _displayRectTransform; // ウィンドウ本体の RectTransform
-        
-        [SerializeField, LabelText("初期位置")]
-        private Vector2 _initialPosition; // 表示前の初期位置（アニメ開始位置）
 
         private IDisplayBackground _background;
-        private ICommonUIPartGroup _partGroup;
         
         private ICommonButton _closeButton;
         public ICommonButton CloseButton => _closeButton;
+
+        private IUIAnimation _showAnim; // 表示アニメーション
+        private IUIAnimation _hideAnim; // 非表示アニメーション
+
+        private IUIAnimation _showPartsAnim;
+        private IUIAnimation _hidePartsAnim;
         
-        [Header("アニメーション設定")]
-        [SerializeField, LabelText("表示アニメーション")]
-        private MoveAnimationComponentParamSO _showAnimParam;
-        [SerializeField, LabelText("非表示アニメーション")]
-        private MoveAnimationComponentParamSO _hideAnimParam;
-
-        private MoveAnimationComponent _showAnim; // 表示アニメーション
-        private MoveAnimationComponent _hideAnim; // 非表示アニメーション
-
         [Inject]
-        public void Construct(IDisplayBackground background, ICommonUIPartGroup partGroup, [Key(ButtonType.Close)] ICommonButton closeButton)
+        public void Construct(IDisplayBackground background, 
+            [Key(ButtonType.Close)] ICommonButton closeButton,
+            [Key(AnimationType.Show)] IUIAnimation showAnim,
+            [Key(AnimationType.Hide)] IUIAnimation hideAnim,
+            [Key(AnimationType.ShowParts)] IUIAnimation showPartsAnim,
+            [Key(AnimationType.HideParts)] IUIAnimation hidePartsAnim)
         {
             _background = background;
-            _partGroup = partGroup;
             _closeButton = closeButton;
+            
+            _showAnim = showAnim;
+            _hideAnim = hideAnim;
+            
+            _showPartsAnim = showPartsAnim;
+            _hidePartsAnim = hidePartsAnim;
         }
         
-        public override void Initialize()
-        {
-            base.Initialize();
-            _showAnim = new MoveAnimationComponent(_displayRectTransform, _showAnimParam);
-            _hideAnim = new MoveAnimationComponent(_displayRectTransform, _hideAnimParam);
-        }
-
         /// <summary>
         /// 表示処理（アニメーションあり）。
         /// - 初期位置に戻してから背景を表示
@@ -61,10 +56,9 @@ namespace Common.UI.Display.Window
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            _displayRectTransform.anchoredPosition = _initialPosition;
             await _background.ShowAsync(ct);
             await _showAnim.PlayAsync(ct);
-            await _partGroup.ShowAsync(ct);
+            await _showPartsAnim.PlayAsync(ct);
         }
 
         /// <summary>
@@ -75,8 +69,8 @@ namespace Common.UI.Display.Window
         public override void Show()
         {
             _background.Show();
-            _displayRectTransform.anchoredPosition = _showAnimParam.AnchoredPosition;
-            _partGroup.Show();
+            _showAnim.PlayImmediate();
+            _showPartsAnim.PlayImmediate();
         }
 
         /// <summary>
@@ -88,7 +82,7 @@ namespace Common.UI.Display.Window
         {
             await _hideAnim.PlayAsync(ct);
             await _background.HideAsync(ct);
-            _partGroup.Hide();
+            _hidePartsAnim.PlayImmediate();
         }
 
         /// <summary>
@@ -98,8 +92,8 @@ namespace Common.UI.Display.Window
         /// </summary>
         public override void Hide()
         {
-            _partGroup.Hide();
-            _displayRectTransform.anchoredPosition = _hideAnimParam.AnchoredPosition;
+            _hideAnim.PlayImmediate();
+            _hidePartsAnim.PlayImmediate();
             _background.Hide();
         }
     }

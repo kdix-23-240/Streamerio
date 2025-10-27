@@ -104,17 +104,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7969427659595915259}
   m_SourcePrefab: {fileID: 100100000, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
---- !u!114 &2870962559115972461 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8317097911988549691, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
+--- !u!225 &5857814711576094730 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 428073072868286300, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
   m_PrefabInstance: {fileID: 6105738979791189846}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6180540302604554523}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 508f4b030fa84666a71486b6227f8ff9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6180540302604554523 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 107595907621414477, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
@@ -136,4 +130,8 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _partGroup: {fileID: 2870962559115972461}
+  _animationPartsGroup:
+    _animationParts:
+    - {fileID: 5857814711576094730}
+    _showPartsAnimationParam: {fileID: 11400000, guid: 6d3828e2e43144ff6bf3c5f9d16d7986, type: 2}
+    _hidePartsAnimationParam: {fileID: 11400000, guid: 926dc35022d8648598b96f89f6b73327, type: 2}

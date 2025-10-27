@@ -5,7 +5,6 @@ using Common.UI.Display.Background;
 using Common.UI.Display.Window.Book.Chapter;
 using Common.UI.Display.Window.Book.Page;
 using Common.UI.Part.Button;
-using Common.UI.Part.Group;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -14,12 +13,10 @@ using ZLinq;
 namespace Common.UI.Display.Window.Book
 {
     [RequireComponent(typeof(BookAnimationComponent))]
-    public class BookWindowLifetimeScope: DisplayLifetimeScopeBase<IBookWindow, BookWindowPresenter, IBookWindowView, BookWindowContext>
+    public class BookWindowLifetimeScope: WindowLifetimeScopeBase<IBookWindow, BookWindowPresenter, IBookWindowView, BookWindowContext>
     {
         [SerializeField]
         private ChapterType _initialChapterType;
-        [SerializeField]
-        private CommonUIPartGroup _buttonPartGroup;
         
         [SerializeField, ReadOnly]
         private BookAnimationComponent _bookAnimation;
@@ -36,9 +33,6 @@ namespace Common.UI.Display.Window.Book
         
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterInstance<ICommonUIPartGroup>(_buttonPartGroup)
-                .As<IInitializable>();
-
             builder.Register<IDisplayBackground, DisplayBackgroundPresenter>(Lifetime.Singleton);
             
             builder

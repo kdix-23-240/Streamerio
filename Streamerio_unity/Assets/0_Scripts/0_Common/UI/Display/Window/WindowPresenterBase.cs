@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace Common.UI.Display.Window
 {
+    public interface IWindow : IDisplay
+    {
+        
+    }
+    
     /// <summary>
     /// Window 系 UI の Presenter 基底クラス。
     /// - 共通の View 型として CommonWindowView を利用
@@ -10,8 +15,7 @@ namespace Common.UI.Display.Window
     /// - 共通処理は DisplayPresenterBase に集約されているため、
     ///   ここでは特に追加実装はせず「マーカー的役割」を担う
     /// </summary>
-    [RequireComponent(typeof(WindowViewBase))]
-    public abstract class WindowPresenterBase<TView, TContext> : DisplayPresenterBase<TView, TContext>
+    public abstract class WindowPresenterBase<TView, TContext> : DisplayPresenterBase<TView, TContext>, IWindow
         where TView : IWindowView
         where TContext : WindowContext<TView>
     {

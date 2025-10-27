@@ -28,6 +28,14 @@ PrefabInstance:
       propertyPath: m_VerticalAlignment
       value: 512
       objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: _buttonType
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.Book.Menu.MenuPagePanelLifetimeScope
+      objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name
       value: HowToPlayButton
@@ -158,6 +166,14 @@ PrefabInstance:
     - target: {fileID: 2735418796011418901, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_VerticalAlignment
       value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: _buttonType
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.Book.Menu.MenuPagePanelLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name
@@ -294,6 +310,14 @@ PrefabInstance:
       propertyPath: m_VerticalAlignment
       value: 512
       objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: _buttonType
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.Book.Menu.MenuPagePanelLifetimeScope
+      objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name
       value: CreditButton
@@ -428,6 +452,14 @@ PrefabInstance:
     - target: {fileID: 2735418796011418901, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_VerticalAlignment
       value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: _buttonType
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.Book.Menu.MenuPagePanelLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name
@@ -706,17 +738,6 @@ CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 8419144815408443971, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
   m_PrefabInstance: {fileID: 7309627665666602462}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1593508863751261669 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8317097911988549691, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
-  m_PrefabInstance: {fileID: 7309627665666602462}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7210054414732858259}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 508f4b030fa84666a71486b6227f8ff9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3603927899853886749 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6301304398102782147, guid: 29af205c10b104b3c93cef811d318e97, type: 3}
@@ -774,7 +795,14 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _partGroup: {fileID: 1593508863751261669}
+  _animationPartsGroup:
+    _animationParts:
+    - {fileID: 4649462243339872626}
+    - {fileID: 8828728337854471352}
+    - {fileID: 3611712601963566249}
+    - {fileID: 6121826803032574760}
+    _showPartsAnimationParam: {fileID: 11400000, guid: 6d3828e2e43144ff6bf3c5f9d16d7986, type: 2}
+    _hidePartsAnimationParam: {fileID: 11400000, guid: 926dc35022d8648598b96f89f6b73327, type: 2}
 --- !u!114 &2836373012505584952
 MonoBehaviour:
   m_ObjectHideFlags: 0

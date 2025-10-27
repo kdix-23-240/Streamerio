@@ -160,7 +160,6 @@ GameObject:
   - component: {fileID: 84501704387346200}
   - component: {fileID: 3155024530706216626}
   - component: {fileID: 5045130469795907022}
-  - component: {fileID: 8096296334466867458}
   - component: {fileID: 2784480414958435557}
   m_Layer: 5
   m_Name: BookWindow
@@ -240,9 +239,6 @@ MonoBehaviour:
   _rectTransform: {fileID: 2786838231688197781}
   _canvasGroup: {fileID: 84501704387346200}
   _displayRectTransform: {fileID: 3570075708126123594}
-  _initialPosition: {x: 0, y: -1080}
-  _showAnimParam: {fileID: 11400000, guid: 1a7fd92e1be064637aa5a7ce5f0bd102, type: 2}
-  _hideAnimParam: {fileID: 11400000, guid: cbcb1bb8223d342f08dad2d17aaa5eb1, type: 2}
 --- !u!114 &5045130469795907022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,8 +255,15 @@ MonoBehaviour:
     TypeName: Common.UI.Display.CommonDiaplayLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
+  _displayRectTransform: {fileID: 3570075708126123594}
+  _showAnimParam: {fileID: 11400000, guid: 1a7fd92e1be064637aa5a7ce5f0bd102, type: 2}
+  _hideAnimParam: {fileID: 11400000, guid: cbcb1bb8223d342f08dad2d17aaa5eb1, type: 2}
+  _animationPartGroup:
+    _animationParts:
+    - {fileID: 7606696854660710323}
+    _showPartsAnimationParam: {fileID: 11400000, guid: 6d3828e2e43144ff6bf3c5f9d16d7986, type: 2}
+    _hidePartsAnimationParam: {fileID: 11400000, guid: 926dc35022d8648598b96f89f6b73327, type: 2}
   _initialChapterType: 2
-  _buttonPartGroup: {fileID: 8096296334466867458}
   _bookAnimation: {fileID: 2784480414958435557}
   _chapterPanelDict:
     _keyValuePairs:
@@ -280,22 +283,6 @@ MonoBehaviour:
       _value:
         PageResisterSO: {fileID: 11400000, guid: 022839d99a6f84a6fa71c467a443b854, type: 2}
         Parent: {fileID: 9042074768376760159}
---- !u!114 &8096296334466867458
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4340314849751866102}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 508f4b030fa84666a71486b6227f8ff9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _uiParts:
-  - {fileID: 7606696854660710323}
-  _showFadeAnimationParam: {fileID: 11400000, guid: 6d3828e2e43144ff6bf3c5f9d16d7986, type: 2}
-  _hideFadeAnimationParam: {fileID: 11400000, guid: 926dc35022d8648598b96f89f6b73327, type: 2}
 --- !u!114 &2784480414958435557
 MonoBehaviour:
   m_ObjectHideFlags: 0

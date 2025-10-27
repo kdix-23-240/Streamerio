@@ -1,4 +1,4 @@
-using Common.UI.Part.Group;
+using Common.UI.Part;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -12,11 +12,11 @@ namespace Common.UI.Display.Window.Book.Page
         where TContext : PagePanelContext<TView>
     {
         [SerializeField]
-        private CommonUIPartGroup _partGroup;
+        private AnimationPartGroup _animationPartsGroup;
+        
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterInstance<ICommonUIPartGroup>(_partGroup)
-                .As<IInitializable>();
+            _animationPartsGroup.BindAnimation(builder);
             
             base.Configure(builder);
         }

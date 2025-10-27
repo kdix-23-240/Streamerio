@@ -5,7 +5,7 @@ using R3;
 
 namespace Common.UI.Display.Window.Book
 {
-    public interface IBookWindow: IDisplay, IAttachable<BookWindowContext>
+    public interface IBookWindow: IWindow, IAttachable<BookWindowContext>
     {
         
     }
