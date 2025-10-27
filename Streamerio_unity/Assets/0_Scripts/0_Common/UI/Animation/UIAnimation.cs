@@ -31,6 +31,8 @@ namespace Common.UI.Animation
         /// </para>
         /// </summary>
         UniTask PlayAsync(CancellationToken ct, bool useInitial = true);
+        
+        void PlayImmediate();
 
         void Skip();
     }
@@ -76,6 +78,8 @@ namespace Common.UI.Animation
                 cancellationToken: ct
             );
         }
+        
+        public abstract void PlayImmediate();
         
         public void Skip()
         {

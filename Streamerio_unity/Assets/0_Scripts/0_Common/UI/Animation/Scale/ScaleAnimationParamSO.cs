@@ -15,7 +15,7 @@ namespace Common.UI.Animation
     /// - Ease: 補間方法
     /// </summary>
     [CreateAssetMenu(fileName = "ScaleAnimationSO", menuName = "SO/UI/Animation/Scale")]
-    public class ScaleAnimationComponentParamSO : UIAnimationComponentParamSO
+    public class ScaleAnimationParamSO : UIAnimationComponentParamSO
     {
         /// <summary>
         /// 【目的】アニメーション終了時の拡大率を指定し、クリック演出などで大きさ変化を制御できるようにする。

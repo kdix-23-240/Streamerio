@@ -44,6 +44,14 @@ namespace Common.UI.Animation
             
             await base.PlayAsync(ct, useInitial);
         }
+        
+        public override void PlayImmediate()
+        {
+            foreach (var canvasGroup in _canvasGroups)
+            {
+                canvasGroup.alpha = _param.Alpha;
+            }   
+        }
 
         /// <summary>
         /// 【目的】DOTween の Sequence を構築し、遅延込みで順次フェードする動きを定義する。

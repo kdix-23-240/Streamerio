@@ -42,6 +42,11 @@ namespace Common.UI.Animation
             
             await base.PlayAsync(ct, useInitial);
         }
+        
+        public override void PlayImmediate()
+        {
+            _canvasGroup.alpha = _param.MaxAlpha;
+        }
 
         /// <summary>
         /// 【目的】DOTween の Sequence を構築し、フェードアウト→フェードインを繰り返す動きを定義する。

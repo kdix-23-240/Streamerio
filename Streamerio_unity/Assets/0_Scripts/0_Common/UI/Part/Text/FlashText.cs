@@ -24,13 +24,13 @@ namespace Common.UI.Part.Text
         /// </summary>
         [SerializeField, LabelText("テキストの点滅アニメーション設定")]
         [Tooltip("FlashAnimationComponent が参照する点滅設定アセット。")]
-        private FlashAnimationComponentParamSO _flashAnimationParam;
+        private FlashAnimationParamSO _flashAnimationParam;
         
         /// <summary>
         /// 【目的】点滅アニメーションを実行するコンポーネントをキャッシュする。
         /// 【理由】Play 毎にインスタンスを生成せず、連続起動時の GC を抑えるため。
         /// </summary>
-        private FlashAnimationComponent _flashAnimation;
+        private FlashAnimation _flashAnimation;
         /// <summary>
         /// 【目的】再生中のアニメーションを停止させるための CancellationTokenSource を保持する。
         /// 【理由】StopTextAnimation 呼び出しで確実に演出を止め、破棄時のリークを避けるため。
@@ -43,7 +43,7 @@ namespace Common.UI.Part.Text
         /// </summary>
         public void Initialize()
         {
-            _flashAnimation = new FlashAnimationComponent(CanvasGroup, _flashAnimationParam);
+            _flashAnimation = new FlashAnimation(CanvasGroup, _flashAnimationParam);
         }
         
         /// <summary>

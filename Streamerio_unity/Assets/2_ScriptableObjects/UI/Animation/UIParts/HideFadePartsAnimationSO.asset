@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f049fd172e0348deb0c3ac4bfa862805, type: 3}
   m_Name: HideFadePartsAnimationSO
   m_EditorClassIdentifier: 
-  DurationSec: 0.3
+  DurationSec: 0.1
   Ease: 3
   InitialAlpha: 1
   Alpha: 0
-  ShowDelaySec: 0.1
+  ShowDelaySec: 0.05

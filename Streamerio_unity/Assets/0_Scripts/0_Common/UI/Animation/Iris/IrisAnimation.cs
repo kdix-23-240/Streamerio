@@ -77,6 +77,12 @@ namespace Common.UI.Animation
         /// </summary>
         public abstract UniTask PlayAsync(CancellationToken ct, bool useInitial = true);
         
+        public void PlayImmediate()
+        {
+            _material.SetVector(Param.CenterPropertyName, Param.Center);
+            _material.SetFloat(Param.RadiusPropertyName, Param.MaxRadius);
+        }
+        
         /// <summary>
         /// 【目的】イリスアニメーションを共通ロジックで再生し、中心や半径の設定を一箇所に集約する。
         /// - 中心座標と開始半径を設定

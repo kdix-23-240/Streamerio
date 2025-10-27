@@ -48,6 +48,11 @@ namespace Common.UI.Animation
                 .ToUniTask(cancellationToken: ct);
         }
         
+        public void PlayImmediate()
+        {
+            _rectTransform.anchoredPosition = _param.AnchoredPosition;
+        }
+        
         public void Skip()
         {
             _rectTransform.DOComplete();

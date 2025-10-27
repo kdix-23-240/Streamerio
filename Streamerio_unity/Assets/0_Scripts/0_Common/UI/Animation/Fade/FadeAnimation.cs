@@ -49,6 +49,11 @@ namespace Common.UI.Animation
                 .ToUniTask(cancellationToken: ct);
         }
         
+        public void PlayImmediate()
+        {
+            _canvasGroup.alpha = _param.Alpha;
+        }
+        
         public void Skip()
         {
             _canvasGroup.DOComplete();

@@ -52,6 +52,14 @@ namespace Common.UI.Animation
                 .ToUniTask(cancellationToken: ct);
         }  
         
+        public void PlayImmediate()
+        {
+            if (_param.Path.Length > 0)
+            {
+                _rectTransform.localPosition = _param.Path[^1];
+            }
+        }
+        
         public void Skip()
         {
             _rectTransform.DOComplete();
