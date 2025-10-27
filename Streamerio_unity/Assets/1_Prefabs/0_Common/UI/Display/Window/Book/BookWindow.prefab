@@ -238,7 +238,6 @@ MonoBehaviour:
   _gameObject: {fileID: 4340314849751866102}
   _rectTransform: {fileID: 2786838231688197781}
   _canvasGroup: {fileID: 84501704387346200}
-  _displayRectTransform: {fileID: 3570075708126123594}
 --- !u!114 &5045130469795907022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,6 +282,7 @@ MonoBehaviour:
       _value:
         PageResisterSO: {fileID: 11400000, guid: 022839d99a6f84a6fa71c467a443b854, type: 2}
         Parent: {fileID: 9042074768376760159}
+  _nextStateOnClose: 2
 --- !u!114 &2784480414958435557
 MonoBehaviour:
   m_ObjectHideFlags: 0

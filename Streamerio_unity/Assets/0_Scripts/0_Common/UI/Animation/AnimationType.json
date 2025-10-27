@@ -34,5 +34,9 @@
   {
     "Name": "FlashText",
     "Num": 9
+  },
+  {
+    "Name": "TitleBackground",
+    "Num": 10
   }
 ]

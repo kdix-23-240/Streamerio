@@ -3,6 +3,7 @@ using Common.Booster;
 using Common.QRCode;
 using Common.Save;
 using Common.Scene;
+using Common.State;
 using Common.UI.Dialog;
 using Common.UI.Dialog.Test;
 using Common.UI.Display.Overlay;
@@ -27,6 +28,8 @@ public class GlobalLifetimeScope : LifetimeScope
             .AsImplementedInterfaces();
         
         builder.Register<ILoadingScreen, LoadingScreenPresenter>(Lifetime.Singleton);
+        
+        builder.Register<IStateManager, StateManager>(Lifetime.Singleton);
         
         builder.Register<IQRCodeService, QRCodeService>(Lifetime.Singleton)
             .WithParameter(new QRCodeSpriteFactory());

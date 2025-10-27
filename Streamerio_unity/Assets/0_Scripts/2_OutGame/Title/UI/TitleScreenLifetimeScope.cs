@@ -1,10 +1,10 @@
 using Alchemy.Inspector;
 using Common;
 using Common.Audio;
+using Common.State;
 using Common.UI.Animation;
 using Common.UI.Click;
 using Common.UI.Display;
-using Common.UI.Display.Window;
 using Common.UI.Part.Text;
 using R3.Triggers;
 using UnityEngine;
@@ -72,7 +72,8 @@ namespace OutGame.Title.UI
             {
                 View = resolver.Resolve<ITitleScreenView>(),
                 ClickEventBinder = binder,
-                WindowService = resolver.Resolve<IWindowService>(),
+                StateManager = resolver.Resolve<IStateManager>(),
+                NextState = resolver.Resolve<IState>(StateType.Menu)
             };
         }
     }

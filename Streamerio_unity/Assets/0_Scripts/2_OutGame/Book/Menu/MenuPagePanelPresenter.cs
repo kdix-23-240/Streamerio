@@ -1,5 +1,7 @@
 using Common;
 using Common.Scene;
+using Common.State;
+using Common.UI.Animation;
 using Common.UI.Display.Window.Book.Chapter;
 using Common.UI.Display.Window.Book.Page;
 using Common.UI.Loading;
@@ -20,15 +22,15 @@ namespace OutGame.Book.Menu
     public class MenuPagePanelPresenter : PagePanelPresenterBase<IMenuPagePanelView, MenuPagePanelContext>, IMenuPagePanel
     {
         private IBookWindowModel _bookWindowModel;
-        private ILoadingScreen _loadingScreen;
-        private ISceneManager _sceneManager;
-
+        private IStateManager _stateManager;
+        private IState _nextState;
+        
         protected override void AttachContext(MenuPagePanelContext context)
         {
             base.AttachContext(context);
             _bookWindowModel = context.BookWindowModel;
-            _loadingScreen = context.LoadingScreen;
-            _sceneManager = context.SceneManager;
+            _stateManager = context.StateManager;
+            _nextState = context.NextState;
         }
 
         /// <summary>
@@ -41,10 +43,9 @@ namespace OutGame.Book.Menu
 
             // ゲーム開始ボタン
             View.StartButton.OnClickAsObservable
-                .SubscribeAwait(async (_, ct) =>
+                .Subscribe(_ =>
                 {
-                    await _loadingScreen.ShowAsync(ct);
-                    await _sceneManager.LoadSceneAsync(SceneType.GameScene);
+                    _stateManager.ChangeState(_nextState);
                 }).RegisterTo(GetCt());
             
             // 遊び方ボタン
@@ -73,7 +74,7 @@ namespace OutGame.Book.Menu
     public class MenuPagePanelContext : PagePanelContext<IMenuPagePanelView>
     {
         public IBookWindowModel BookWindowModel;
-        public ILoadingScreen LoadingScreen;
-        public ISceneManager SceneManager;
+        public IStateManager StateManager;
+        public IState NextState;
     }
 }

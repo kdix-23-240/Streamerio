@@ -1,4 +1,5 @@
 using Common;
+using Common.State;
 using Common.UI.Click;
 using Common.UI.Display;
 using Common.UI.Display.Window;
@@ -14,13 +15,16 @@ namespace OutGame.Title.UI
 	public class TitleScreenPresenter : DisplayPresenterBase<ITitleScreenView, TitleScreenContext>, ITitleScreen
 	{
 		private IClickEventBinder _clickEventBinder;
-		private IWindowService _windowService;
+		
+		private IStateManager _stateManager;
+		private IState _nextState;
 
 		protected override void AttachContext(TitleScreenContext context)
 		{
 			View = context.View;
 			_clickEventBinder = context.ClickEventBinder;
-			_windowService = context.WindowService;
+			_stateManager = context.StateManager;
+			_nextState = context.NextState;
 		}
 
 		protected override void Bind()
@@ -29,12 +33,10 @@ namespace OutGame.Title.UI
 
 			_clickEventBinder.BindClickEvent();
 			_clickEventBinder.ClickEvent
-				.SubscribeAwait(async (_, ct) =>
+				.Subscribe(_ => 
 				{
-					await HideAsync(ct);
-					await _windowService.OpenAndWaitCloseAsync<IBookWindow>(ct);
-					await ShowAsync(ct);
-				}, AwaitOperation.Drop)
+					_stateManager.ChangeState(_nextState);
+				})
 				.RegisterTo(GetCt());
 		}
 	}
@@ -44,7 +46,8 @@ namespace OutGame.Title.UI
 	{
 		public ITitleScreenView View;
 		public IClickEventBinder ClickEventBinder;
-		public IWindowService WindowService;
+		public IStateManager StateManager;
+		public IState NextState;
 	}
 
 }

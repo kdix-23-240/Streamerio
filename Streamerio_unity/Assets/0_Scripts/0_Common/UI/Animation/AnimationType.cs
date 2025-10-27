@@ -12,6 +12,7 @@ namespace Common.UI.Animation
 		Enter = 7,
 		Exit = 8,
 		FlashText = 9,
+		TitleBackground = 10,
 
     }
 }

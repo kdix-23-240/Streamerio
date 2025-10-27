@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alchemy.Inspector;
+using Common.State;
 using Common.UI.Display.Window.Book.Chapter;
 using Common.UI.Display.Window.Book.Page;
 using Common.UI.Part.Button;
@@ -23,6 +24,9 @@ namespace Common.UI.Display.Window.Book
         [SerializeField]
         private SerializeDictionary<ChapterType, ChapterData> _chapterPanelDict;
 
+        [SerializeField]
+        private StateType _nextStateOnClose;
+        
 #if UNITY_EDITOR
         protected void OnValidate()
         {
@@ -42,7 +46,7 @@ namespace Common.UI.Display.Window.Book
                 .Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
                 .Keyed(ButtonType.BackPage);
             
-            builder.RegisterComponent<IBookAnimation>(_bookAnimation);
+            builder.RegisterComponent<IBookAnimation>(_bookAnimation); ;
             
             Dictionary<ChapterType, IPagePanelIterator> pagePanelIteratorDict = _chapterPanelDict.ToDictionary()
                 .AsValueEnumerable()
@@ -71,7 +75,8 @@ namespace Common.UI.Display.Window.Book
                 BookWindowModel = resolver.Resolve<IBookWindowModel>(),
                 InitialChapterType = _initialChapterType,
                 BookAnimation = resolver.Resolve<IBookAnimation>(),
-                WindowService = resolver.Resolve<IWindowService>(),
+                StateManager = resolver.Resolve<IStateManager>(),
+                NextState = resolver.Resolve<IState>(_nextStateOnClose),
             };
         }
 

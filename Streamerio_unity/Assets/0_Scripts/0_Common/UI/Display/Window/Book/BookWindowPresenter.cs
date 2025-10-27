@@ -1,4 +1,5 @@
 using System.Threading;
+using Common.State;
 using Common.UI.Display.Window.Book.Chapter;
 using Cysharp.Threading.Tasks;
 using R3;
@@ -23,8 +24,9 @@ namespace Common.UI.Display.Window.Book
         private ChapterType _initialChapterType;
         
         private IBookAnimation _bookAnimation;
-        
-        private IWindowService _windowService;
+
+        private IStateManager _stateManager;
+        private IState _nextState;
 
         private CancellationTokenSource _windowCts;
         private CancellationTokenSource _chapterCts;
@@ -44,7 +46,8 @@ namespace Common.UI.Display.Window.Book
             _bookWindowModel = context.BookWindowModel;
             _initialChapterType = context.InitialChapterType;
             _bookAnimation = context.BookAnimation;
-            _windowService = context.WindowService;
+            _stateManager = context.StateManager;
+            _nextState = context.NextState;
         }
         
         protected override void CloseEvent()
@@ -155,9 +158,9 @@ namespace Common.UI.Display.Window.Book
                 .SkipWhile(isEmpty => isEmpty)
                 .DistinctUntilChanged()
                 .Where(isEmpty => isEmpty)
-                .SubscribeAwait(async (_, ct) =>
+                .Subscribe(_ =>
                 {
-                    await _windowService.CloseTopAsync(ct);
+                    _stateManager.ChangeState(_nextState);
                 })
                 .RegisterTo(_windowCts.Token);
         }
@@ -211,6 +214,7 @@ namespace Common.UI.Display.Window.Book
         public IBookWindowModel BookWindowModel;
         public ChapterType InitialChapterType;
         public IBookAnimation BookAnimation;
-        public IWindowService WindowService;
+        public IStateManager StateManager;
+        public IState NextState;
     }
 }
