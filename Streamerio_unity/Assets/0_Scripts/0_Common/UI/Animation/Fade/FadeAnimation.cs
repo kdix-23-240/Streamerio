@@ -16,17 +16,17 @@ namespace Common.UI.Animation
     /// - CanvasGroup の alpha を補間して透明度を変更
     /// - DOTween を利用して非同期でアニメーションを実行
     /// </summary>
-    public class FadeAnimationComponent : IUIAnimationComponent
+    public class FadeAnimation : IUIAnimation
     {
         private readonly CanvasGroup _canvasGroup;
-        private readonly FadeAnimationComponentParamSO _param;
+        private readonly FadeAnimationParamSO _param;
 
         /// <summary>
         /// 【目的】演出対象の CanvasGroup とパラメータを束ね、再生時に都度依存を渡さなくて済むようにする。
         /// </summary>
         /// <param name="canvasGroup">【用途】アルファ値を補間する対象。</param>
         /// <param name="param">【用途】目標アルファ値や再生時間を保持する ScriptableObject。</param>
-        public FadeAnimationComponent(CanvasGroup canvasGroup, FadeAnimationComponentParamSO param)
+        public FadeAnimation(CanvasGroup canvasGroup, FadeAnimationParamSO param)
         {
             _canvasGroup = canvasGroup;
             _param = param;

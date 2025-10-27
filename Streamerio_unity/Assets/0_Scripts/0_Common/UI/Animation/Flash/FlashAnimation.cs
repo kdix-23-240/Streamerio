@@ -16,16 +16,16 @@ namespace Common.UI.Animation
     /// - CanvasGroup の alpha を補間してフェードイン/フェードアウトを繰り返す
     /// - DOTween のシーケンスで制御
     /// </summary>
-    public class FlashAnimationComponent : SequenceAnimationComponentBase
+    public class FlashAnimation : SequenceAnimationBase
     {
         private readonly CanvasGroup _canvasGroup;
-        private readonly FlashAnimationComponentParamSO _param;
+        private readonly FlashAnimationParamSO _param;
         
         /// <summary>
         /// 【目的】点滅対象とパラメータを受け取り、即座に再生可能な Sequence を構築する。
         /// 【理由】PlayAsync 呼び出し前にシーケンスを準備し、実行時 GC を避けるため。
         /// </summary>
-        public FlashAnimationComponent(CanvasGroup canvasGroup, FlashAnimationComponentParamSO param)
+        public FlashAnimation(CanvasGroup canvasGroup, FlashAnimationParamSO param)
         {
             _canvasGroup = canvasGroup;
             _param = param;

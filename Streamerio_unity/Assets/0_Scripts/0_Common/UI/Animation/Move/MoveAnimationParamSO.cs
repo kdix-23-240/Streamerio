@@ -15,7 +15,7 @@ namespace Common.UI.Animation
     /// - Ease: 補間方法（基底から継承）
     /// </summary>
     [CreateAssetMenu(fileName = "MoveAnimationSO", menuName = "SO/UI/Animation/Move")]
-    public class MoveAnimationComponentParamSO : UIAnimationComponentParamSO
+    public class MoveAnimationParamSO : UIAnimationComponentParamSO
     {
         /// <summary>
         /// 【目的】RectTransform.anchoredPosition の目標値を指定し、演出後の位置をデータ側で制御する。

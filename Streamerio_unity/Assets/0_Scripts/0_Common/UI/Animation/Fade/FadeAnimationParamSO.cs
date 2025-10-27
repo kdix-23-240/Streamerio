@@ -18,7 +18,7 @@ namespace Common.UI.Animation
     /// </para>
     /// </summary>
     [CreateAssetMenu(fileName = "FadeAnimationSO", menuName = "SO/UI/Animation/Fade")]
-    public class FadeAnimationComponentParamSO : UIAnimationComponentParamSO
+    public class FadeAnimationParamSO : UIAnimationComponentParamSO
     {
         /// <summary>
         /// 【目的】アニメーション完了時の目標透明度を設定し、演出の強度をデザイナーが調整できるようにする。

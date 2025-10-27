@@ -16,7 +16,7 @@ namespace Common.UI.Animation
     /// - FlashCount: 点滅回数（-1 なら無限）
     /// </summary>
     [CreateAssetMenu(fileName = "FlashAnimationSO", menuName = "SO/UI/Animation/Flash")]
-    public class FlashAnimationComponentParamSO : UIAnimationComponentParamSO
+    public class FlashAnimationParamSO : UIAnimationComponentParamSO
     {
         /// <summary>
         /// 【目的】点滅時の最小透明度を指定し、どの程度まで暗くなるかを制御する。

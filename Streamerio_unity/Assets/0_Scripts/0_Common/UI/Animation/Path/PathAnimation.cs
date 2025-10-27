@@ -18,17 +18,17 @@ namespace Common.UI.Animation
     /// - PathType によって直線 / 曲線補間を切り替え可能
     /// - 非同期で再生し、CancellationToken で中断も可能
     /// </summary>
-    public class PathAnimationComponent : IUIAnimationComponent
+    public class PathAnimation : IUIAnimation
     {
         private readonly RectTransform _rectTransform;
-        private readonly PathAnimationComponentParamSO _param;
+        private readonly PathAnimationParamSO _param;
 
         /// <summary>
         /// 【目的】対象 RectTransform とパス設定を束ね、再生ロジックから分離する。
         /// </summary>
         /// <param name="rectTransform">【用途】経路移動させたい UI 要素。</param>
         /// <param name="param">【用途】通過点や補間方法を保持する ScriptableObject。</param>
-        public PathAnimationComponent(RectTransform rectTransform, PathAnimationComponentParamSO param)
+        public PathAnimation(RectTransform rectTransform, PathAnimationParamSO param)
         {
             _rectTransform = rectTransform;
             _param = param;

@@ -16,7 +16,7 @@ namespace Common.UI.Animation
     /// - 開閉範囲（Min/Max半径）
     /// </summary>
     [CreateAssetMenu(fileName = "IrisAnimationSO", menuName = "SO/UI/Animation/Iris")]
-    public class IrisAnimationComponentParamSO : UIAnimationComponentParamSO
+    public class IrisAnimationParamSO : UIAnimationComponentParamSO
     {
         /// <summary>
         /// 【目的】マテリアル上で円の中心を表すプロパティ名を指定し、カスタムシェーダと連携する。

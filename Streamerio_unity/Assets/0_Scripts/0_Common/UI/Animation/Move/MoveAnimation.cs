@@ -16,17 +16,17 @@ namespace Common.UI.Animation
     /// - DOTween の DOAnchorPos を利用
     /// - 非同期で再生でき、CancellationToken による中断も可能
     /// </summary>
-    public class MoveAnimationComponent : IUIAnimationComponent
+    public class MoveAnimation : IUIAnimation
     {
         private readonly RectTransform _rectTransform;
-        private readonly MoveAnimationComponentParamSO _param;
+        private readonly MoveAnimationParamSO _param;
         
         /// <summary>
         /// 【目的】移動対象とパラメータを関連付け、再生時に毎回依存を探し直さないようにする。
         /// </summary>
         /// <param name="rectTransform">【用途】DOAnchorPos で補間する RectTransform。</param>
         /// <param name="param">【用途】目標座標や補間設定を保持する ScriptableObject。</param>
-        public MoveAnimationComponent(RectTransform rectTransform, MoveAnimationComponentParamSO param)
+        public MoveAnimation(RectTransform rectTransform, MoveAnimationParamSO param)
         {
             _rectTransform = rectTransform;
             _param = param;

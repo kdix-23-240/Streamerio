@@ -20,7 +20,7 @@ namespace Common.UI.Animation
     /// 【理由】演出処理を統一 API で扱い、Presenter から await 可能にするため。
     /// </para>
     /// </summary>
-    public interface IUIAnimationComponent
+    public interface IUIAnimation
     {
         /// <summary>
         /// アニメーションを再生する。
@@ -41,7 +41,7 @@ namespace Common.UI.Animation
     /// - 派生クラスはコンストラクタ内で Sequence にアニメーションを組み立てる
     /// - PlayAsync で Restart して最初から再生し、完了まで待機できる
     /// </summary>
-    public abstract class SequenceAnimationComponentBase : IUIAnimationComponent, IDisposable
+    public abstract class SequenceAnimationBase : IUIAnimation, IDisposable
     {
         /// <summary>
         /// 管理対象の DOTween Sequence。
@@ -53,7 +53,7 @@ namespace Common.UI.Animation
         /// </summary>
         protected Sequence Sequence;
         
-        protected SequenceAnimationComponentBase()
+        protected SequenceAnimationBase()
         {
             Sequence = DOTween.Sequence()
                 .SetAutoKill(false) // 完了しても破棄されず再利用可能

@@ -17,7 +17,7 @@ namespace Common.UI.Animation
     /// - DurationSec / Ease: アニメーション速度やイージング（基底から継承）
     /// </summary>
     [CreateAssetMenu(fileName = "PathAnimationSO", menuName = "SO/UI/Animation/Path")]
-    public class PathAnimationComponentParamSO : UIAnimationComponentParamSO
+    public class PathAnimationParamSO : UIAnimationComponentParamSO
     {
         public Vector3 InitialPosition; 
         /// <summary>

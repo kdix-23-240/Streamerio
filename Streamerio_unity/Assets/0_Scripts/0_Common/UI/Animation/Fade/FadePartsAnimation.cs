@@ -16,15 +16,15 @@ namespace Common.UI.Animation
     /// - DOTween の Sequence を使って順番にアニメーションを構築
     /// - 各パーツ間にディレイを挿入可能
     /// </summary>
-    public class FadePartsAnimationComponent : SequenceAnimationComponentBase
+    public class FadePartsAnimation : SequenceAnimationBase
     {
         private readonly CanvasGroup[] _canvasGroups;
-        private readonly FadePartsAnimationComponentParamSO _param;
+        private readonly FadePartsAnimationParamSO _param;
         /// <summary>
         /// 【目的】対象パーツ群とパラメータを受け取り、再利用可能な DOTween Sequence を組み立てる。
         /// 【理由】コンストラクタ内でセットアップしておくことで、PlayAsync 呼び出し時に余計な GC を発生させないため。
         /// </summary>
-        public FadePartsAnimationComponent(CanvasGroup[] canvasGroups, FadePartsAnimationComponentParamSO param)
+        public FadePartsAnimation(CanvasGroup[] canvasGroups, FadePartsAnimationParamSO param)
         {
             _canvasGroups = canvasGroups;
             _param = param;
@@ -42,7 +42,7 @@ namespace Common.UI.Animation
                 }   
             }
             
-            await base.PlayAsync(ct);
+            await base.PlayAsync(ct, useInitial);
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Common.UI.Animation
     /// - ShowDelaySec を追加してパーツごとの遅延を指定可能
     /// </summary>
     [CreateAssetMenu(fileName = "FadePartsAnimationSO", menuName = "SO/UI/Animation/FadeParts")]
-    public class FadePartsAnimationComponentParamSO : FadeAnimationComponentParamSO
+    public class FadePartsAnimationParamSO : FadeAnimationParamSO
     {
         /// <summary>
         /// 【目的】パーツ間の演出間隔を秒指定で調整し、演出テンポをチューニングできるようにする。

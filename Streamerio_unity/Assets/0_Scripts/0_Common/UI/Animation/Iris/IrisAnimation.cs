@@ -14,13 +14,13 @@ namespace Common.UI.Animation
     /// <summary>
     /// 円が閉じるアニメーション（外から内へ収束）。
     /// </summary>
-    public class IrisInAnimationComponent : IrisAnimationComponent
+    public class IrisInAnimation : IrisAnimation
     {
         /// <summary>
         /// 【目的】閉じ演出に必要なマテリアルとパラメータを基底へ渡す。
         /// 【理由】Material を共有しつつ半径だけ切り替えることで GC を抑えるため。
         /// </summary>
-        public IrisInAnimationComponent(Material material, IrisAnimationComponentParamSO param) 
+        public IrisInAnimation(Material material, IrisAnimationParamSO param) 
             : base(material, param) { }
 
         /// <inheritdoc/>
@@ -33,12 +33,12 @@ namespace Common.UI.Animation
     /// <summary>
     /// 円が開くアニメーション（内から外へ拡散）。
     /// </summary>
-    public class IrisOutAnimationComponent : IrisAnimationComponent
+    public class IrisOutAnimation : IrisAnimation
     {
         /// <summary>
         /// 【目的】開き演出に必要なマテリアルとパラメータを基底へ渡す。
         /// </summary>
-        public IrisOutAnimationComponent(Material material, IrisAnimationComponentParamSO param) 
+        public IrisOutAnimation(Material material, IrisAnimationParamSO param) 
             : base(material, param) { }
 
         /// <inheritdoc/>
@@ -53,19 +53,19 @@ namespace Common.UI.Animation
     /// - 指定した半径を DOTween で補間しながらシェーダープロパティに反映
     /// - 開閉の方向は派生クラスで制御
     /// </summary>
-    public abstract class IrisAnimationComponent : IUIAnimationComponent
+    public abstract class IrisAnimation : IUIAnimation
     {
         private readonly Material _material;
         /// <summary>
         /// 【目的】アニメーションに必要な半径や中心情報を保持し、派生クラスからも調整可能にする。
         /// </summary>
-        protected IrisAnimationComponentParamSO Param;
+        protected IrisAnimationParamSO Param;
         
         /// <summary>
         /// 【目的】演出ターゲットとなるマテリアルと設定値を保持する。
         /// 【理由】毎回 Material を検索せず、事前に参照を確保しておくことで描画コストを抑える。
         /// </summary>
-        protected IrisAnimationComponent(Material material, IrisAnimationComponentParamSO param)
+        protected IrisAnimation(Material material, IrisAnimationParamSO param)
         {
             _material = material;
             Param = param;
