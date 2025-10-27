@@ -27,7 +27,7 @@ namespace Common.UI.Dialog
         {
             return new Dictionary<Type, Type>
             {
-                {typeof(QRCodeDialogPresenter), typeof(QRCodeDialogLifetimeScope)},
+                {typeof(IQRCodeDialog), typeof(QRCodeDialogLifetimeScope)},
             };
         }
     }

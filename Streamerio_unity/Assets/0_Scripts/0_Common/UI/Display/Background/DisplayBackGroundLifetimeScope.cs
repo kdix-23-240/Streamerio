@@ -4,6 +4,7 @@
 
 using Alchemy.Inspector;
 using Common.Audio;
+using Common.UI.Animation;
 using Common.UI.Click;
 using R3.Triggers;
 using UnityEngine;
@@ -27,6 +28,14 @@ namespace Common.UI.Display.Background
         [SerializeField, ReadOnly]
         [Tooltip("PointerEventData を流す ObservableEventTrigger。OnValidate で自動補完される。")]
         private ObservableEventTrigger _clickTrigger;
+        
+        [SerializeField, ReadOnly]
+        private CanvasGroup _canvasGroup;
+        
+        [SerializeField]
+        private FadeAnimationParamSO _showAnimationParam;
+        [SerializeField]
+        private FadeAnimationParamSO _hideAnimationParam;
 
         [Header("Settings")]
         /// <summary>
@@ -45,8 +54,19 @@ namespace Common.UI.Display.Background
         private void OnValidate()
         {
             _clickTrigger ??= GetComponent<ObservableEventTrigger>();
+            _canvasGroup ??= GetComponent<CanvasGroup>();
         }
 #endif
+
+        protected override void Configure(IContainerBuilder builder)
+        {
+            builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_canvasGroup, _showAnimationParam))
+                .Keyed(AnimationType.Show);
+            builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_canvasGroup, _hideAnimationParam))
+                .Keyed(AnimationType.Hide);
+            
+            base.Configure(builder);
+        }
 
         protected override void BindPresenter(IContainerBuilder builder)
         {

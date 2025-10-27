@@ -18,7 +18,7 @@ namespace InGame.QRCode.UI
     /// 【目的】QR コードを表示するダイアログの View として、Image への Sprite 適用を担当する。
     /// 【理由】Presenter が生成した Sprite を即座に表示し、UI 側で追加処理を持たないシンプルな責務へ限定するため。
     /// </summary>
-    public class QRCodeDialogView : DialogViewBase
+    public class QRCodeDialogView : DialogViewBase, IQRCodeDialogView
     {
         /// <summary>
         /// 【目的】表示対象となる Image コンポーネントを Inspector から設定する。

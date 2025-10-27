@@ -55,14 +55,14 @@ namespace Common.UI.Dialog
         /// </summary>
         [SerializeField, LabelText("表示アニメーション")]
         [Tooltip("表示時に辿る PathAnimation 設定。")]
-        private PathAnimationComponentParamSO _showAnimationParam;
+        private PathAnimationParamSO _showAnimationParam;
         /// <summary>
         /// 【目的】ダイアログ非表示時の移動経路と補間設定を保持する。
         /// 【理由】表示と対になる演出を同一ファイルで管理し、挙動差異が発生しないようにするため。
         /// </summary>
         [SerializeField, LabelText("非表示アニメーション")]
         [Tooltip("非表示時に辿る PathAnimation 設定。")]
-        private PathAnimationComponentParamSO _hideAnimationParam;
+        private PathAnimationParamSO _hideAnimationParam;
 
         /// <summary>
         /// 【目的】背景 Presenter の参照を保持し、表示/非表示時に即座に呼び出せるようにする。
@@ -78,12 +78,12 @@ namespace Common.UI.Dialog
         /// 【目的】表示アニメーションの実行コンポーネントをキャッシュする。
         /// 【理由】毎回インスタンス生成せずに済ませ、GC 発生や初回遅延を防ぐため。
         /// </summary>
-        private PathAnimationComponent _showAnimation;
+        private PathAnimation _showAnimation;
         /// <summary>
         /// 【目的】非表示アニメーションの実行コンポーネントをキャッシュする。
         /// 【理由】Hide のたびに新規生成すると GC が発生し、演出がカクつくため。
         /// </summary>
-        private PathAnimationComponent _hideAnimation;
+        private PathAnimation _hideAnimation;
 
         /// <summary>
         /// 【目的】背景 Presenter を公開し、Presenter 層がフェード制御やクリック検知を扱えるようにする。
@@ -114,8 +114,8 @@ namespace Common.UI.Dialog
         {
             base.Initialize();
             
-            _showAnimation = new PathAnimationComponent(_moveRectTransform, _showAnimationParam);
-            _hideAnimation = new PathAnimationComponent(_moveRectTransform, _hideAnimationParam);
+            _showAnimation = new PathAnimation(_moveRectTransform, _showAnimationParam);
+            _hideAnimation = new PathAnimation(_moveRectTransform, _hideAnimationParam);
         }
         
         /// <summary>
