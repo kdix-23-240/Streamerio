@@ -4,12 +4,9 @@
 // 使用例: OverlayViewBase を継承して固有演出を追加しつつ、共通のフェード/パーツ制御を再利用する。
 // ============================================================================
 
-using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using Common.UI.Part.Group;
-using UnityEngine;
 using VContainer;
 
 namespace Common.UI.Display.Overlay
@@ -32,30 +29,24 @@ namespace Common.UI.Display.Overlay
     /// </summary>
     public abstract class OverlayViewBase : DisplayViewBase, IOverlayView
     {
-        // 部分的なフェード演出を委譲するグループ。Overlay 表示時に順次表示する役割を担う。
-        private ICommonUIPartGroup _partGroup;
+        private IUIAnimation _showAnimation;
+        private IUIAnimation _hideAnimation;
         
-        [Header("アニメーション")] 
-        [SerializeField, LabelText("非表示アニメーション")]
-        [Tooltip("オーバーレイを非表示にするときのフェード設定。")]
-        private FadeAnimationComponentParamSO _hideAnimationParam;
-        
-        private FadeAnimationComponent _hideAnimation;
+        private IUIAnimation _partShowAnimation;
+        private IUIAnimation _partHideAnimaiton;
 
         [Inject]
-        /// <summary>
-        /// 【目的】DI から共通パーツグループを受け取り、表示/非表示のアニメーションを委譲する。
-        /// </summary>
-        public virtual void Construct(ICommonUIPartGroup partGroup)
+        public virtual void Construct(
+            [Key(AnimationType.Show)] IUIAnimation showAnimation,
+            [Key(AnimationType.Hide)] IUIAnimation hideAnimation,
+            [Key(AnimationType.ShowParts)] IUIAnimation partShowAnimation,
+            [Key(AnimationType.HideParts)] IUIAnimation partHideAnimation)
         {
-            _partGroup = partGroup;
-        }
-
-        public override void Initialize()
-        {
-            base.Initialize();
+            _showAnimation = showAnimation;
+            _hideAnimation = hideAnimation;
             
-            _hideAnimation = new (CanvasGroup, _hideAnimationParam);
+            _partShowAnimation = partShowAnimation;
+            _partHideAnimaiton = partHideAnimation;
         }
         
         /// <summary>
@@ -65,9 +56,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            CanvasGroup.alpha = UIUtil.DEFAULT_SHOW_ALPHA;
-
-            await _partGroup.ShowAsync(ct);
+            await _showAnimation.PlayAsync(ct);
+            await _partShowAnimation.PlayAsync(ct);
         }
         
         /// <summary>
@@ -77,9 +67,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override void Show()
         {
-            CanvasGroup.alpha = UIUtil.DEFAULT_SHOW_ALPHA;
-            
-            _partGroup.Show();
+            _partShowAnimation.PlayImmediate();
+            _showAnimation.PlayImmediate();
         }
         
         /// <summary>
@@ -90,8 +79,7 @@ namespace Common.UI.Display.Overlay
         public override async UniTask HideAsync(CancellationToken ct)
         {
             await _hideAnimation.PlayAsync(ct);
-            
-            _partGroup.Hide();
+            _partHideAnimaiton.PlayImmediate();
         }
 
         /// <summary>
@@ -101,9 +89,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override void Hide()
         {
-            CanvasGroup.alpha = _hideAnimationParam.Alpha;
-            
-            _partGroup.Hide();
+            _hideAnimation.PlayImmediate();
+            _partHideAnimaiton.PlayImmediate();
         }
     }
 }

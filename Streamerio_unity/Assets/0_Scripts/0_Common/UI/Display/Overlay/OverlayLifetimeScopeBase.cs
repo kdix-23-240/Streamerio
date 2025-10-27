@@ -4,7 +4,10 @@
 // 使用例: 特定オーバーレイ用に派生させ、共通パーツグループを DI で提供して演出制御を共通化する。
 // ============================================================================
 
-using Common.UI.Part.Group;
+using Alchemy.Inspector;
+using Common.UI.Animation;
+using Common.UI.Display.Background;
+using Common.UI.Part;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -21,12 +24,23 @@ namespace Common.UI.Display.Overlay
         where TView : IOverlayView
         where TContext: CommonOverlayContext<TView>
     {
-        /// <summary>
-        /// 【目的】パーツ表示演出を司るコンポーネントを Inspector から受け取り、DI で共有する。
-        /// </summary>
+        [SerializeField, ReadOnly]
+        private CanvasGroup _canvasGroup;
+        
         [SerializeField]
-        [Tooltip("Overlay 表示時に順次表示させる共通パーツグループ。")]
-        private CommonUIPartGroup _partGroup;
+        private FadeAnimationParamSO _showAnimationParam;
+        [SerializeField]
+        private FadeAnimationParamSO _hideAnimationParam;
+        
+        [SerializeField]
+        private AnimationPartGroup _animationParts;
+
+#if UNITY_EDITOR
+        protected virtual void OnValidate()
+        {
+            _canvasGroup ??= GetComponent<CanvasGroup>();
+        }
+#endif
         
         /// <summary>
         /// 【目的】パーツグループを DI コンテナへ登録し、基底 Configure の登録と組み合わせる。
@@ -34,9 +48,12 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponent(_partGroup)
-                .As<ICommonUIPartGroup>()
-                .As<IInitializable>();
+            builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_canvasGroup, _showAnimationParam))
+                .Keyed(AnimationType.Show);
+            builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_canvasGroup, _hideAnimationParam))
+                .Keyed(AnimationType.Hide);
+            
+            _animationParts.BindAnimation(builder);
             
             base.Configure(builder);
         }

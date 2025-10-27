@@ -205,6 +205,14 @@ PrefabInstance:
       propertyPath: m_HorizontalAlignment
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: _buttonType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.UI.GameOver.GameOverOverlayLifetimeScope
+      objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name
       value: TitleButton
@@ -320,6 +328,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1970169695285369292, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
+      propertyPath: _clickSE
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1970169695285369292, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.UI.GameOver.GameOverOverlayLifetimeScope
+      objectReference: {fileID: 0}
     - target: {fileID: 2909299415159140714, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
       propertyPath: _clickSE
       value: 0
@@ -428,7 +444,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5699195081976541843, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6877069330589355082, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
@@ -498,7 +515,6 @@ MonoBehaviour:
   _gameObject: {fileID: 542300406942503225}
   _rectTransform: {fileID: 7562624646717844250}
   _canvasGroup: {fileID: 7469927576039130000}
-  _hideAnimationParam: {fileID: 11400000, guid: 5ac7f87e8e8fa426fb49c00158b11276, type: 2}
 --- !u!114 &8700566484341213087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -515,23 +531,21 @@ MonoBehaviour:
     TypeName: Common.UI.Display.CommonDiaplayLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
-  _partGroup: {fileID: 8688585703243994563}
+  _canvasGroup: {fileID: 7469927576039130000}
+  _showAnimationParam: {fileID: 11400000, guid: 6d3828e2e43144ff6bf3c5f9d16d7986, type: 2}
+  _hideAnimationParam: {fileID: 11400000, guid: 926dc35022d8648598b96f89f6b73327, type: 2}
+  _animationParts:
+    _animationParts:
+    - {fileID: 5987759299248005397}
+    - {fileID: 6811769372135845690}
+    - {fileID: 4627120929520970541}
+    _showPartsAnimationParam: {fileID: 11400000, guid: a6f69a937597049f2a8c6ee86c2a0dd8, type: 2}
+    _hidePartsAnimationParam: {fileID: 11400000, guid: eae61f453b5804763b3fd4dc6474fd79, type: 2}
 --- !u!224 &7562624646717844250 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6877069330589355082, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
   m_PrefabInstance: {fileID: 4000204800803743568}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8688585703243994563 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5699195081976541843, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
-  m_PrefabInstance: {fileID: 4000204800803743568}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 542300406942503225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 508f4b030fa84666a71486b6227f8ff9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &4109519652904562723
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -587,6 +601,14 @@ PrefabInstance:
     - target: {fileID: 2735418796011418901, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_HorizontalAlignment
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: _buttonType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.UI.GameOver.GameOverOverlayLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name
