@@ -35,23 +35,52 @@ namespace Common.UI.Loading
     /// </summary>
     public class LoadingScreenPresenter: DisplayPresenterBase<ILoadingScreenView, LoadingScreenContext>, ILoadingScreen
     {
+        private Animator _playerAnimator;
+        
         protected override void AttachContext(LoadingScreenContext context)
         {
             View = context.View;
+            _playerAnimator = context.PlayerAnimator;
+        }
+
+        public override async UniTask ShowAsync(CancellationToken ct)
+        {
+            _playerAnimator.enabled = true;
+            await base.ShowAsync(ct);
         }
 
         public async UniTask ShowAsync(Vector3 centerCirclePosition, CancellationToken ct)
         {
             _isShow = true;
+            _playerAnimator.enabled = true;
             await View.ShowAsync(centerCirclePosition, ct);
             View.SetInteractable(true);
+        }
+        
+        public override void Show()
+        {
+            _playerAnimator.enabled = true;
+            base.Show();
+        }
+        
+        public override async UniTask HideAsync(CancellationToken ct)
+        {
+            await base.HideAsync(ct);
+            _playerAnimator.enabled = false;
         }
         
         public async UniTask HideAsync(Vector3 centerCirclePosition, CancellationToken ct)
         {
             await View.HideAsync(centerCirclePosition, ct);
             View.SetInteractable(false);
+            _playerAnimator.enabled = false;
             _isShow = false;
+        }
+        
+        public override void Hide()
+        {
+            base.Hide();
+            _playerAnimator.enabled = false;
         }
     }
     
@@ -67,5 +96,7 @@ namespace Common.UI.Loading
         /// 【目的】Presenter が操作対象とする View 参照を保持する。
         /// </summary>
         public ILoadingScreenView View;
+        
+        public Animator PlayerAnimator;
     }
 }

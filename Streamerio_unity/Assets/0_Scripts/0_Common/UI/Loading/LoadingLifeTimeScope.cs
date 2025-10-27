@@ -28,6 +28,16 @@ namespace Common.UI.Loading
         [SerializeField]
         private IrisAnimationParamSO _hideAnimationParamSO;
         
+        [SerializeField]
+        private Animator _playerAnimator;
+        
+        [SerializeField]
+        private CanvasGroup _panel;
+        [SerializeField]
+        private FadeAnimationParamSO _panelShowAnimationParamSO;
+        [SerializeField]
+        private FadeAnimationParamSO _panelHideAnimationParamSO;
+        
         /// <summary>
         /// 【目的】ローディング画面に必要な依存をコンテナへ登録する。
         /// <para>
@@ -45,6 +55,11 @@ namespace Common.UI.Loading
             builder.RegisterInstance<IIrisAnimation>(new IrisInAnimation(irisMaterialInstance, _hideAnimationParamSO))
                 .Keyed(AnimationType.Hide);
             
+            builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_panel, _panelShowAnimationParamSO))
+                .Keyed(AnimationType.Show);
+            builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_panel, _panelHideAnimationParamSO))
+                .Keyed(AnimationType.Hide);
+            
             base.Configure(builder);
         }
 
@@ -60,6 +75,7 @@ namespace Common.UI.Loading
             return new LoadingScreenContext()
             {
                 View = resolver.Resolve<ILoadingScreenView>(),
+                PlayerAnimator = _playerAnimator,
             };
         }
     }

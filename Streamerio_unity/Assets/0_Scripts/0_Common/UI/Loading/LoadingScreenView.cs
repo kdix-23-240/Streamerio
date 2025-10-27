@@ -41,6 +41,9 @@ namespace Common.UI.Loading
 
         private IIrisAnimation _showAnimation;
         private IIrisAnimation _hideAnimation;
+        
+        private IUIAnimation _panelShowAnimation;
+        private IUIAnimation _panelHideAnimation;
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -54,12 +57,17 @@ namespace Common.UI.Loading
         public void Construct(
             Material irisOutMaterial,
             [Key(AnimationType.Show)] IIrisAnimation showAnimation,
-            [Key(AnimationType.Hide)] IIrisAnimation hideAnimation)
+            [Key(AnimationType.Hide)] IIrisAnimation hideAnimation,
+            [Key(AnimationType.Show)] IUIAnimation panelShowAnimation,
+            [Key(AnimationType.Hide)] IUIAnimation panelHideAnimation)
         {
             _image.material = irisOutMaterial;
 
             _showAnimation = showAnimation;
             _hideAnimation = hideAnimation;
+            
+            _panelShowAnimation = panelShowAnimation;
+            _panelHideAnimation = panelHideAnimation;
         }
 
         /// <summary>
@@ -68,6 +76,7 @@ namespace Common.UI.Loading
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             await _showAnimation.PlayAsync(ct);
+            await _panelShowAnimation.PlayAsync(ct);
         }
 
         /// <summary>
@@ -77,6 +86,7 @@ namespace Common.UI.Loading
         public async UniTask ShowAsync(Vector3 centerCirclePosition, CancellationToken ct)
         {
             await _showAnimation.PlayAsync(WorldToViewportPoint(centerCirclePosition), ct);
+            await _panelShowAnimation.PlayAsync(ct);
         }
 
         /// <summary>
@@ -86,20 +96,24 @@ namespace Common.UI.Loading
         public override void Show()
         {
             _showAnimation.PlayImmediate();
+            _panelShowAnimation.PlayImmediate();
         }
 
         public override async UniTask HideAsync(CancellationToken ct)
         {
+            await _panelHideAnimation.PlayAsync(ct);
             await _hideAnimation.PlayAsync(ct);
         }
         
         public async UniTask HideAsync(Vector3 centerCirclePosition, CancellationToken ct)
         {
+            await _panelHideAnimation.PlayAsync(ct);
             await _hideAnimation.PlayAsync(WorldToViewportPoint(centerCirclePosition), ct);
         }
 
         public override void Hide()
         {
+            _panelHideAnimation.PlayImmediate();
             _hideAnimation.PlayImmediate();
         }
         
