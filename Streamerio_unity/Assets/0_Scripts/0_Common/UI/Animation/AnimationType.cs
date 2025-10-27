@@ -1,27 +1,16 @@
-// ============================================================================
-// モジュール概要: UI アニメーションの向きを列挙型で定義し、再生処理の条件分岐を読みやすくする。
-// 外部依存: なし（Unity 標準のみ）。
-// 使用例: FadeAnimationComponent などで AnimationType.Show を指定し、表示/非表示の演出を切り替える。
-// ============================================================================
-
 namespace Common.UI.Animation
 {
-    /// <summary>
-    /// UI アニメーションの再生方向を表す列挙型。
-    /// <para>
-    /// 【理由】条件分岐に真偽値を使うと意図が曖昧になるため、可読性を高める目的で列挙型として明示する。
-    /// </para>
-    /// </summary>
+    
     public enum AnimationType
     {
-        /// <summary>
-        /// 【意味】UI を表示方向へ遷移させる（例: Alpha を 0→1 に補間）。
-        /// </summary>
-        Show,
+		Show = 1,
+		Hide = 2,
+		ShowParts = 3,
+		HideParts = 4,
+		PushDown = 5,
+		PushUp = 6,
+		Enter = 7,
+		Exit = 8,
 
-        /// <summary>
-        /// 【意味】UI を非表示方向へ遷移させる（例: Alpha を 1→0 に補間）。
-        /// </summary>
-        Hide
     }
 }
