@@ -42,6 +42,7 @@ namespace Common.Audio
         /// <inheritdoc />
         public void ChangeVolume(SoundType soundType, Volume volume)
         {
+            Debug.Log(_volumeParameterDict[soundType] + " : " + volume.MixerValue);
             _audioMixer.SetFloat(_volumeParameterDict[soundType], volume.MixerValue);
         }
     }

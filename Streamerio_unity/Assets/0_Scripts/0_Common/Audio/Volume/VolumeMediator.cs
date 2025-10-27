@@ -54,7 +54,7 @@ namespace Common.Audio
     /// 実行中の音量変更・ミュート操作は AudioMixer に即時反映され、終了時には音量設定がセーブされます。
     /// </para>
     /// </summary>
-    public class VolumeMediator : IVolumeMediator, IMuteMediator
+    public class VolumeMediator : IVolumeMediator, IMuteMediator, IStartable
     {
         /// <summary>
         /// ミュート時に適用される音量値。
@@ -117,7 +117,10 @@ namespace Common.Audio
             
             // セーブデータから音量情報を復元
             _volumeDict = new(_saveManager.LoadVolumes());
-            
+        }
+        
+        public void Start()
+        {
             // 音量をすべて AudioMixer に適用
             ApplyVolumeToAll();
         }

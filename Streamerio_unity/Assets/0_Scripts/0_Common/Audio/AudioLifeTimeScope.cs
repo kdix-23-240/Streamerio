@@ -56,7 +56,8 @@ namespace Common.Audio
                 .WithParameter(_audioMixer)
                 .WithParameter(_audioMixerParameterSO.VolumeParamDict);
 
-            builder.Register<IVolumeMediator, IMuteMediator, VolumeMediator>(Lifetime.Singleton);
+            builder.Register<IVolumeMediator, IMuteMediator, VolumeMediator>(Lifetime.Singleton)
+                .As<IStartable>();
 
             var audioSourcePoolFactory = new AudioSourcePoolFactory(_sourceDict.ToDictionary());
             var bgmPlayer = new BGMPlayer(_bgmScriptableObject.Dictionary, audioSourcePoolFactory.Create);
