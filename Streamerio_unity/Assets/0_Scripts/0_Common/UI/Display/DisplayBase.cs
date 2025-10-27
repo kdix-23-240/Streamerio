@@ -167,7 +167,6 @@ namespace Common.UI.Display
         /// <returns>【戻り値】表示演出が完了したことを示す UniTask。</returns>
         public virtual async UniTask ShowAsync(CancellationToken ct)
         {
-            Debug.Log(typeof(TView).Name + " ShowAsync");
             _isShow = true;
             await View.ShowAsync(ct);
             View.SetInteractable(true);
