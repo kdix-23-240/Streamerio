@@ -44,7 +44,7 @@ namespace OutGame.UI.GameOver
             View.RetryButton.OnClickAsObservable
                 .SubscribeAwait(async (_, ct) =>
                 {
-                    await _loadingScreen.ShowAsync();
+                    await _loadingScreen.ShowAsync(ct);
                     _sceneManager.ReloadSceneAsync();
                 })
                 .RegisterTo(GetCt());
@@ -53,7 +53,7 @@ namespace OutGame.UI.GameOver
             View.TitleButton.OnClickAsObservable
                 .SubscribeAwait(async (_, ct) =>
                 {
-                    await _loadingScreen.ShowAsync();
+                    await _loadingScreen.ShowAsync(ct);
                     _sceneManager.LoadSceneAsync(SceneType.Title).Forget();
                 })
                 .RegisterTo(GetCt());

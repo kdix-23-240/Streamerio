@@ -11,6 +11,11 @@ using UnityEngine;
 
 namespace Common.UI.Animation
 {
+    public interface IIrisAnimation : IUIAnimation
+    {
+        UniTask PlayAsync(Vector2 center, CancellationToken ct, bool useInitial = true);
+    }
+    
     /// <summary>
     /// 円が閉じるアニメーション（外から内へ収束）。
     /// </summary>
@@ -26,7 +31,18 @@ namespace Common.UI.Animation
         /// <inheritdoc/>
         public override async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
-            await PlayIrisAsync(Param.MaxRadius, Param.MinRadius, ct);
+            await PlayIrisAsync(Param.Center, Param.MinRadius, Param.MaxRadius, ct, useInitial);
+        }
+        
+        public override async UniTask PlayAsync(Vector2 center, CancellationToken ct, bool useInitial = true)
+        {
+            await PlayIrisAsync(center, Param.MinRadius, Param.MaxRadius, ct, useInitial);
+        }
+        
+        public override void PlayImmediate()
+        {
+            Material.SetVector(Param.CenterPropertyName, Param.Center);
+            Material.SetFloat(Param.RadiusPropertyName, Param.MaxRadius);
         }
     }
     
@@ -44,7 +60,18 @@ namespace Common.UI.Animation
         /// <inheritdoc/>
         public override async UniTask PlayAsync(CancellationToken ct, bool useInitial = true)
         {
-            await PlayIrisAsync(Param.MinRadius, Param.MaxRadius, ct);
+            await PlayIrisAsync(Param.Center, Param.MaxRadius, Param.MinRadius, ct, useInitial);
+        }
+        
+        public override async UniTask PlayAsync(Vector2 center, CancellationToken ct, bool useInitial = true)
+        {
+            await PlayIrisAsync(center, Param.MaxRadius, Param.MinRadius, ct, useInitial);
+        }
+        
+        public override void PlayImmediate()
+        {
+            Material.SetVector(Param.CenterPropertyName, Param.Center);
+            Material.SetFloat(Param.RadiusPropertyName, Param.MinRadius);
         }
     }
     
@@ -53,13 +80,13 @@ namespace Common.UI.Animation
     /// - 指定した半径を DOTween で補間しながらシェーダープロパティに反映
     /// - 開閉の方向は派生クラスで制御
     /// </summary>
-    public abstract class IrisAnimation : IUIAnimation
+    public abstract class IrisAnimation : IIrisAnimation
     {
-        private readonly Material _material;
+        protected readonly Material Material;
         /// <summary>
         /// 【目的】アニメーションに必要な半径や中心情報を保持し、派生クラスからも調整可能にする。
         /// </summary>
-        protected IrisAnimationParamSO Param;
+        protected readonly IrisAnimationParamSO Param;
         
         /// <summary>
         /// 【目的】演出ターゲットとなるマテリアルと設定値を保持する。
@@ -67,7 +94,7 @@ namespace Common.UI.Animation
         /// </summary>
         protected IrisAnimation(Material material, IrisAnimationParamSO param)
         {
-            _material = material;
+            Material = material;
             Param = param;
         }
         
@@ -77,33 +104,33 @@ namespace Common.UI.Animation
         /// </summary>
         public abstract UniTask PlayAsync(CancellationToken ct, bool useInitial = true);
         
-        public void PlayImmediate()
-        {
-            _material.SetVector(Param.CenterPropertyName, Param.Center);
-            _material.SetFloat(Param.RadiusPropertyName, Param.MaxRadius);
-        }
+        public abstract UniTask PlayAsync(Vector2 center, CancellationToken ct, bool useInitial = true);
+
+        public abstract void PlayImmediate();
         
         /// <summary>
         /// 【目的】イリスアニメーションを共通ロジックで再生し、中心や半径の設定を一箇所に集約する。
         /// - 中心座標と開始半径を設定
         /// - Tween で終了半径まで補間
         /// </summary>
-        protected async UniTask PlayIrisAsync(float startRadius, float endRadius, CancellationToken ct)
+        protected async UniTask PlayIrisAsync(Vector2 center, float startRadius, float endRadius, CancellationToken ct, bool useInitial)
         {
+            var initialRadius = useInitial ? startRadius : Material.GetFloat(Param.RadiusPropertyName);
+            
             // 中心位置と初期半径をシェーダに適用
-            _material.SetVector(Param.CenterPropertyName, Param.Center);
+            Material.SetVector(Param.CenterPropertyName, center);
             
             // Tweenで半径を補間しつつシェーダに反映
-            await _material
+            await Material
                 .DOFloat(endRadius, Param.RadiusPropertyName, Param.DurationSec)
-                .From(startRadius)
+                .From(initialRadius)
                 .SetEase(Param.Ease)
                 .ToUniTask(cancellationToken: ct);
         }
 
         public void Skip()
         {
-            _material.DOComplete();
+            Material.DOComplete();
         }
     }
 }

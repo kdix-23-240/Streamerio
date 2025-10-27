@@ -4,6 +4,9 @@
 // 使用例: ローディングシーンで LoadingLifeTimeScope を配置し、ILoadingScreenView を自動解決する。
 // ============================================================================
 
+using Common.UI.Animation;
+using Common.UI.Display;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -15,8 +18,16 @@ namespace Common.UI.Loading
     /// 【理由】View コンポーネントと Presenter を DI で結び、シーン遷移時にも同一設定を再利用できるようにする。
     /// </para>
     /// </summary>
-    public class LoadingLifeTimeScope: LifetimeScope
+    public class LoadingLifeTimeScope: DisplayLifetimeScopeBase<ILoadingScreen, LoadingScreenPresenter, ILoadingScreenView, LoadingScreenContext>
     {
+        [SerializeField]
+        private Material _irisAnimationMaterial;
+        
+        [SerializeField]
+        private IrisAnimationParamSO _showAnimationParamSO;
+        [SerializeField]
+        private IrisAnimationParamSO _hideAnimationParamSO;
+        
         /// <summary>
         /// 【目的】ローディング画面に必要な依存をコンテナへ登録する。
         /// <para>
@@ -26,22 +37,30 @@ namespace Common.UI.Loading
         /// </summary>
         protected override void Configure(IContainerBuilder builder)
         {
-            // シーン上に存在する View インスタンスをそのまま DI へ登録するため、GetComponent で取得する。
-            var view = GetComponent<ILoadingScreenView>();
-            builder.RegisterComponent(view)
-                .As<ILoadingScreenView>()
-                .As<IInitializable>();
+            var irisMaterialInstance = new Material(_irisAnimationMaterial);
+            builder.RegisterInstance(irisMaterialInstance);
+            
+            builder.RegisterInstance<IIrisAnimation>(new IrisOutAnimation(irisMaterialInstance, _showAnimationParamSO))
+                .Keyed(AnimationType.Show);
+            builder.RegisterInstance<IIrisAnimation>(new IrisInAnimation(irisMaterialInstance, _hideAnimationParamSO))
+                .Keyed(AnimationType.Hide);
+            
+            base.Configure(builder);
+        }
 
-            builder
-                .RegisterEntryPoint<Wiring<ILoadingScreen, LoadingScreenPresenterContext>>()
-                .WithParameter(resolver =>
-                {
-                    // PresenterContext に View を手動注入することで、Prefab に組み込まれた View を再利用しつつ DI を完結させる。
-                    return new LoadingScreenPresenterContext
-                    {
-                        View = resolver.Resolve<ILoadingScreenView>()
-                    };
-                });
+        protected override void BindPresenter(IContainerBuilder builder)
+        {
+            builder.RegisterEntryPoint<Wiring<ILoadingScreen, LoadingScreenContext>>()
+                .WithParameter(resolver => resolver.Resolve<ILoadingScreen>())
+                .WithParameter(CreateContext);
+        }
+
+        protected override LoadingScreenContext CreateContext(IObjectResolver resolver)
+        {
+            return new LoadingScreenContext()
+            {
+                View = resolver.Resolve<ILoadingScreenView>(),
+            };
         }
     }
 }

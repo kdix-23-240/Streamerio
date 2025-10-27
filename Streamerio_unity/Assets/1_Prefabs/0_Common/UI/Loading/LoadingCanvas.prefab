@@ -106,11 +106,6 @@ MonoBehaviour:
   _rectTransform: {fileID: 2682838244002474396}
   _canvasGroup: {fileID: 8066417646364474472}
   _image: {fileID: 6513916331779527677}
-  _loadingInAnimationParam: {fileID: 11400000, guid: a30e6c4b2157a477b8baf78c3266bd54, type: 2}
-  _loadingOutAnimationParam: {fileID: 11400000, guid: 1354061583b3e4abca28bc65b85b39bb, type: 2}
-  _titleToLoadingAnimationParam: {fileID: 0}
-  _loadingToInGameAnimationParam: {fileID: 0}
-  _cheiceIrisAnimationParam: {fileID: 11400000, guid: a30e6c4b2157a477b8baf78c3266bd54, type: 2}
 --- !u!114 &6968772182867010546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,6 +122,9 @@ MonoBehaviour:
     TypeName: GlobalLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
+  _irisAnimationMaterial: {fileID: 2100000, guid: 9505051c1c2a245cc97bd8a80e5eddce, type: 2}
+  _showAnimationParamSO: {fileID: 11400000, guid: a30e6c4b2157a477b8baf78c3266bd54, type: 2}
+  _hideAnimationParamSO: {fileID: 11400000, guid: 1354061583b3e4abca28bc65b85b39bb, type: 2}
 --- !u!1001 &6158916701073076904
 PrefabInstance:
   m_ObjectHideFlags: 0
