@@ -1,0 +1,34 @@
+[
+  {
+    "Name": "Show",
+    "Num": 1
+  },
+  {
+    "Name": "Hide",
+    "Num": 2
+  },
+  {
+    "Name": "ShowParts",
+    "Num": 3
+  },
+  {
+    "Name": "HideParts",
+    "Num": 4
+  },
+  {
+    "Name": "PushDown",
+    "Num": 5
+  },
+  {
+    "Name": "PushUp",
+    "Num": 6
+  },
+  {
+    "Name": "Enter",
+    "Num": 7
+  },
+  {
+    "Name": "Exit",
+    "Num": 8
+  }
+]
