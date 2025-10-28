@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using Common.UI.Display.Overlay.Test;
 using OutGame.GameOver.UI;
 using UnityEngine;
 
@@ -23,7 +22,6 @@ namespace Common.UI.Display.Overlay
             return new()
             {
                 {typeof(IGameOverOverlay), typeof(GameOverOverlayLifetimeScope)},
-                {typeof(ITestOverlay), typeof(TestOverlayLifeTimeScope)},
             };
         }
     }

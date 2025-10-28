@@ -1,6 +1,7 @@
 using Common.Audio;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 
 public class Skeleton : MonoBehaviour
 {
@@ -13,6 +14,14 @@ public class Skeleton : MonoBehaviour
     private bool _canMove = false;
 
     private Transform _player;
+    
+    private IAudioFacade _audioFacade;
+    
+    [Inject]
+    public void Construct(IAudioFacade audioFacade)
+    {
+        _audioFacade = audioFacade;
+    }
 
     void Awake()
     {
@@ -31,7 +40,7 @@ public class Skeleton : MonoBehaviour
         
         float rand = Random.Range(5f, 8f);
         transform.position += new Vector3(_player.position.x + rand, _player.position.y, 0); // 少し上にずらして生成
-        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
+        //_audioFacade.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
 
     void Update()

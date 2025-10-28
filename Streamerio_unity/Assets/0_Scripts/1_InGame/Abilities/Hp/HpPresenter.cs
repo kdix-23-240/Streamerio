@@ -1,9 +1,11 @@
 using Common.Audio;
+using Common.State;
 using Cysharp.Threading.Tasks;
 using InGame;
 using InGame.UI.Heart;
 using UnityEngine;
 using R3;
+using VContainer;
 
 public class HpPresenter : MonoBehaviour, IAbility
 {
@@ -14,6 +16,18 @@ public class HpPresenter : MonoBehaviour, IAbility
 
     private float _currentHp;
     private float _maxHp;
+    
+    private IState _gameOverState;
+    private IStateManager _stateManager;
+    private IAudioFacade _audioFacade;
+    
+    [Inject]
+    public void Construct([Key(StateType.ToGameOver)] IState gameOverState, IStateManager stateManager, IAudioFacade audioFacade)
+    {
+        _gameOverState = gameOverState;
+        _stateManager = stateManager;
+        _audioFacade = audioFacade;
+    }
 
     void Awake()
     {
@@ -35,7 +49,8 @@ public class HpPresenter : MonoBehaviour, IAbility
             _hpView.UpdateHP(hp);
             if (hp <= 0)
             {
-                InGameManager.Instance.GameOver();
+                Debug.Log("ゲームオーバー");
+                //_stateManager.ChangeState(_gameOverState);
             }
         }).AddTo(this);
     }
@@ -47,7 +62,7 @@ public class HpPresenter : MonoBehaviour, IAbility
 
     public void Decrease(float amount)
     {
-        AudioManager.Instance.PlayAsync(SEType.PlayerDamage, destroyCancellationToken).Forget();
+        _audioFacade.PlayAsync(SEType.PlayerDamage, destroyCancellationToken).Forget();
         _hpModel.Decrease(amount);
     }
 }

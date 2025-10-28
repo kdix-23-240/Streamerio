@@ -1,6 +1,7 @@
 using Common.Audio;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 
 public class GatoWalkMovement : MonoBehaviour
 {
@@ -16,6 +17,14 @@ public class GatoWalkMovement : MonoBehaviour
     private EnemyAttackManager _attackManager;
     private float _lastAttackTime = -999f;
     private Transform _player;
+    
+    private IAudioFacade _audioFacade;
+
+    [Inject]
+    public void Construct(IAudioFacade audioFacade)
+    {
+        _audioFacade = audioFacade;
+    }
 
     void Start()
     {
@@ -40,7 +49,7 @@ public class GatoWalkMovement : MonoBehaviour
         _jumpTimer = jumpInterval;
         
         transform.position += new Vector3(_player.position.x + 10, _player.position.y + 1, 0); // 少し上にずらして生成
-        AudioManager.Instance.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
+        //_audioFacade.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()

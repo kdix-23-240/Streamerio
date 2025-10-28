@@ -38,5 +38,13 @@
   {
     "Name": "Credit",
     "Num": 12
+  },
+  {
+    "Name": "Jump",
+    "Num": 13
+  },
+  {
+    "Name": "Attack",
+    "Num": 14
   }
 ]

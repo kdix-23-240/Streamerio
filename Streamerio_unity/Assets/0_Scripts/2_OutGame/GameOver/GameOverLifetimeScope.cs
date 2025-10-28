@@ -13,7 +13,7 @@ namespace OutGame.GameOver
             builder.Register<IState, GameOverState>(Lifetime.Singleton)
                 .Keyed(StateType.GameOver);
             builder.Register<IState, RestartState>(Lifetime.Singleton)
-                .WithParameter(_ => SceneType.TestGameScene)
+                .WithParameter(_ => SceneType.GameScene)
                 .Keyed(StateType.Restart);
             builder.Register<IState, ChangeSceneState>(Lifetime.Singleton)
                 .WithParameter(_ => SceneType.Title)

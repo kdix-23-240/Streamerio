@@ -13,6 +13,8 @@ namespace Common.UI.Part.Button
 		HowToPlay = 10,
 		Option = 11,
 		Credit = 12,
+		Jump = 13,
+		Attack = 14,
 
     }
 }

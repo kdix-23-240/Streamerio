@@ -2,6 +2,7 @@ using Common.Audio;
 using Cysharp.Threading.Tasks;
 using R3;
 using UnityEngine;
+using VContainer;
 
 public class PlayerGrounded : MonoBehaviour
 {
@@ -10,6 +11,14 @@ public class PlayerGrounded : MonoBehaviour
     /// 地面についているかどうか
     /// </summary>
     public ReadOnlyReactiveProperty<bool> IsGrounded => _isGrounded;
+    
+    private IAudioFacade _audioFacade;
+    
+    [Inject]
+    public void Construct(IAudioFacade audioFacade)
+    {
+        _audioFacade = audioFacade;
+    }
     
     public void OnTriggerEnter2D(Collider2D collision)
     {
@@ -23,7 +32,7 @@ public class PlayerGrounded : MonoBehaviour
     
     public void OnTriggerExit2D(Collider2D collision)
     {
-        AudioManager.Instance.PlayAsync(SEType.PlayerJump, destroyCancellationToken).Forget();
+        //_audioFacade.PlayAsync(SEType.PlayerJump, destroyCancellationToken).Forget();
         _isGrounded.Value = false;
     }
 }

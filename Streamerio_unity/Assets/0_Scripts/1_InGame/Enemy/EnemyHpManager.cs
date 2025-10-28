@@ -1,12 +1,21 @@
 using Common.Audio;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 
 public class EnemyHpManager : MonoBehaviour
 {
     [SerializeField] private int health = 50;
     public int CurrentHealth => health;
     public bool IsDead => health <= 0;
+    
+    private IAudioFacade _audioFacade;
+    
+    [Inject]
+    public void Construct(IAudioFacade audioFacade)
+    {
+        _audioFacade = audioFacade;
+    }
 
     public void TakeDamage(int amount)
     {
@@ -19,13 +28,13 @@ public class EnemyHpManager : MonoBehaviour
         }
         else
         {
-            AudioManager.Instance.PlayAsync(SEType.どん_効果音,destroyCancellationToken).Forget();
+            _audioFacade.PlayAsync(SEType.どん_効果音,destroyCancellationToken).Forget();
         }
     }
 
     protected virtual void Die()
     {
-        AudioManager.Instance.PlayAsync(SEType.敵のダウン,destroyCancellationToken).Forget();
+        //_audioFacade.PlayAsync(SEType.敵のダウン,destroyCancellationToken).Forget();
         Destroy(gameObject);
     }
 }

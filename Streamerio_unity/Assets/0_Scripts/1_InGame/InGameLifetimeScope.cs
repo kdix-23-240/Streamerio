@@ -1,6 +1,7 @@
 using Common.Booster;
 using Common.Scene;
 using Common.State;
+using Common.UI.Part.Button;
 using InGame.Setting;
 using InGame.UI.Timer;
 using UnityEngine;
@@ -36,6 +37,11 @@ namespace InGame
             builder.Register<IState, ChangeSceneState>(Lifetime.Singleton)
                 .WithParameter(_ => SceneType.ResultScene)
                 .Keyed(StateType.ToResult);
+
+            builder.Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
+                .Keyed(ButtonType.Jump);
+            builder.Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
+                .Keyed(ButtonType.Attack);
 
             SceneBoosterBinder.Bind(builder, StateType.InGameStart);
         }

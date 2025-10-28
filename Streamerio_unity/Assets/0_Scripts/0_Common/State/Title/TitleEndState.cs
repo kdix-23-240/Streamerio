@@ -36,7 +36,7 @@ namespace Common.State
             await _audioFacade.StopBGMAsync(ct);
             
             _sceneManager.UpdateRestartFlag(false);
-            await _sceneManager.LoadSceneAsync(SceneType.TestGameScene);
+            await _sceneManager.LoadSceneAsync(SceneType.GameScene);
         }
         
         public async UniTask ExitAsync(CancellationToken ct)
