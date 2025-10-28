@@ -22,7 +22,7 @@ namespace Common.UI.Dialog
     /// <typeparam name="TContext">Presenter に注入されるダイアログコンテキスト型。</typeparam>
     public abstract class DialogPresenterBase<TView, TContext> : DisplayPresenterBase<TView, TContext>, IDialog
         where TView : IDialogView
-        where TContext : CommonDialogContext<TView>
+        where TContext : DialogContext<TView>
     {
         /// <summary>
         /// 【目的】ダイアログの開閉を制御するサービス参照を保持する。
@@ -74,7 +74,7 @@ namespace Common.UI.Dialog
     /// 【目的】DialogBase が必要とする依存をひとまとめにした文脈クラス。
     /// 【拡張性】新たに依存が増えた場合はプロパティを追加することで対応する。
     /// </summary>
-    public class CommonDialogContext<TView>
+    public class DialogContext<TView>
         where TView : IDialogView
     {
         /// <summary>

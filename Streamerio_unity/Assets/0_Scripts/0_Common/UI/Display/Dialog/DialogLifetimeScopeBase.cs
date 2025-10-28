@@ -19,7 +19,7 @@ namespace Common.UI.Dialog
         where TDialog : IDialog, IAttachable<TContext>
         where TPresenter : TDialog, IStartable
         where TView : IDialogView
-        where TContext: CommonDialogContext<TView>
+        where TContext: DialogContext<TView>
     {
         /// <summary>
         /// 【目的】ダイアログで共通的に必要となる依存登録を実行する。
