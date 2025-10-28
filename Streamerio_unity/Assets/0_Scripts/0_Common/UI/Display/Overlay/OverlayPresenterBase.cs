@@ -22,7 +22,7 @@ namespace Common.UI.Display.Overlay
     /// </summary>
     public class OverlayPresenterBase<TView, TContext> : DisplayPresenterBase<TView, TContext>
         where TView : IOverlayView
-        where TContext : CommonOverlayContext<TView>
+        where TContext : OverlayContext<TView>
     {
         /// <summary>
         /// 【目的】コンテキストから View を受け取り、基底クラスの View フィールドへ割り当てる。
@@ -36,7 +36,7 @@ namespace Common.UI.Display.Overlay
     /// <summary>
     /// オーバーレイ Presenter へ渡す共通コンテキスト。
     /// </summary>
-    public class CommonOverlayContext<TView>
+    public class OverlayContext<TView>
         where TView : IOverlayView
     {
         /// <summary>

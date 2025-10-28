@@ -77,7 +77,7 @@ namespace OutGame.GameOver.UI
         }
     }
 
-    public class GameOverOverlayContext : CommonOverlayContext<IGameOverOverlayView>
+    public class GameOverOverlayContext : OverlayContext<IGameOverOverlayView>
     {
         public IStateManager StateManager;
         public IState RestartState;

@@ -22,7 +22,7 @@ namespace Common.UI.Display.Overlay
         where TOverlay : IOverlay, IAttachable<TContext>
         where TPresenter : TOverlay, IStartable
         where TView : IOverlayView
-        where TContext: CommonOverlayContext<TView>
+        where TContext: OverlayContext<TView>
     {
         [SerializeField, ReadOnly]
         private CanvasGroup _canvasGroup;
