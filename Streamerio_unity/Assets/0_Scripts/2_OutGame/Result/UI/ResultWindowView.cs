@@ -60,9 +60,16 @@ namespace OutGame.Result.UI
             _clickTextAnimation.Skip();
             base.Hide();
         }
+        
+        public void SkipShowAnimation()
+        {
+            ShowAnim.Skip();
+            ShowPartsAnim.Skip();
+        }
     }
     
     public interface IResultWindowView : IWindowView
     {
+        void SkipShowAnimation();
     }
 }

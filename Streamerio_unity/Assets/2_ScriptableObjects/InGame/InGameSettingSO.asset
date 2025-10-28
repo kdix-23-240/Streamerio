@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: InGameSettingSO
   m_EditorClassIdentifier: 
   _bgm: 3
-  _timeLimit: 15
+  _timeLimit: 3

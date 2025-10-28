@@ -20,10 +20,10 @@ namespace Common.UI.Display.Window
         private IDisplayBackground _background;
         public IDisplayBackground Background => _background;
 
-        private IUIAnimation _showAnim; // 表示アニメーション
+        protected IUIAnimation ShowAnim; // 表示アニメーション
         private IUIAnimation _hideAnim; // 非表示アニメーション
 
-        private IUIAnimation _showPartsAnim;
+        protected IUIAnimation ShowPartsAnim;
         private IUIAnimation _hidePartsAnim;
         
         [Inject]
@@ -35,10 +35,10 @@ namespace Common.UI.Display.Window
         {
             _background = background;
             
-            _showAnim = showAnim;
+            ShowAnim = showAnim;
             _hideAnim = hideAnim;
             
-            _showPartsAnim = showPartsAnim;
+            ShowPartsAnim = showPartsAnim;
             _hidePartsAnim = hidePartsAnim;
         }
         
@@ -50,8 +50,8 @@ namespace Common.UI.Display.Window
         public override async UniTask ShowAsync(CancellationToken ct)
         {
             await _background.ShowAsync(ct);
-            await _showAnim.PlayAsync(ct);
-            await _showPartsAnim.PlayAsync(ct);
+            await ShowAnim.PlayAsync(ct);
+            await ShowPartsAnim.PlayAsync(ct);
         }
 
         /// <summary>
@@ -62,8 +62,8 @@ namespace Common.UI.Display.Window
         public override void Show()
         {
             _background.Show();
-            _showAnim.PlayImmediate();
-            _showPartsAnim.PlayImmediate();
+            ShowAnim.PlayImmediate();
+            ShowPartsAnim.PlayImmediate();
         }
 
         /// <summary>

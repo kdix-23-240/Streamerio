@@ -72,8 +72,18 @@ namespace OutGame.GameOver.UI
 
         public override async UniTask ShowAsync(CancellationToken ct)
         {
+            SetActiveButtons(false);
             View.SetInteractable(true);
+            
             await base.ShowAsync(ct);
+            
+            SetActiveButtons(true);
+        }
+        
+        private void SetActiveButtons(bool isActive)
+        {
+            View.TitleButton.SetActive(isActive);
+            View.RetryButton.SetActive(isActive);
         }
     }
 

@@ -32,7 +32,10 @@ namespace Common.State
         {
             _titleBackgroundAnimation.PlayAsync(ct).Forget();
             await _loadingScreen.ShowAsync(ct);
+            
             await _audioFacade.StopBGMAsync(ct);
+            
+            _sceneManager.UpdateRestartFlag(false);
             await _sceneManager.LoadSceneAsync(SceneType.TestGameScene);
         }
         

@@ -1,4 +1,5 @@
 using Common.Booster;
+using Common.Scene;
 using Common.State;
 using InGame.Setting;
 using InGame.UI.Timer;
@@ -29,8 +30,12 @@ namespace InGame
                 .Keyed(StateType.PlayFromTitle);
             builder.Register<IState, InGameState>(Lifetime.Singleton)
                 .Keyed(StateType.InGame);
-            builder.Register<IState, ToGameOverState>(Lifetime.Singleton)
+            builder.Register<IState, ChangeSceneState>(Lifetime.Singleton)
+                .WithParameter(_ => SceneType.GameOverScene)
                 .Keyed(StateType.ToGameOver);
+            builder.Register<IState, ChangeSceneState>(Lifetime.Singleton)
+                .WithParameter(_ => SceneType.ResultScene)
+                .Keyed(StateType.ToResult);
 
             SceneBoosterBinder.Bind(builder, StateType.InGameStart);
         }

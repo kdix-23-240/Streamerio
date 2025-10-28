@@ -40,7 +40,6 @@ namespace InGame.UI.Heart
         /// <param name="value"></param>
         public void UpdateHP(float value)
         {
-            Debug.Log(value);
             float heartValue = value * _multiply;
 
             for (int i = 0; i < _heartLength; i++)

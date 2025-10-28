@@ -1,6 +1,8 @@
+using System.Threading;
 using Common;
 using Common.State;
 using Common.UI.Display.Window;
+using Cysharp.Threading.Tasks;
 using R3;
 
 namespace OutGame.Result.UI
@@ -19,6 +21,8 @@ namespace OutGame.Result.UI
         private IStateManager _stateManager;
         private IState _nextState;
 
+        private bool _isAnimation;
+
         protected override void Bind()
         {
             base.Bind();
@@ -34,10 +38,25 @@ namespace OutGame.Result.UI
             _stateManager = context.StateManager;
             _nextState = context.NextState;
         }
-        
+
+        public override async UniTask ShowAsync(CancellationToken ct)
+        {
+            _isAnimation = true;
+            View.SetInteractable(true);
+            await base.ShowAsync(ct);
+            _isAnimation = false;
+        }
+
         protected override void CloseEvent()
         {
-            _stateManager.ChangeState(_nextState);
+            if(_isAnimation)
+            {
+                View.SkipShowAnimation();
+            }
+            else
+            {
+                _stateManager.ChangeState(_nextState);   
+            }
         }
     }
 

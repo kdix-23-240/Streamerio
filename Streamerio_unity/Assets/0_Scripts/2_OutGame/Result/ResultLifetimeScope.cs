@@ -1,4 +1,5 @@
 using Common.Booster;
+using Common.Scene;
 using Common.State;
 using VContainer;
 using VContainer.Unity;
@@ -13,7 +14,8 @@ namespace OutGame.Result
             
             builder.Register<IState, ResultState>(Lifetime.Singleton)
                 .Keyed(StateType.Result);
-            builder.Register<IState, ToTitleState>(Lifetime.Singleton)
+            builder.Register<IState, ChangeSceneState>(Lifetime.Singleton)
+                .WithParameter(_ => SceneType.Title)
                 .Keyed(StateType.ToTitle);
             
             SceneBoosterBinder.Bind(builder, StateType.Result);

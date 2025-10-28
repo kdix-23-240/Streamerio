@@ -6,28 +6,17 @@ using VContainer;
 
 namespace Common.State
 {
-    public class RestartState: IState
+    public class RestartState: ChangeSceneState
     {
-        private readonly ILoadingScreen _loadingScreen;
-        private readonly ISceneManager _sceneManager;
-        
-        [Inject]
-        public RestartState(ILoadingScreen loadingScreen, ISceneManager sceneManager)
+        public RestartState(SceneType changeSceneType) : base(changeSceneType)
         {
-            _loadingScreen = loadingScreen;
-            _sceneManager = sceneManager;
         }
         
-        public async UniTask EnterAsync(CancellationToken ct)
-        {
-            await _loadingScreen.ShowAsync(ct);
-            _sceneManager.UpdateRestartFlag(true);
-            await _sceneManager.LoadSceneAsync(SceneType.TestGameScene);
-        }
         
-        public async UniTask ExitAsync(CancellationToken ct)
+        public override async UniTask EnterAsync(CancellationToken ct)
         {
-            await UniTask.WaitForEndOfFrame(cancellationToken: ct);
+            SceneManager.UpdateRestartFlag(true);
+            await base.EnterAsync(ct);
         }
     }
 }
