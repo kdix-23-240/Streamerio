@@ -1,4 +1,5 @@
 using System.Threading;
+using Common.Audio;
 using Common.Scene;
 using Common.UI.Animation;
 using Common.UI.Loading;
@@ -12,23 +13,27 @@ namespace Common.State
         private readonly IUIAnimation _titleBackgroundAnimation;
         private readonly ILoadingScreen _loadingScreen;
         private readonly ISceneManager _sceneManager;
+        private readonly IAudioFacade _audioFacade;
         
         [Inject]
         public TitleEndState(
             [Key(AnimationType.TitleBackground)] IUIAnimation titleBackgroundAnimation,
             ILoadingScreen loadingScreen,
-            ISceneManager sceneManager)
+            ISceneManager sceneManager,
+            IAudioFacade audioFacade)
         {
             _titleBackgroundAnimation = titleBackgroundAnimation;
             _loadingScreen = loadingScreen;
             _sceneManager = sceneManager;
+            _audioFacade = audioFacade;
         }
         
         public async UniTask EnterAsync(CancellationToken ct)
         {
             _titleBackgroundAnimation.PlayAsync(ct).Forget();
             await _loadingScreen.ShowAsync(ct);
-            await _sceneManager.LoadSceneAsync(SceneType.GameScene);
+            await _audioFacade.StopBGMAsync(ct);
+            await _sceneManager.LoadSceneAsync(SceneType.TestGameScene);
         }
         
         public async UniTask ExitAsync(CancellationToken ct)

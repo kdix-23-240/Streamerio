@@ -12,8 +12,8 @@
     "Num": 3
   },
   {
-    "Name": "ShowHowToPlay",
-    "Num": 5
+    "Name": "FirstPlay",
+    "Num": 20
   },
   {
     "Name": "InGame",
@@ -30,10 +30,6 @@
   {
     "Name": "Result",
     "Num": 9
-  },
-  {
-    "Name": "Loading",
-    "Num": 10
   },
   {
     "Name": "TitleStart",
@@ -54,5 +50,17 @@
   {
     "Name": "ToTitle",
     "Num": 17
+  },
+  {
+    "Name": "ToGameOver",
+    "Num": 18
+  },
+  {
+    "Name": "ToResult",
+    "Num": 19
+  },
+  {
+    "Name": "PlayFromTitle",
+    "Num": 21
   }
 ]
