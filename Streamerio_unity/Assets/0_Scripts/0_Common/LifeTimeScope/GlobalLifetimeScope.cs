@@ -18,7 +18,7 @@ public class GlobalLifetimeScope : LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterEntryPoint<Booster>();
+        builder.RegisterEntryPoint<GlobalBooster>();
         
         builder.Register<IVolumeSaveFacade, IPlayDataSaveFacade, SaveManager>(Lifetime.Singleton);
 

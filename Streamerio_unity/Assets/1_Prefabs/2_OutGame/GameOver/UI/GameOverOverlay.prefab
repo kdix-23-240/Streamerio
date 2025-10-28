@@ -211,7 +211,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: parentReference.TypeName
-      value: OutGame.UI.GameOver.GameOverOverlayLifetimeScope
+      value: OutGame.GameOver.UI.GameOverOverlayLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name
@@ -364,6 +364,14 @@ PrefabInstance:
       propertyPath: '_uiParts.Array.data[3]'
       value: 
       objectReference: {fileID: 4627120929520970541}
+    - target: {fileID: 6314382362367899195, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
+      propertyPath: _clickSE
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6314382362367899195, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
+      propertyPath: parentReference.TypeName
+      value: OutGame.GameOver.UI.GameOverOverlayLifetimeScope
+      objectReference: {fileID: 0}
     - target: {fileID: 6877069330589355082, guid: 001d5578d00b94ce6b52c29b1cd43320, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -608,7 +616,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5010429538601831527, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: parentReference.TypeName
-      value: OutGame.UI.GameOver.GameOverOverlayLifetimeScope
+      value: OutGame.GameOver.UI.GameOverOverlayLifetimeScope
       objectReference: {fileID: 0}
     - target: {fileID: 6178945486548579912, guid: 7326c1b5f120a46008ac996c5abfc4d8, type: 3}
       propertyPath: m_Name

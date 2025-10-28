@@ -1,11 +1,12 @@
 using Common.Scene;
+using Common.State;
 using Common.UI.Display;
 using Common.UI.Display.Overlay;
 using Common.UI.Loading;
 using Common.UI.Part.Button;
 using VContainer;
 
-namespace OutGame.UI.GameOver
+namespace OutGame.GameOver.UI
 {
     public class GameOverOverlayLifetimeScope: OverlayLifetimeScopeBase<IGameOverOverlay, GameOverOverlayPresenter, IGameOverOverlayView, GameOverOverlayContext>
     {
@@ -25,8 +26,9 @@ namespace OutGame.UI.GameOver
             return new GameOverOverlayContext
             {
                 View = resolver.Resolve<IGameOverOverlayView>(),
-                SceneManager = resolver.Resolve<ISceneManager>(),
-                LoadingScreen = resolver.Resolve<ILoadingScreen>(),
+                StateManager = resolver.Resolve<IStateManager>(),
+                RestartState = resolver.Resolve<IState>(StateType.Restart),
+                ToTitleState = resolver.Resolve<IState>(StateType.Title),
             };
         }
     }

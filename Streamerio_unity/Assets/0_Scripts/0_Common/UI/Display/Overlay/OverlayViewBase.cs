@@ -7,6 +7,7 @@
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using Common.UI.Display.Background;
 using VContainer;
 
 namespace Common.UI.Display.Overlay
@@ -19,6 +20,7 @@ namespace Common.UI.Display.Overlay
     /// </summary>
     public interface IOverlayView : IDisplayView
     {
+        IDisplayBackground Background { get; }
     }
     
     /// <summary>
@@ -29,23 +31,29 @@ namespace Common.UI.Display.Overlay
     /// </summary>
     public abstract class OverlayViewBase : DisplayViewBase, IOverlayView
     {
-        private IUIAnimation _showAnimation;
+        private IDisplayBackground _background;
+        public IDisplayBackground Background => _background;
+        
+        protected IUIAnimation ShowAnimation;
         private IUIAnimation _hideAnimation;
         
-        private IUIAnimation _partShowAnimation;
+        protected IUIAnimation PartShowAnimation;
         private IUIAnimation _partHideAnimaiton;
 
         [Inject]
         public virtual void Construct(
+            IDisplayBackground background,
             [Key(AnimationType.Show)] IUIAnimation showAnimation,
             [Key(AnimationType.Hide)] IUIAnimation hideAnimation,
             [Key(AnimationType.ShowParts)] IUIAnimation partShowAnimation,
             [Key(AnimationType.HideParts)] IUIAnimation partHideAnimation)
         {
-            _showAnimation = showAnimation;
+            _background = background;
+            
+            ShowAnimation = showAnimation;
             _hideAnimation = hideAnimation;
             
-            _partShowAnimation = partShowAnimation;
+            PartShowAnimation = partShowAnimation;
             _partHideAnimaiton = partHideAnimation;
         }
         
@@ -56,8 +64,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         {
-            await _showAnimation.PlayAsync(ct);
-            await _partShowAnimation.PlayAsync(ct);
+            await ShowAnimation.PlayAsync(ct);
+            await PartShowAnimation.PlayAsync(ct);
         }
         
         /// <summary>
@@ -67,8 +75,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         public override void Show()
         {
-            _partShowAnimation.PlayImmediate();
-            _showAnimation.PlayImmediate();
+            PartShowAnimation.PlayImmediate();
+            ShowAnimation.PlayImmediate();
         }
         
         /// <summary>

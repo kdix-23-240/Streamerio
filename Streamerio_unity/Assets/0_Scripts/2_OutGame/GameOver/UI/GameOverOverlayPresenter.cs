@@ -1,11 +1,11 @@
+using System.Threading;
 using Common;
-using Common.Scene;
+using Common.State;
 using Common.UI.Display.Overlay;
-using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using R3;
 
-namespace OutGame.UI.GameOver
+namespace OutGame.GameOver.UI
 {
     public interface IGameOverOverlay: IOverlay, IAttachable<GameOverOverlayContext>
     {
@@ -20,15 +20,19 @@ namespace OutGame.UI.GameOver
     /// </summary>
     public class GameOverOverlayPresenter : OverlayPresenterBase<IGameOverOverlayView, GameOverOverlayContext>, IGameOverOverlay
     {
-        private ISceneManager _sceneManager;
-        private ILoadingScreen _loadingScreen;
+        private IStateManager _stateManager;
+        private IState _restartState;
+        private IState _toTitleState;
+
+        private CancellationTokenSource _skipAnimationCts;
 
         protected override void AttachContext(GameOverOverlayContext context)
         {
             base.AttachContext(context);
 
-            _sceneManager = context.SceneManager;
-            _loadingScreen = context.LoadingScreen;
+            _stateManager = context.StateManager;
+            _restartState = context.RestartState;
+            _toTitleState = context.ToTitleState;
         }
 
         /// <summary>
@@ -39,30 +43,44 @@ namespace OutGame.UI.GameOver
         protected override void Bind()
         {
             base.Bind();
+            _skipAnimationCts = CancellationTokenSource.CreateLinkedTokenSource(GetCt());
 
+            View.Background.OnClickAsObservable
+                .Subscribe(_ =>
+                {
+                    View.SkipShowAnimation();
+                    _skipAnimationCts.Cancel();
+                })
+                .RegisterTo(_skipAnimationCts.Token);
+            
             // リトライボタンクリック
             View.RetryButton.OnClickAsObservable
-                .SubscribeAwait(async (_, ct) =>
+                .Subscribe(_ =>
                 {
-                    await _loadingScreen.ShowAsync(ct);
-                    _sceneManager.ReloadSceneAsync();
+                    _stateManager.ChangeState(_restartState);
                 })
                 .RegisterTo(GetCt());
             
             // タイトルボタンクリック
             View.TitleButton.OnClickAsObservable
-                .SubscribeAwait(async (_, ct) =>
+                .Subscribe(_ =>
                 {
-                    await _loadingScreen.ShowAsync(ct);
-                    _sceneManager.LoadSceneAsync(SceneType.Title).Forget();
+                    _stateManager.ChangeState(_toTitleState);
                 })
                 .RegisterTo(GetCt());
+        }
+
+        public override async UniTask ShowAsync(CancellationToken ct)
+        {
+            View.SetInteractable(true);
+            await base.ShowAsync(ct);
         }
     }
 
     public class GameOverOverlayContext : CommonOverlayContext<IGameOverOverlayView>
     {
-        public ISceneManager SceneManager;
-        public ILoadingScreen LoadingScreen;
+        public IStateManager StateManager;
+        public IState RestartState;
+        public IState ToTitleState;
     }
 }

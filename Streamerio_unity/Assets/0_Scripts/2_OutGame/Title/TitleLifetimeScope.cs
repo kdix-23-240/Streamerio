@@ -1,3 +1,4 @@
+using Common.Booster;
 using Common.State;
 using Common.UI.Animation;
 using OutGame.Title.UI;
@@ -33,7 +34,7 @@ namespace OutGame.Title
             builder.RegisterInstance<IUIAnimation>(new CloseAnimation(_background, _closeAnimationParam))
                 .Keyed(AnimationType.TitleBackground);
 
-            builder.RegisterEntryPoint<TitleBooster>();
+            SceneBoosterBinder.Bind(builder, StateType.TitleStart);
         }
     }
 }

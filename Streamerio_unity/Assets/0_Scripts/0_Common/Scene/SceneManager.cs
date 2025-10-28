@@ -11,7 +11,7 @@ namespace Common.Scene
         /// <summary>
         /// リロードしたか
         /// </summary>
-        bool IsReloaded { get; }
+        bool IsRestart { get; }
         
         /// <summary>
         /// シーンをロードする(前のシーンがアンロード)
@@ -23,17 +23,19 @@ namespace Common.Scene
         /// リロード
         /// </summary>
         UniTask ReloadSceneAsync();
+        
+        void UpdateRestartFlag(bool isRestart);
     }
     
     public class SceneManager: ISceneManager, IInitializable, IDisposable
     {
         private SceneType _currentScene = SceneType.None;
         
-        private bool _isReloaded = false;
+        private bool _isRestart = false;
         /// <summary>
         /// リロードしたか
         /// </summary>
-        public bool IsReloaded => _isReloaded;
+        public bool IsRestart => _isRestart;
         
         private CancellationTokenSource _cts;
         
@@ -60,8 +62,6 @@ namespace Common.Scene
                 return;
             }
             
-            _isReloaded=false;
-            
             if(_currentScene != SceneType.None)
             {
                 // 現在のシーンをアンロード
@@ -81,8 +81,6 @@ namespace Common.Scene
         /// </summary>
         public async UniTask ReloadSceneAsync()
         {
-            _isReloaded=true;
-
             await UnityEngine.SceneManagement.SceneManager
                 .UnloadSceneAsync(_currentScene.ToString())
                 .ToUniTask(cancellationToken: _cts.Token);
@@ -90,6 +88,11 @@ namespace Common.Scene
             await UnityEngine.SceneManagement.SceneManager
                 .LoadSceneAsync(_currentScene.ToString(), LoadSceneMode.Additive)
                 .ToUniTask(cancellationToken: _cts.Token);
+        }
+
+        public void UpdateRestartFlag(bool isRestart)
+        {
+            _isRestart = isRestart;
         }
     }
 }

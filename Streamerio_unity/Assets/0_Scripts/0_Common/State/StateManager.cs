@@ -36,11 +36,9 @@ namespace Common.State
         {
             if (_currentState != null)
             {
-                Debug.Log(_currentState.GetType().Name + " -> " + newState.GetType().Name);
                 await _currentState.ExitAsync(_cts.Token);   
             }
             
-            Debug.Log("Enter " + newState.GetType().Name);
             _currentState = newState;
             await _currentState.EnterAsync(_cts.Token);
         }

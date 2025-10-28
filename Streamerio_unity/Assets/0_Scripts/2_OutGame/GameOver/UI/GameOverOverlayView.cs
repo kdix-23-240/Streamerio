@@ -2,7 +2,7 @@ using Common.UI.Display.Overlay;
 using Common.UI.Part.Button;
 using VContainer;
 
-namespace OutGame.UI.GameOver
+namespace OutGame.GameOver.UI
 {
     /// <summary>
     /// ゲームオーバー画面の View。
@@ -26,11 +26,19 @@ namespace OutGame.UI.GameOver
             _retryButton = retryButton;
             _titleButton = titleButton;
         }
+        
+        public void SkipShowAnimation()
+        {
+            ShowAnimation.Skip();
+            PartShowAnimation.Skip();
+        }
     }
 
     public interface IGameOverOverlayView : IOverlayView
     {
         ICommonButton RetryButton { get; }
         ICommonButton TitleButton { get; }
+        
+        void SkipShowAnimation();
     }
 }

@@ -48,6 +48,8 @@ namespace Common.UI.Display.Overlay
         /// </summary>
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.Register<IDisplayBackground, DisplayBackgroundPresenter>(Lifetime.Singleton);
+            
             builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_canvasGroup, _showAnimationParam))
                 .Keyed(AnimationType.Show);
             builder.RegisterInstance<IUIAnimation>(new FadeAnimation(_canvasGroup, _hideAnimationParam))

@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 using Common.UI.Display.Overlay.Test;
-using OutGame.UI.GameOver;
+using OutGame.GameOver.UI;
 using UnityEngine;
 
 namespace Common.UI.Display.Overlay

@@ -6,13 +6,13 @@ using VContainer.Unity;
 
 namespace Common.Booster
 {
-    public class Booster: IStartable
+    public class GlobalBooster: IStartable
     {
         private ILoadingScreen _loadingScreen;
         private ISceneManager _sceneManager;
         
         [Inject]
-        public Booster(ILoadingScreen loadingScreen, ISceneManager sceneManager)
+        public GlobalBooster(ILoadingScreen loadingScreen, ISceneManager sceneManager)
         {
             _loadingScreen = loadingScreen;
             _sceneManager = sceneManager;
