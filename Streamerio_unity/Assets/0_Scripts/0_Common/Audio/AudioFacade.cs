@@ -62,11 +62,15 @@ namespace Common.Audio
         /// 再生中の BGM をすべて停止します。
         /// </summary>
         void StopBGM();
+        
+        UniTask StopBGMAsync(CancellationToken ct);
 
         /// <summary>
         /// 再生中の SE をすべて停止します。
         /// </summary>
         void StopSE();
+        
+        UniTask StopSEAsync(CancellationToken ct);
     }
 
     /// <summary>
@@ -145,9 +149,15 @@ namespace Common.Audio
 
         /// <inheritdoc />
         public void StopBGM() => _bgmPlayer.Stop();
+        
+        public async UniTask StopBGMAsync(CancellationToken ct)
+            => await _bgmPlayer.StopAsync(ct);
 
         /// <inheritdoc />
         public void StopSE() => _sePlayer.Stop();
+        
+        public async UniTask StopSEAsync(CancellationToken ct)
+            => await _sePlayer.StopAsync(ct);
     }
 
     /// <summary>

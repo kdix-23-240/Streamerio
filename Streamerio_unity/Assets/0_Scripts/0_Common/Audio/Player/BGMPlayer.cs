@@ -30,6 +30,8 @@ namespace Common.Audio
         /// 再生中の BGM を停止します。
         /// </summary>
         void Stop();
+        
+        UniTask StopAsync(CancellationToken ct);
     }
 
     /// <summary>

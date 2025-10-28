@@ -80,6 +80,17 @@ namespace Common.Audio
                 source.Stop();
             }
         }
+        
+        public async UniTask StopAsync(CancellationToken ct)
+        {
+            var stopTasks = new List<UniTask>();
+            foreach (var source in _usedSources)
+            {
+                stopTasks.Add(source.StopAsync(ct));
+            }
+
+            await UniTask.WhenAll(stopTasks);
+        }
 
         /// <summary>
         /// 指定された Enum に対応する Source をプールから取得します。  

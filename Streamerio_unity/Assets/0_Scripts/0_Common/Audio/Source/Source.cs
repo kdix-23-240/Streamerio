@@ -28,6 +28,9 @@ namespace Common.Audio
         /// </summary>
         [SerializeField, ReadOnly]
         private AudioSource _audioSource;
+        
+        [SerializeField]
+        private float _stopFadeDuration = 1f;
 
         /// <summary>
         /// 【目的】再生終了時にプールへ返却するコールバック。
@@ -90,16 +93,16 @@ namespace Common.Audio
         /// 【目的】指定時間でフェードアウトしながら停止する。
         /// 【理由】BGM の切り替えなど、唐突な音切れを避けたいケースに対応するため。
         /// </summary>
-        /// <param name="duration">【用途】フェードアウトにかける時間（秒）。</param>
         /// <param name="ct">【用途】フェード途中で停止処理をキャンセルするためのトークン。</param>
-        public async UniTask StopAsync(float duration, CancellationToken ct)
+        public async UniTask StopAsync(CancellationToken ct)
         {
             await _audioSource
-                .DOFade(0, duration)
+                .DOFade(0, _stopFadeDuration)
                 .SetEase(Ease.InOutQuad)
                 .ToUniTask(cancellationToken: _lct.GetCancellationToken(ct));
 
             Stop();
+            _audioSource.volume = 1f; // フェード後に音量を元に戻す
         }
 
         /// <summary>

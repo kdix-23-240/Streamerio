@@ -27,6 +27,8 @@ namespace Common.Audio
         /// 再生中の SE をすべて停止します。
         /// </summary>
         void Stop();
+        
+        UniTask StopAsync(CancellationToken ct);
     }
 
     /// <summary>
