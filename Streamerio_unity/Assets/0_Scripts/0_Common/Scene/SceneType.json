@@ -12,8 +12,8 @@
     "Num": 9
   },
   {
-    "Name": "ClearScene",
-    "Num": 10
+    "Name": "DITestScene",
+    "Num": 18
   },
   {
     "Name": "EnemyStatus",
@@ -36,6 +36,10 @@
     "Num": 14
   },
   {
+    "Name": "GameTest_Enemy_Create",
+    "Num": 19
+  },
+  {
     "Name": "GameTest_Ult_Create",
     "Num": 15
   },
@@ -46,6 +50,10 @@
   {
     "Name": "PlayerAttack",
     "Num": 16
+  },
+  {
+    "Name": "ResultScene",
+    "Num": 20
   },
   {
     "Name": "SampleScene",

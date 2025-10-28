@@ -120,6 +120,7 @@ namespace Common.UI.Display
         public async UniTask<TDisplay> OpenDisplayAsync<TDisplay>(CancellationToken ct)
             where TDisplay : class, IDisplay
         {
+            Debug.Log("DisplayService OpenDisplayAsync");
             _isEmptyProp.Value = false;
 
             if (_displayStack.TryPeek(out var current))

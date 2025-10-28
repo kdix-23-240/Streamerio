@@ -1,9 +1,6 @@
 using Common;
-using Common.Scene;
-using Common.UI.Display.Overlay;
+using Common.State;
 using Common.UI.Display.Window;
-using Common.UI.Loading;
-using Cysharp.Threading.Tasks;
 using R3;
 
 namespace OutGame.Result.UI
@@ -19,8 +16,8 @@ namespace OutGame.Result.UI
     /// </summary>
     public class ResultWindowPresenter : WindowPresenterBase<IResultWindowView, ResultWindowContext>, IResultWindow
     {
-        private ILoadingScreen _loadingScreen;
-        private ISceneManager _sceneManager;
+        private IStateManager _stateManager;
+        private IState _nextState;
 
         protected override void Bind()
         {
@@ -34,20 +31,19 @@ namespace OutGame.Result.UI
         {
             base.AttachContext(context);
 
-            _loadingScreen = context.LoadingScreen;
-            _sceneManager = context.SceneManager;
+            _stateManager = context.StateManager;
+            _nextState = context.NextState;
         }
         
-        protected override async void CloseEvent()
+        protected override void CloseEvent()
         {
-            await _loadingScreen.ShowAsync(GetCt());
-            _sceneManager.LoadSceneAsync(SceneType.Title).Forget();
+            _stateManager.ChangeState(_nextState);
         }
     }
 
     public class ResultWindowContext : WindowContext<IResultWindowView>
     {
-        public ILoadingScreen LoadingScreen;
-        public ISceneManager SceneManager;
+        public IStateManager StateManager;
+        public IState NextState;
     }
 }

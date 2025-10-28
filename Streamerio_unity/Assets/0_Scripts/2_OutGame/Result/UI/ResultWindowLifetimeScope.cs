@@ -1,3 +1,4 @@
+using Common.State;
 using Common.UI.Display.Window;
 using Common.UI.Part.Text;
 using UnityEngine;
@@ -22,6 +23,8 @@ namespace OutGame.Result.UI
             return new ResultWindowContext
             {
                 View = resolver.Resolve<IResultWindowView>(),
+                StateManager = resolver.Resolve<IStateManager>(),
+                NextState = resolver.Resolve<IState>(StateType.ToTitle),
             };
         }
     }

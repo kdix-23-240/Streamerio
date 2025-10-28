@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3723624189276127379}
   - component: {fileID: 3757485810195997519}
   - component: {fileID: 7059078668798634387}
+  - component: {fileID: 6483555171262186074}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -78,6 +79,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &6483555171262186074
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396580134651457853}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &4066068465683376677
 GameObject:
   m_ObjectHideFlags: 0
@@ -606,7 +619,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4648105322662381009, guid: bff8377074bb84c508ad7b476786ea05, type: 3}
       propertyPath: _clickSE
-      value: 0
+      value: 29
       objectReference: {fileID: 0}
     - target: {fileID: 4648105322662381009, guid: bff8377074bb84c508ad7b476786ea05, type: 3}
       propertyPath: parentReference.TypeName

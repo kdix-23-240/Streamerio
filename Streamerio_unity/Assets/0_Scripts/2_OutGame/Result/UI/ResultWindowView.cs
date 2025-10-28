@@ -1,8 +1,6 @@
 using System.Threading;
 using Common.UI.Animation;
-using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
-using Common.UI.Part.Text;
 using Cysharp.Threading.Tasks;
 using VContainer;
 
