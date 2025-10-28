@@ -28,7 +28,7 @@ namespace OutGame.GameOver.UI
                 View = resolver.Resolve<IGameOverOverlayView>(),
                 StateManager = resolver.Resolve<IStateManager>(),
                 RestartState = resolver.Resolve<IState>(StateType.Restart),
-                ToTitleState = resolver.Resolve<IState>(StateType.Title),
+                ToTitleState = resolver.Resolve<IState>(StateType.ToTitle),
             };
         }
     }
