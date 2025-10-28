@@ -16,5 +16,5 @@ MonoBehaviour:
   Ease: 2
   InitialPosition: {x: 0, y: 0, z: 0}
   Path:
-  - {x: -1920, y: 0, z: 0}
+  - {x: -1360, y: 880, z: 0}
   PathType: 1

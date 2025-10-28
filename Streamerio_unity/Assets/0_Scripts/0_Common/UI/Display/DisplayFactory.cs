@@ -85,6 +85,7 @@ namespace Common.UI.Display
                 var instance = Object.Instantiate(displayScope, _parent);
 
                 var display = instance.Container.Resolve<TDisplay>();
+                display.Hide();
                 return display;
             }
         }

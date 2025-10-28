@@ -1,5 +1,6 @@
 using System.Threading;
 using Common.Audio;
+using Common.QRCode;
 using Common.Save;
 using Common.Scene;
 using Common.UI.Loading;
@@ -20,6 +21,8 @@ namespace Common.State
         
         private readonly IInGameSetting _inGameSetting;
         
+        private readonly IQRCodeService _qrCodeService;
+        
         private readonly IStateManager _stateManager;
         private readonly IState _firstPlayState;
         private readonly IState _playFromTitleState;
@@ -32,6 +35,7 @@ namespace Common.State
             ISceneManager sceneManager,
             IAudioFacade audioFacade,
             IInGameSetting inGameSetting,
+            IQRCodeService qrCodeService,
             IStateManager stateManager,
             [Key(StateType.FirstPlay)] IState firstPlayState,
             [Key(StateType.PlayFromTitle)] IState playFromTitleState,
@@ -46,6 +50,8 @@ namespace Common.State
             
             _inGameSetting = inGameSetting;
             
+            _qrCodeService = qrCodeService;
+            
             _stateManager = stateManager;
             _firstPlayState = firstPlayState;
             _playFromTitleState = playFromTitleState;
@@ -54,6 +60,7 @@ namespace Common.State
         
         public async UniTask EnterAsync(CancellationToken ct)
         {
+            _qrCodeService.UpdateSprite("https://www.google.com/");
             _audioFacade.PlayAsync(_inGameSetting.BGM, ct).Forget();
             
             if (!_playDataSaveFacade.LoadPlayed())
