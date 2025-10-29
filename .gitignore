@@ -168,3 +168,9 @@ crashlytics-build.properties
 .serena
 
 .gocache
+
+# GAS
+*/.clasp.json
+*/.clasprc.json
+
+*/AGENTS.md
