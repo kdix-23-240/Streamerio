@@ -9,6 +9,7 @@ public class EnemyHpManager : MonoBehaviour
     public int CurrentHealth => _health;
     public bool IsDead => _health <= 0;
 
+    // ...existing code...
     public void Initialize(int health)
     {
         _health = health;
@@ -16,7 +17,6 @@ public class EnemyHpManager : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        Debug.Log($"Enemy took {amount} damage.");
         if (IsDead) return;
         _health -= amount;
         if (_health <= 0)
@@ -32,7 +32,6 @@ public class EnemyHpManager : MonoBehaviour
 
     protected virtual void Die()
     {
-        Debug.Log("Enemy died.");
         //_audioFacade.PlayAsync(SEType.敵のダウン,destroyCancellationToken).Forget();
         Destroy(gameObject);
     }
