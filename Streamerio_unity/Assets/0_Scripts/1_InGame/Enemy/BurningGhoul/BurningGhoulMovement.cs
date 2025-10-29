@@ -3,23 +3,14 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 
-public class GatoWalkMovement : MonoBehaviour, IAttackable, IHealth
+public class BurningGhoulMovement : MonoBehaviour, IAttackable, IHealth
 {
-    private GatoWalkScriptableObject _config;
+    private BurningGhoulScriptableObject _config;
     private float _speed;
-    private float _jumpForce;
-    private float _jumpInterval;
-    private float _attackCoolTime;
-
-    private bool _isGrounded = true;
-    private float _jumpTimer = 0f;
-    private float _lastAttackTime = -999f;
-
     private float _detectionRange;
     private float _stopDistance;
 
     private Transform _player;
-    private Rigidbody2D _rigidbody;
 
     private EnemyHpManager _enemyHpManager;
 
@@ -28,11 +19,11 @@ public class GatoWalkMovement : MonoBehaviour, IAttackable, IHealth
 
     void Awake()
     {
-        _jumpTimer = 0f;
+        _enemyHpManager = GetComponent<EnemyHpManager>();
     }
 
     [Inject]
-    private void Construct(GatoWalkScriptableObject config, EnemyHpManager enemyHpManager)
+    private void Construct(BurningGhoulScriptableObject config, EnemyHpManager enemyHpManager)
     {
         if (config == null) throw new System.ArgumentNullException(nameof(config));
         if (enemyHpManager == null) throw new System.ArgumentNullException(nameof(enemyHpManager));
@@ -41,14 +32,8 @@ public class GatoWalkMovement : MonoBehaviour, IAttackable, IHealth
         _enemyHpManager = enemyHpManager;
 
         _speed = _config.Speed;
-        _jumpForce = _config.JumpForce;
-        _jumpInterval = _config.JumpInterval;
-        _attackCoolTime = _config.AttackCoolTime;
-
         _detectionRange = _config.DetectionRange;
         _stopDistance = _config.StopRange;
-
-        _jumpTimer = _jumpInterval;
 
         _enemyHpManager.Initialize(Health);
     }
@@ -57,20 +42,16 @@ public class GatoWalkMovement : MonoBehaviour, IAttackable, IHealth
     {
         if (_config != null) return;
 
-        var scope = GetComponentInParent<GatoWalkLifeTimeScope>(true);
-        if (scope == null) throw new System.InvalidOperationException("GatoWalkLifeTimeScope not found in parent hierarchy.");
+        var scope = GetComponentInParent<BurningGhoulLifeTimeScope>(true);
+        if (scope == null) throw new System.InvalidOperationException("BurningGhoulLifeTimeScope not found in parent hierarchy.");
 
         var cfg = scope.Config;
-        if (cfg == null) throw new System.InvalidOperationException("GatoWalkLifeTimeScope.Config is null.");
+        if (cfg == null) throw new System.InvalidOperationException("BurningGhoulLifeTimeScope.Config is null.");
 
         _config = cfg;
         _speed = _config.Speed;
-        _jumpForce = _config.JumpForce;
-        _jumpInterval = _config.JumpInterval;
-        _attackCoolTime = _config.AttackCoolTime;
         _detectionRange = _config.DetectionRange;
         _stopDistance = _config.StopRange;
-        _jumpTimer = _jumpInterval;
     }
 
     void Start()
@@ -78,23 +59,19 @@ public class GatoWalkMovement : MonoBehaviour, IAttackable, IHealth
         _player = GameObject.FindGameObjectWithTag("Player")?.transform;
         EnsureConfigFromScopeFallback();
 
+        // 保険：EnemyHpManager が null なら取得し、必ず初期化する
         if (_enemyHpManager == null) _enemyHpManager = GetComponent<EnemyHpManager>();
         _enemyHpManager.Initialize(Health);
-        if (_player == null) throw new System.InvalidOperationException("Player not found in scene.");
 
         float randPosX = Random.Range(_config.MinRelativeSpawnPosX, _config.MaxRelativeSpawnPosX);
         float randPosY = Random.Range(_config.MinRelativeSpawnPosY, _config.MaxRelativeSpawnPosY);
         transform.position += new Vector3(_player.position.x + randPosX, _player.position.y + randPosY, 0);
-
-        _rigidbody = GetComponent<Rigidbody2D>();
-        _rigidbody.gravityScale = 2f;
-        _rigidbody.freezeRotation = true;
     }
 
     void Update()
     {
+        if (_enemyHpManager != null && _enemyHpManager.IsDead) return;
         FollowPlayer();
-        HandleJump();
     }
 
     private void FollowPlayer()
@@ -116,22 +93,15 @@ public class GatoWalkMovement : MonoBehaviour, IAttackable, IHealth
             }
         }
     }
-
-    private void HandleJump()
+    
+    public void TakeDamage(int amount)
     {
-        _jumpTimer -= Time.deltaTime;
-        if (_isGrounded && _jumpTimer <= 0f)
-        {
-            Jump();
-            _jumpTimer = _jumpInterval;
-        }
+        if (_enemyHpManager == null) _enemyHpManager = GetComponent<EnemyHpManager>();
+        _enemyHpManager.TakeDamage(amount);
     }
 
-    private void Jump()
+    public void TakeDamage(float amount)
     {
-        var vel = _rigidbody.linearVelocity;
-        vel.y = _jumpForce;
-        _rigidbody.linearVelocity = vel;
-        _isGrounded = false;
+        TakeDamage(Mathf.CeilToInt(amount));
     }
 }
