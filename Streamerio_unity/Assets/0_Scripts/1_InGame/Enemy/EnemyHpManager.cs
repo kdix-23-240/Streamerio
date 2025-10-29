@@ -25,7 +25,7 @@ public class EnemyHpManager : MonoBehaviour
         }
         else
         {
-            _audioFacade.PlayAsync(SEType.どん_効果音,destroyCancellationToken).Forget();
+            // _audioFacade.PlayAsync(SEType.どん_効果音,destroyCancellationToken).Forget();
         }
     }
 
