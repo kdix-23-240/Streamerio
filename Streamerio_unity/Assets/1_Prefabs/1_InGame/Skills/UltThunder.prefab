@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 25
-  _damage: 20
+  _damage: 7
   _lifetime: 2
   _strikeCount: 3
   _strikeInterval: 0.5
