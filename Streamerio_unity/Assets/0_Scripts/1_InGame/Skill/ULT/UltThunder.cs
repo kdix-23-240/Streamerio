@@ -12,7 +12,6 @@ public class UltThunder : MonoBehaviour
     [SerializeField] private float _lifetime = 3f;
     [SerializeField] private int _strikeCount = 3;
     [SerializeField] private float _strikeInterval = 0.5f;
-    [SerializeField] private float _strikeRange = 3f;
     [SerializeField] private float _continuousDamageInterval = 0.4f;
     [SerializeField] private float _continuousDamage = 30f;
 
@@ -21,9 +20,7 @@ public class UltThunder : MonoBehaviour
 
     // 侵入中の敵
     private readonly HashSet<GameObject> _enemiesInRange = new HashSet<GameObject>();
-    // 初回ストライクで既にヒット済み（以後のストライクで重複ダメージを与えない）
     private readonly HashSet<GameObject> _hitEnemies = new HashSet<GameObject>();
-    // 持続ダメージ用タイマー
     private readonly Dictionary<GameObject, float> _enemyTimers = new Dictionary<GameObject, float>();
 
     private GameObject _player;
@@ -40,7 +37,6 @@ public class UltThunder : MonoBehaviour
 
         _box = GetComponent<BoxCollider2D>();
         _box.isTrigger = true;
-        ApplyColliderSize();
     }
 
     void OnValidate()
@@ -49,7 +45,6 @@ public class UltThunder : MonoBehaviour
         if (_box != null)
         {
             _box.isTrigger = true;
-            ApplyColliderSize();
         }
     }
 
@@ -60,10 +55,8 @@ public class UltThunder : MonoBehaviour
             transform.position = new Vector2(_player.transform.position.x + 6f,
                                              _player.transform.position.y + 3f);
         }
-        // フレームベースでインターバルを計算
         _damageIntervalFrames = Mathf.RoundToInt(_continuousDamageInterval / Time.fixedDeltaTime);
         
-        // 縦方向（上から下）への攻撃開始
         StartThunderStrike();
 
         AudioManager.Instance.PlayAsync(SEType.UltThunder, destroyCancellationToken).Forget();
@@ -77,14 +70,7 @@ public class UltThunder : MonoBehaviour
         if (_lifetime <= 0f) DestroySkill();
     }
 
-    private void ApplyColliderSize()
-    {
-        if (_box != null)
-        {
-            _box.size = new Vector2(1f, _strikeRange);
-            _box.offset = Vector2.zero;
-        }
-    }
+
 
     private async UniTaskVoid StartThunderStrike()
     {
@@ -98,14 +84,12 @@ public class UltThunder : MonoBehaviour
 
     private void PerformThunderStrike()
     {
-        // 侵入中の敵に対して初回ストライク判定
         foreach (var enemyObj in _enemiesInRange)
         {
             if (_hitEnemies.Contains(enemyObj)) continue;
             var hp = enemyObj.GetComponent<EnemyHpManager>();
             if (hp != null)
             {
-                // Debug.Log($"UltThunder struck: {enemyObj.name}");
                 hp.TakeDamage((int)_damage);
                 _hitEnemies.Add(enemyObj);
             }
@@ -132,7 +116,6 @@ public class UltThunder : MonoBehaviour
                 var hp = enemyObj.GetComponent<EnemyHpManager>();
                 if (hp != null)
                 {
-                    // Debug.Log($"UltThunder continuous damage: {enemyObj.name}");
                     hp.TakeDamage((int)_continuousDamage);
                 }
                 _enemyTimers[enemyObj] = 0f;
@@ -165,19 +148,11 @@ public class UltThunder : MonoBehaviour
         if (!_enemyTimers.ContainsKey(go)) _enemyTimers[go] = 0f;
     }
 
-    // Trigger 退出
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Enemy")) return;
         var go = other.gameObject;
         _enemiesInRange.Remove(go);
         _enemyTimers.Remove(go);
-        // _hitEnemies は残す（再侵入しても初回ストライク重複させない元仕様踏襲）
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(transform.position, new Vector3(1f, _strikeRange, 0f));
     }
 }
