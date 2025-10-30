@@ -141,6 +141,7 @@ func main() {
 	api.GET("/rooms/:id/stats", apiHandler.GetRoomStats)
 	api.GET("/rooms/:id/results", apiHandler.GetRoomResult)
 	api.POST("/viewers/set_name", apiHandler.SetViewerName)
+	api.POST("/rooms/:id/restart", apiHandler.RestartRoom)
 
 	// 13. サーバ起動
 	log.Info("starting http server", slog.String("port", cfg.Port))
