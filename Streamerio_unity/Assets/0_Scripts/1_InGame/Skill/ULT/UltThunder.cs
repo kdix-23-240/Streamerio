@@ -84,14 +84,29 @@ public class UltThunder : MonoBehaviour
 
     private void PerformThunderStrike()
     {
-        foreach (var enemyObj in _enemiesInRange)
+        // 安全のためスナップショットを作成して列挙します。
+        // さらに foreach 内で例外を捕捉して処理の中断を防止します。
+        foreach (var enemyObj in _enemiesInRange.ToList())
         {
-            if (_hitEnemies.Contains(enemyObj)) continue;
-            var hp = enemyObj.GetComponent<EnemyHpManager>();
-            if (hp != null)
+            try
             {
-                hp.TakeDamage((int)_damage);
-                _hitEnemies.Add(enemyObj);
+                if (_hitEnemies.Contains(enemyObj)) continue;
+                var hp = enemyObj.GetComponent<EnemyHpManager>();
+                if (hp != null)
+                {
+                    hp.TakeDamage((int)_damage);
+                    _hitEnemies.Add(enemyObj);
+                }
+            }
+            catch (System.InvalidOperationException invEx)
+            {
+                // コレクションの変更による例外が念のため発生した場合のログ
+                Debug.LogWarning($"PerformThunderStrike: collection modified during enumeration for {enemyObj?.name}. Exception: {invEx.Message}");
+            }
+            catch (System.Exception ex)
+            {
+                // その他の例外も握りつぶさずログ化
+                Debug.LogError($"PerformThunderStrike: unexpected exception for {enemyObj?.name}: {ex}");
             }
         }
         _currentStrikes++;
