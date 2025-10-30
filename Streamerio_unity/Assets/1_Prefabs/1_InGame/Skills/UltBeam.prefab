@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 0
-  _damage: 5
+  _damage: 10
   _lifetime: 0.5
   _beamWidth: 2
   _continuousDamageInterval: 0.5
