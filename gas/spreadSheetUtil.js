@@ -16,5 +16,6 @@ function getRows(sheetName, initRowIndex, columnIndex) {
         return [];
     }
 
-    return sheet.getRange(initRowIndex, columnIndex, lastRow-(initRowIndex-1), 1).getValues();
+    const values2D = sheet.getRange(initRowIndex, columnIndex, lastRow-(initRowIndex-1), 1).getValues();
+    return values2D.flat();
 }
