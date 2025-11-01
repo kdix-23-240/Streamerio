@@ -53,17 +53,15 @@ func (r *viewerRepository) Create(viewer *model.Viewer) error {
 	if viewer.CreatedAt.IsZero() {
 		viewer.CreatedAt = time.Now()
 	}
-	q := `INSERT INTO viewers (id, name, created_at, updated_at) VALUES ($1, $2, $3, $4)
-        ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, updated_at = EXCLUDED.updated_at`
 	logger := r.logger.With(
 		slog.String("repo", "viewer"),
 		slog.String("op", "create"),
 		slog.String("viewer_id", viewer.ID),
 	)
 	start := time.Now()
-	res, err := r.db.Exec(q, viewer.ID, viewer.Name, viewer.CreatedAt, viewer.UpdatedAt)
+	res, err := r.createStmt.Exec(viewer.ID, viewer.Name, viewer.CreatedAt, viewer.UpdatedAt)
 	if err != nil {
-		logger.Error("db.exec failed", slog.Any("error", err))
+		logger.Error("db.exec (prepared) failed", slog.Any("error", err))
 		return err
 	}
 	rows, _ := res.RowsAffected()
@@ -73,15 +71,14 @@ func (r *viewerRepository) Create(viewer *model.Viewer) error {
 
 func (r *viewerRepository) Exists(id string) (bool, error) {
 	var exists bool
-	q := `SELECT EXISTS(SELECT 1 FROM viewers WHERE id = $1)`
 	logger := r.logger.With(
 		slog.String("repo", "viewer"),
 		slog.String("op", "exists"),
 		slog.String("viewer_id", id),
 	)
 	start := time.Now()
-	if err := r.db.Get(&exists, q, id); err != nil {
-		logger.Error("db.query failed", slog.Any("error", err))
+	if err := r.existsStmt.Get(&exists, id); err != nil {
+		logger.Error("db.query (prepared) failed", slog.Any("error", err))
 		return false, err
 	}
 	logger.Debug("db.query", slog.Bool("exists", exists), slog.Duration("elapsed", time.Since(start)))
@@ -90,21 +87,19 @@ func (r *viewerRepository) Exists(id string) (bool, error) {
 
 func (r *viewerRepository) Get(id string) (*model.Viewer, error) {
 	var viewer model.Viewer
-	q := `SELECT id, name, created_at, updated_at FROM viewers WHERE id = $1`
 	logger := r.logger.With(
 		slog.String("repo", "viewer"),
 		slog.String("op", "get"),
 		slog.String("viewer_id", id),
 	)
 	start := time.Now()
-	if err := r.db.Get(&viewer, q, id); err != nil {
+	if err := r.getStmt.Get(&viewer, id); err != nil {
 		if err == sql.ErrNoRows {
-			logger.Debug("db.query", slog.Bool("found", false), slog.Duration("elapsed", time.Since(start)))
+			logger.Debug("db.query (prepared)", slog.Bool("found", false), slog.Duration("elapsed", time.Since(start)))
 			return nil, nil
 		}
-		logger.Error("db.query failed", slog.Any("error", err))
+		logger.Error("db.query (prepared) failed", slog.Any("error", err))
 		return nil, err
 	}
-	logger.Debug("db.query", slog.Bool("found", true), slog.Duration("elapsed", time.Since(start)))
-	return &viewer, nil
+	logger.Debug("db.query (prepared)", slog.Bool("found", true), slog.Duration("elapsed", time.Since(start)))
 }
