@@ -102,4 +102,5 @@ func (r *viewerRepository) Get(id string) (*model.Viewer, error) {
 		return nil, err
 	}
 	logger.Debug("db.query (prepared)", slog.Bool("found", true), slog.Duration("elapsed", time.Since(start)))
+	return &viewer, nil
 }
