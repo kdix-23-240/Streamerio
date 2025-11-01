@@ -37,7 +37,26 @@ func NewEventRepository(db *sqlx.DB, logger *slog.Logger) EventRepository {
 	if logger == nil {
 		logger = slog.Default()
 	}
-	return &eventRepository{db: db, logger: logger}
+
+	// 準備に失敗した場合は、起動時エラーとして panic させる
+ 	mustPrepare := func(query string) *sqlx.Stmt {
+		stmt, err := db.Preparex(query)
+		if err != nil {
+			logger.Error("failed to prepare statement", slog.Any("error", err), slog.String("query", query))
+			panic(err)
+		}
+		return stmt
+	}
+
+	return &eventRepository{
+		db:                        db,
+		logger:                    logger,
+		createEventStmt:           mustPrepare(queryCreateEvent),
+		listEventViewerCountsStmt: mustPrepare(queryListEventViewerCounts),
+		listEventTotalsStmt:       mustPrepare(queryListEventTotals),
+		listViewerTotalsStmt:      mustPrepare(queryListViewerTotals),
+		listViewerEventCountsStmt: mustPrepare(queryListViewerEventCounts),
+	}
 }
 
 // CreateEvent: events テーブルへ挿入 (TriggeredAt 未設定なら現在時刻)
