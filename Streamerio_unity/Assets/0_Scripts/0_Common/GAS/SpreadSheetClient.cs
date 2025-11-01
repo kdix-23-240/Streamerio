@@ -12,7 +12,7 @@ namespace Common.GAS
         private const string _getParameterKey = "dataType";
         
         // スプレッドシートのデータを辞書型で取得
-        public static async UniTask<Dictionary<string, List<object>>> GetRequestAsync(string sheetType, CancellationToken ct, int timeout = 0)
+        public static async UniTask<Dictionary<string, List<object>>> GetRequestAsync(SheetType sheetType, CancellationToken ct, int timeout = 0)
         {
             var uriBuilder = new UriBuilder(Env.Parameter.GasApiUrl)
             {
@@ -51,10 +51,10 @@ namespace Common.GAS
             }
         }
 
-        private static string CreateGetQuery(string dataType)
+        private static string CreateGetQuery(SheetType sheetType)
         {
             var query = System.Web.HttpUtility.ParseQueryString("");
-            query[_getParameterKey] = dataType;
+            query[_getParameterKey] = sheetType.ToString();
             
             return query.ToString();
         }
