@@ -64,7 +64,6 @@ func (r *eventRepository) CreateEvent(event *model.Event) error {
 	if event.TriggeredAt.IsZero() {
 		event.TriggeredAt = time.Now()
 	}
-	q := `INSERT INTO events (room_id, viewer_id, event_type, triggered_at, metadata) VALUES ($1,$2,$3,$4,$5)`
 	attrs := []any{
 		slog.String("repo", "event"),
 		slog.String("op", "create_event"),
@@ -77,9 +76,9 @@ func (r *eventRepository) CreateEvent(event *model.Event) error {
 	}
 	logger := r.logger.With(attrs...)
 	start := time.Now()
-	res, err := r.db.Exec(q, event.RoomID, event.ViewerID, event.EventType, event.TriggeredAt, event.Metadata)
+	res, err := r.createEventStmt.Exec(event.RoomID, event.ViewerID, event.EventType, event.TriggeredAt, event.Metadata)
 	if err != nil {
-		logger.Error("db.exec failed", slog.Any("error", err))
+		logger.Error("db.exec (prepared) failed", slog.Any("error", err))
 		return err
 	}
 	rows, _ := res.RowsAffected()
