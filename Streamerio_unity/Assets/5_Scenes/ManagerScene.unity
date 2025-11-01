@@ -339,6 +339,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 546742815135425358, guid: 5226a601fa219423ab841fa455e50ce5, type: 3}
+      propertyPath: _apiConfigSO
+      value: 
+      objectReference: {fileID: 11400000, guid: fa75fb4f06bf741d1a74999cd7de3bb4, type: 2}
+    - target: {fileID: 546742815135425358, guid: 5226a601fa219423ab841fa455e50ce5, type: 3}
       propertyPath: _websocketId
       value: 0
       objectReference: {fileID: 0}

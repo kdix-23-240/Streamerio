@@ -6,24 +6,46 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using NativeWebSocket;
 using R3;
+using UnityEngine.Networking;
 public class WebsocketManager : SingletonBase<WebsocketManager>
 {
   private bool _isConnected = false;
   private WebSocket _websocket;
 
-  [SerializeField]
-  private string _websocketId = string.Empty;
-  public string WebsocketId => _websocketId;
-  
+  private string _roomId = string.Empty;
+
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
+
+  // アプリケーション終了中フラグ
+  private bool _isShuttingDown = false;
   
-  private string _url = string.Empty;
+  [SerializeField]
+  private ApiConfigSO _apiConfigSO;
   
-  private string _frontendUrlFormat = "https://streamerio.vercel.app/?streamer_id={0}";
-  
-  private void Awake()
+  private string _qrCodeURL = string.Empty;
+
+  private string _frontendUrlFormat = null; 
+
+  private string _backendHttpUrl = null;
+
+  private string _backendWsBaseUrl = null;
+
+  protected override void Awake()
   {
+    base.Awake();
+    
+    if (_apiConfigSO != null)
+    {
+      _frontendUrlFormat = _apiConfigSO.frontendUrlFormat;
+      _backendHttpUrl = _apiConfigSO.backendHttpUrl;
+      _backendWsBaseUrl = _apiConfigSO.backendWsUrl;
+    }
+    else
+    {
+      Debug.LogError("ApiConfigSO is not assigned. Please assign an ApiConfigSO asset in the Inspector.");
+    }
+    
     foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
     {
       _frontEventDict[key] = new Subject<Unit>();
@@ -40,7 +62,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   }
 
   // websocketのコネクションを確立する
-  public async UniTask ConnectWebSocket()
+  public async UniTask ConnectWebSocket(string websocketId)
   {
     if (_isConnected)
     {
@@ -49,7 +71,17 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     }
     
     // WebSocketのインスタンスを生成
-    _websocket = new WebSocket("wss://streamerio-282618030957.asia-northeast1.run.app/ws-unity");
+    string websocketUrl;
+    if (string.IsNullOrEmpty(websocketId))
+    {
+      websocketUrl = _backendWsBaseUrl;
+    }
+    else
+    {
+      websocketUrl = ZString.Format("{0}?room_id={1}", _backendWsBaseUrl, websocketId);
+    }
+    
+    _websocket = new WebSocket(websocketUrl);
 
     if (_websocket == null)
     {
@@ -72,10 +104,17 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       Debug.Log("Error! " + e);
     };
 
-    _websocket.OnClose += (e) =>
+    _websocket.OnClose += async (e) =>
     {
       Debug.Log("Connection closed!");
       _isConnected = false;
+      
+      // アプリケーション終了中は再接続しない
+      if (_isShuttingDown) return;
+      
+      // 再接続を試行
+      // 現在のwebsocketIdが空の場合は新しくwebsocketIdを生成して接続
+      await ConnectWebSocket(_roomId ?? string.Empty);
     };
 
     _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
@@ -115,7 +154,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
         var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
         if (room != null)
         {
-          _websocketId = room.room_id;
+          _roomId = room.room_id;
           return;
         }
       }
@@ -155,7 +194,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///<summary>
   /// WebSocketを切断する
   ///</summary>
-  public async void DisconnectWebSocket()
+  private async UniTask DisconnectWebSocket()
   {
     if (!_isConnected)
     {
@@ -177,15 +216,15 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///</summary>
   public async UniTask<string> GetFrontUrlAsync()
   {
-    if (_url != string.Empty)
+    if (_qrCodeURL != string.Empty)
     {
-      return _url;
+      return _qrCodeURL;
     }
     
-    await UniTask.WaitWhile(() => _websocketId == string.Empty);
-    _url = ZString.Format(_frontendUrlFormat, _websocketId);
+    await UniTask.WaitWhile(() => _roomId == string.Empty);
+    _qrCodeURL = ZString.Format(_frontendUrlFormat, _roomId);
     
-    return _url;
+    return _qrCodeURL;
   }
 
   ///<summary>
@@ -211,13 +250,30 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     await _websocket.SendText(message);
   }
 
+  ///<summary>
+  /// ヘルスチェック
+  ///</summary>
+  public void HealthCheck()
+  {
+    UnityWebRequest.Get(_backendHttpUrl).SendWebRequest();
+    Debug.Log("HealthCheck");
+  }
+
 
   ///<summary>
   /// アプリケーションが終了したときにwebsocketを閉じる
   ///</summary>
   private async void OnApplicationQuit()
   {
-    await _websocket.Close();
+    _isShuttingDown = true;
+    try
+    {
+      await DisconnectWebSocket();
+    }
+    catch (Exception ex)
+    {
+      Debug.Log($"Error during WebSocket disconnection: {ex.Message}");
+    }
   }
   
   ///<summary>
