@@ -23,6 +23,13 @@ type RoomRepository interface {
 type roomRepository struct {
 	db     *sqlx.DB
 	logger *slog.Logger
+
+	// 準備済みステートメント
+	createStmt    *sqlx.Stmt
+	getStmt       *sqlx.Stmt
+	updateStmt    *sqlx.Stmt
+	deleteStmt    *sqlx.Stmt
+	markEndedStmt *sqlx.Stmt
 }
 
 // NewRoomRepository: 実装生成
