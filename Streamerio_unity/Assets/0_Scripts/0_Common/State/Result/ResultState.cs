@@ -21,6 +21,7 @@ namespace Common.State
         
         public async UniTask EnterAsync(CancellationToken ct)
         {
+            await UniTask.WaitWhile(() =>WebsocketManager.Instance.GameEndSummary == null, cancellationToken: ct);
             await _loadingScreen.HideAsync(ct);
             await _windowService.OpenDisplayAsync<IResultWindow>(ct);
         }

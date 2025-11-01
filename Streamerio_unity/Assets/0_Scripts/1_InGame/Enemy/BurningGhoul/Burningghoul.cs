@@ -41,7 +41,7 @@ public class BurningGhoulMovement : MonoBehaviour
         
         float rand = Random.Range(6f, 10f);
         transform.position += new Vector3(_player.position.x + rand, _player.position.y, 0); // 少し上にずらして生成
-        //_audioFacade.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
+        AudioManager.Instance.AudioFacade.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()

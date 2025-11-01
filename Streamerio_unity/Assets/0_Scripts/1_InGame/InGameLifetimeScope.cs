@@ -2,6 +2,7 @@ using Common.Booster;
 using Common.Scene;
 using Common.State;
 using Common.UI.Part.Button;
+using InGame.Goal;
 using InGame.Setting;
 using InGame.UI.Timer;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace InGame
 {
     public class InGameLifetimeScope: LifetimeScope
     {
+        [SerializeField]
+        private HpPresenter _hpPresenter;
         [SerializeField]
         private InGameSettingSO _inGameSetting;
         protected override void Configure(IContainerBuilder builder)
@@ -41,6 +44,10 @@ namespace InGame
                 .Keyed(ButtonType.Jump);
             builder.Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)
                 .Keyed(ButtonType.Attack);
+
+            builder.Register<StickInput>(Lifetime.Singleton);
+            builder.RegisterComponentInHierarchy<Result>();
+            builder.RegisterInstance<HpPresenter>(_hpPresenter);
 
             SceneBoosterBinder.Bind(builder, StateType.InGameStart);
         }

@@ -323,9 +323,16 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public const string EnemyKey = "enemy";
     public const string SkillKey = "skill";
     
-    public string All;
-    public string Enemy;
-    public string Skill;
+    public SummaryDetail all;
+    public SummaryDetail enemy;
+    public SummaryDetail skill;
+    
+    public class SummaryDetail
+    {
+      public int count;
+      public string viewer_id;
+      public string viewer_name;
+    }
   }
 }
 

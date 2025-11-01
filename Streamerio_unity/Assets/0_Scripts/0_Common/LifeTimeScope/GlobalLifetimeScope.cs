@@ -27,6 +27,7 @@ public class GlobalLifetimeScope : LifetimeScope
         builder.Register<IVolumeSaveFacade, IPlayDataSaveFacade, SaveManager>(Lifetime.Singleton);
 
         builder.Register<IAudioFacade, AudioFacade>(Lifetime.Singleton);
+        builder.RegisterComponentInHierarchy<AudioManager>();
         
         builder.Register<SceneManager>(Lifetime.Singleton)
             .AsImplementedInterfaces();

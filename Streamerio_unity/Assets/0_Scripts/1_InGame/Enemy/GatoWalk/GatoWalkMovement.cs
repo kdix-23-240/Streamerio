@@ -49,7 +49,7 @@ public class GatoWalkMovement : MonoBehaviour
         _jumpTimer = jumpInterval;
         
         transform.position += new Vector3(_player.position.x + 10, _player.position.y + 1, 0); // 少し上にずらして生成
-        //_audioFacade.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
+        AudioManager.Instance.AudioFacade.PlayAsync(SEType.Monster012, destroyCancellationToken).Forget();
     }
     
     void Update()

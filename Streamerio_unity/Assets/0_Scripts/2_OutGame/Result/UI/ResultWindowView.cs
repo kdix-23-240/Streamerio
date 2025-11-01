@@ -36,15 +36,16 @@ namespace OutGame.Result.UI
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         { 
-            await base.ShowAsync(ct);
-            
             if(WebsocketManager.Instance.GameEndSummary != null)
             {
-                var summary = WebsocketManager.Instance.GameEndSummary;
-                _allText.text = summary.All;
-                _enemyText.text = summary.Enemy;
-                _skillText.text = summary.Skill;
+                WebsocketManager.GameEndSummaryNotification summary = WebsocketManager.Instance.GameEndSummary;
+                _allText.text = (summary.all ==null || summary.all.viewer_name == null) ? "名無しの視聴者" : summary.all.viewer_name;
+                _enemyText.text = (summary.enemy ==null || summary.enemy.viewer_name == null) ? "名無しの視聴者" : summary.enemy.viewer_name;
+                _skillText.text =  (summary.skill ==null || summary.skill.viewer_name == null) ? "名無しの視聴者" : summary.skill.viewer_name;
             }
+            
+            await base.ShowAsync(ct);
+            
             
             _clickTextAnimation.PlayAsync(destroyCancellationToken).Forget();
         }
