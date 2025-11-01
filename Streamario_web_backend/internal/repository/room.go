@@ -63,17 +63,15 @@ func (r *roomRepository) Create(room *model.Room) error {
 	if room.CreatedAt.IsZero() {
 		room.CreatedAt = time.Now()
 	}
-	q := `INSERT INTO rooms (id, streamer_id, created_at, expires_at, status, settings, ended_at)
-          VALUES ($1,$2,$3,$4,$5,$6,$7)`
 	logger := r.logger.With(
 		slog.String("repo", "room"),
 		slog.String("op", "create"),
 		slog.String("room_id", room.ID),
 	)
 	start := time.Now()
-	res, err := r.db.Exec(q, room.ID, room.StreamerID, room.CreatedAt, room.ExpiresAt, room.Status, room.Settings, room.EndedAt)
+	res, err := r.createStmt.Exec(room.ID, room.StreamerID, room.CreatedAt, room.ExpiresAt, room.Status, room.Settings, room.EndedAt)
 	if err != nil {
-		logger.Error("db.exec failed", slog.Any("error", err))
+		logger.Error("db.exec (prepared) failed", slog.Any("error", err))
 		return err
 	}
 	rows, _ := res.RowsAffected()
