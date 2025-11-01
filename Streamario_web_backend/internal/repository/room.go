@@ -152,3 +152,23 @@ func (r *roomRepository) MarkEnded(id string, endedAt time.Time) error {
 	logger.Debug("db.exec", slog.Int64("rows_affected", rows), slog.Duration("elapsed", time.Since(start)))
 	return nil
 }
+
+func (r *roomRepository) Close() error {
+    var firstErr error
+    closeStmt := func(s *sqlx.Stmt) {
+        if s == nil {
+            return
+        }
+        if err := s.Close(); err != nil && firstErr == nil {
+            firstErr = err
+        }
+    }
+
+    closeStmt(r.createStmt)
+	closeStmt(r.getStmt)
+	closeStmt(r.updateStmt)
+	closeStmt(r.deleteStmt)
+	closeStmt(r.markEndedStmt)
+
+    return firstErr
+}
