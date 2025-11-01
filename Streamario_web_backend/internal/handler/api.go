@@ -144,23 +144,27 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "total push count exceeds limit (20)"})
 	}
 
+	// リクエスト全体で共通のイベント種別が指定されていれば先に正規化
+	var defaultEventType model.EventType
+	if req.EventType != "" {
+		defaultEventType = model.EventType(req.EventType)
+	}
 
 	// ProcessEventの戻り値を格納する配列
 	var eventResults []*model.EventResult
 
 	for _, event := range req.PushEvents {
-		evTypeStr := req.EventType
-		if evTypeStr == "" {
-			evTypeStr = event.ButtonName
+		eventType := defaultEventType
+		if eventType == "" {
+			if event.ButtonName == "" {
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": "event_type is required"})
+			}
+			eventType = model.EventType(event.ButtonName)
 		}
-		if evTypeStr == "" {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "event_type is required"})
-		}
-		evType := model.EventType(evTypeStr)
 
-		pushCount := int64(event.PushCount)
+		pushCount := event.PushCount
 
-		res, err := h.eventService.ProcessEvent(roomID, evType, pushCount, viewerID)
+		res, err := h.eventService.ProcessEvent(roomID, eventType, pushCount, viewerID)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
