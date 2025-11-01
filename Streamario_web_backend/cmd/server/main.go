@@ -82,6 +82,18 @@ func main() {
 	roomRepo := repository.NewRoomRepository(db, repoLogger.With(slog.String("repository", "room")))
 	viewerRepo := repository.NewViewerRepository(db, repoLogger.With(slog.String("repository", "viewer")))
 
+	// リポジトリのリソース解放（Prepared Statement）
+	type closer interface{ Close() error }
+	if c, ok := eventRepo.(closer); ok {
+		defer c.Close()
+	}
+	if c, ok := roomRepo.(closer); ok {
+		defer c.Close()
+	}
+	if c, ok := viewerRepo.(closer); ok {
+		defer c.Close()
+	}
+
 	// 8. サービス層生成
 	roomService := service.NewRoomService(roomRepo, cfg)
 	wsHandlerLogger := appLogger.With(slog.String("component", "websocket_handler"))
