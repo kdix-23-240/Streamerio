@@ -121,18 +121,14 @@ func (r *eventRepository) ListEventViewerCounts(roomID string) ([]model.EventAgg
 
 func (r *eventRepository) ListEventTotals(roomID string) ([]model.EventTotal, error) {
 	rows := []model.EventTotal{}
-	q := `SELECT event_type, COUNT(*) AS count
-        FROM events
-        WHERE room_id = $1
-        GROUP BY event_type`
 	logger := r.logger.With(
 		slog.String("repo", "event"),
 		slog.String("op", "list_event_totals"),
 		slog.String("room_id", roomID),
 	)
 	start := time.Now()
-	if err := r.db.Select(&rows, q, roomID); err != nil {
-		logger.Error("db.query failed", slog.Any("error", err))
+	if err := r.listEventTotalsStmt.Select(&rows, roomID); err != nil {
+		logger.Error("db.query (prepared) failed", slog.Any("error", err))
 		return nil, err
 	}
 	logger.Debug("db.query", slog.Int("row_count", len(rows)), slog.Duration("elapsed", time.Since(start)))
