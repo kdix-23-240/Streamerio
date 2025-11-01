@@ -34,8 +34,7 @@ namespace InGame
             builder.Register<IState, ChangeSceneState>(Lifetime.Singleton)
                 .WithParameter(_ => SceneType.GameOverScene)
                 .Keyed(StateType.ToGameOver);
-            builder.Register<IState, ChangeSceneState>(Lifetime.Singleton)
-                .WithParameter(_ => SceneType.ResultScene)
+            builder.Register<IState, ToResultState>(Lifetime.Singleton)
                 .Keyed(StateType.ToResult);
 
             builder.Register<ICommonButton, CommonButtonPresenter>(Lifetime.Singleton)

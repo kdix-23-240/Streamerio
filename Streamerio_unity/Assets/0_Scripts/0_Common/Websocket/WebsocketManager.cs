@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Common;
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using UnityEngine;
 using NativeWebSocket;
 using R3;
@@ -16,6 +17,9 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
 
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
+  
+  private GameEndSummaryNotification _gameEndSummary = null;
+  public GameEndSummaryNotification GameEndSummary => _gameEndSummary;
 
   // アプリケーション終了中フラグ
   private bool _isShuttingDown = false;
@@ -62,7 +66,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   }
 
   // websocketのコネクションを確立する
-  public async UniTask ConnectWebSocket(string websocketId)
+  public async UniTask ConnectWebSocket([CanBeNull] string websocketId)
   {
     if (_isConnected)
     {
@@ -186,6 +190,21 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
       Debug.Log("Failed to parse game_event message.");
       return;
     }
+    if (baseMessage.type == "game_end_summary")
+    {
+      try
+      {
+        _gameEndSummary = JsonUtility.FromJson<GameEndSummaryNotification>(message);
+        
+        return;
+      }
+      catch (Exception ex)
+      {
+        Debug.Log($"game_event parse error: {ex.Message}");
+      }
+      Debug.Log("Failed to parse game_event message.");
+      return;
+    }
 
     Debug.Log($"Unhandled JSON payload type: {baseMessage.type}");
     return;
@@ -296,7 +315,17 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public string type;
     public string event_type;
     public int trigger_count;
+  }
+
+  public  class GameEndSummaryNotification
+  {
+    public const string AllKey = "all";
+    public const string EnemyKey = "enemy";
+    public const string SkillKey = "skill";
     
+    public string All;
+    public string Enemy;
+    public string Skill;
   }
 }
 

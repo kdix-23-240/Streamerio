@@ -26,7 +26,7 @@ namespace InGame.UI.Timer
                         Model = resolver.Resolve<ITimerModel>(),
                         View = view,
                         StateManager = resolver.Resolve<IStateManager>(),
-                        GameOverState = resolver.Resolve<IState>(StateType.ToResult),
+                        GameOverState = resolver.Resolve<IState>(StateType.ToGameOver),
                     };
                 });
         }

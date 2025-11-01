@@ -2,6 +2,8 @@ using System.Threading;
 using Common.UI.Animation;
 using Common.UI.Display.Window;
 using Cysharp.Threading.Tasks;
+using TMPro;
+using UnityEngine;
 using VContainer;
 
 namespace OutGame.Result.UI
@@ -13,6 +15,13 @@ namespace OutGame.Result.UI
     /// </summary>
     public class ResultWindowView : WindowViewBase, IResultWindowView
     {
+        [SerializeField]
+        private TMP_Text _allText;
+        [SerializeField]
+        private TMP_Text _enemyText;
+        [SerializeField]
+        private TMP_Text _skillText;
+        
         private IUIAnimation _clickTextAnimation;
         
         [Inject]
@@ -28,6 +37,15 @@ namespace OutGame.Result.UI
         public override async UniTask ShowAsync(CancellationToken ct)
         { 
             await base.ShowAsync(ct);
+            
+            if(WebsocketManager.Instance.GameEndSummary != null)
+            {
+                var summary = WebsocketManager.Instance.GameEndSummary;
+                _allText.text = summary.All;
+                _enemyText.text = summary.Enemy;
+                _skillText.text = summary.Skill;
+            }
+            
             _clickTextAnimation.PlayAsync(destroyCancellationToken).Forget();
         }
         

@@ -60,7 +60,8 @@ namespace Common.State
         
         public async UniTask EnterAsync(CancellationToken ct)
         {
-            _qrCodeService.UpdateSprite("https://www.google.com/");
+            WebsocketManager.Instance.ConnectWebSocket(null).Forget();
+            _qrCodeService.UpdateSprite(await WebsocketManager.Instance.GetFrontUrlAsync());
             _audioFacade.PlayAsync(_inGameSetting.BGM, ct).Forget();
             
             if (!_playDataSaveFacade.LoadPlayed())
@@ -76,8 +77,6 @@ namespace Common.State
             {
                 _stateManager.ChangeState(_nextState);
             }
-
-            await UniTask.WaitForEndOfFrame(cancellationToken: ct);
         }
         
         public async UniTask ExitAsync(CancellationToken ct)
