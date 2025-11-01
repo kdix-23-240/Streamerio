@@ -9,26 +9,33 @@ using UnityEngine;
 
 namespace Common
 {
+    
     [CreateAssetMenu(fileName = "OnlineStatusDataSO", menuName = "SO/Online/Status")]
-    public class OnlineStatusDataSO : ScriptableObject
+    public class OnlineStatusDataSO : ScriptableObject, IOnlineStatusData
     {
         [Button]
         private async UniTaskVoid FetchData()
         {
-            await GetData(default);
+            await FetchDataAsync(default);
         }
         
         [SerializeField, Min(0f)]
         private int _timeOutTime = 8;
         
-        public OnlineGameSetting[] GameSetting;
-        public OnlinePlayerStatus[] PlayerStatus;
-        public OnlineUltStatus[] UltStatus;
+        [SerializeField]
+        private OnlineGameSetting[] _gameSetting;
+        public OnlineGameSetting[] GameSetting => _gameSetting;
+
+        [SerializeField] private OnlinePlayerStatus[] _playerStatus; 
+        public OnlinePlayerStatus[] PlayerStatus => _playerStatus;
+        [SerializeField]
+        private OnlineUltStatus[] _ultStatus;
+        public OnlineUltStatus[] UltStatus => _ultStatus;
         [SerializeField]
         private SerializeDictionary<OnlineEnemyType, OnlineEnemyStatus> _enemyStatusDict;
-        public Dictionary<OnlineEnemyType, OnlineEnemyStatus> EnemyStatusDict => _enemyStatusDict.ToDictionary();
+        public IReadOnlyDictionary<OnlineEnemyType, OnlineEnemyStatus> EnemyStatusDict => _enemyStatusDict.ToDictionary();
 
-        public async UniTask GetData(CancellationToken ct)
+        public async UniTask FetchDataAsync(CancellationToken ct)
         {
             var gameTask    = SpreadSheetClient.GetRequestAsync(SheetType.GameSettings, ct, _timeOutTime);
             var playerTask  = SpreadSheetClient.GetRequestAsync(SheetType.PlayerStatus, ct, _timeOutTime);
@@ -39,17 +46,17 @@ namespace Common
                 await UniTask.WhenAll(gameTask, playerTask, ultTask, enemyTask);
 
             int gameCount = gameRows[OnlineGameSetting.TimeLimitKey].Count;
-            GameSetting = new OnlineGameSetting[gameCount];
+            _gameSetting = new OnlineGameSetting[gameCount];
             for(int i = 0; i < gameCount; i++)
             {
-                GameSetting[i] = new OnlineGameSetting()
+                _gameSetting[i] = new OnlineGameSetting()
                 {
                     TimeLimit = ToFloat(gameRows[OnlineGameSetting.TimeLimitKey][i]),
                 };
             }
             
             int playerCount = playerRows[OnlinePlayerStatus.HPKey].Count;
-            PlayerStatus = new OnlinePlayerStatus[playerCount];
+            _playerStatus = new OnlinePlayerStatus[playerCount];
             for (int i = 0; i < playerCount; i++)
             {
                 PlayerStatus[i] = new OnlinePlayerStatus()
@@ -62,7 +69,7 @@ namespace Common
             }
             
             int ultCount = ultRows[OnlineUltStatus.AttackPowerKey].Count;
-            UltStatus = new OnlineUltStatus[ultCount];
+            _ultStatus = new OnlineUltStatus[ultCount];
             for (int i = 0; i < ultCount; i++)
             {
                 UltStatus[i] = new OnlineUltStatus()
@@ -89,6 +96,16 @@ namespace Common
         {
             return Convert.ToSingle(num, CultureInfo.InvariantCulture);
         }
+    }
+    
+    public interface IOnlineStatusData
+    {
+        OnlineGameSetting[] GameSetting { get; }
+        OnlinePlayerStatus[] PlayerStatus { get; }
+        OnlineUltStatus[] UltStatus { get; }
+        IReadOnlyDictionary<OnlineEnemyType, OnlineEnemyStatus> EnemyStatusDict { get; }
+        
+        UniTask FetchDataAsync(CancellationToken ct);
     }
     
     [Serializable]
