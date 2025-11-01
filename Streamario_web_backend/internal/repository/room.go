@@ -38,23 +38,14 @@ func NewRoomRepository(db *sqlx.DB, logger *slog.Logger) RoomRepository {
 		logger = slog.Default()
 	}
 
-	mustPrepare := func(query string) *sqlx.Stmt {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			logger.Error("failed to prepare statement", slog.Any("error", err), slog.String("query", query))
-			panic(err)
-		}
-		return stmt
-	}
-
 	return &roomRepository{
 		db:            db,
 		logger:        logger,
-		createStmt:    mustPrepare(queryCreateRoom),
-		getStmt:       mustPrepare(queryGetRoom),
-		updateStmt:    mustPrepare(queryUpdateRoom),
-		deleteStmt:    mustPrepare(queryDeleteRoom),
-		markEndedStmt: mustPrepare(queryMarkEndedRoom),
+		createStmt:    mustPrepare(db, logger, queryCreateRoom),
+        getStmt:       mustPrepare(db, logger, queryGetRoom),
+        updateStmt:    mustPrepare(db, logger, queryUpdateRoom),
+        deleteStmt:    mustPrepare(db, logger, queryDeleteRoom),
+        markEndedStmt: mustPrepare(db, logger, queryMarkEndedRoom),
 	}
 }
 

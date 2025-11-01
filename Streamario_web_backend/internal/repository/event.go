@@ -38,24 +38,14 @@ func NewEventRepository(db *sqlx.DB, logger *slog.Logger) EventRepository {
 		logger = slog.Default()
 	}
 
-	// 準備に失敗した場合は、起動時エラーとして panic させる
-	mustPrepare := func(query string) *sqlx.Stmt {
-		stmt, err := db.Preparex(query)
-		if err != nil {
-			logger.Error("failed to prepare statement", slog.Any("error", err), slog.String("query", query))
-			panic(err)
-		}
-		return stmt
-	}
-
 	return &eventRepository{
 		db:                        db,
 		logger:                    logger,
-		createEventStmt:           mustPrepare(queryCreateEvent),
-		listEventViewerCountsStmt: mustPrepare(queryListEventViewerCounts),
-		listEventTotalsStmt:       mustPrepare(queryListEventTotals),
-		listViewerTotalsStmt:      mustPrepare(queryListViewerTotals),
-		listViewerEventCountsStmt: mustPrepare(queryListViewerEventCounts),
+		createEventStmt:           mustPrepare(db, logger, queryCreateEvent),
+        listEventViewerCountsStmt: mustPrepare(db, logger, queryListEventViewerCounts),
+        listEventTotalsStmt:       mustPrepare(db, logger, queryListEventTotals),
+        listViewerTotalsStmt:      mustPrepare(db, logger, queryListViewerTotals),
+        listViewerEventCountsStmt: mustPrepare(db, logger, queryListViewerEventCounts),
 	}
 }
 
