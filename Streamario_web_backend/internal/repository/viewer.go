@@ -104,3 +104,19 @@ func (r *viewerRepository) Get(id string) (*model.Viewer, error) {
 	logger.Debug("db.query (prepared)", slog.Bool("found", true), slog.Duration("elapsed", time.Since(start)))
 	return &viewer, nil
 }
+
+func (r *viewerRepository) Close() error {
+    var firstErr error
+    closeStmt := func(s *sqlx.Stmt) {
+        if s == nil {
+            return
+        }
+        if err := s.Close(); err != nil && firstErr == nil {
+            firstErr = err
+        }
+    }
+    closeStmt(r.createStmt)
+    closeStmt(r.existsStmt)
+    closeStmt(r.getStmt)
+    return firstErr
+}
