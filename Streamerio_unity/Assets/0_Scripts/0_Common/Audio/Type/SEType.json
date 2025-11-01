@@ -1,10 +1,94 @@
 [
   {
-    "Name": "maou_se_system48",
-    "Num": 1
+    "Name": "None",
+    "Num": 0
   },
   {
-    "Name": "maou_se_system49",
-    "Num": 2
+    "Name": "Monster012",
+    "Num": 43
+  },
+  {
+    "Name": "どん_効果音",
+    "Num": 41
+  },
+  {
+    "Name": "敵のダウン",
+    "Num": 42
+  },
+  {
+    "Name": "Explosion01",
+    "Num": 19
+  },
+  {
+    "Name": "Explosion02",
+    "Num": 20
+  },
+  {
+    "Name": "Explosion03",
+    "Num": 21
+  },
+  {
+    "Name": "Explosion04",
+    "Num": 22
+  },
+  {
+    "Name": "Explosion05",
+    "Num": 23
+  },
+  {
+    "Name": "Explosion06",
+    "Num": 24
+  },
+  {
+    "Name": "Explosion07",
+    "Num": 25
+  },
+  {
+    "Name": "Explosion08",
+    "Num": 26
+  },
+  {
+    "Name": "PlayerAttack",
+    "Num": 30
+  },
+  {
+    "Name": "PlayerDamage",
+    "Num": 31
+  },
+  {
+    "Name": "PlayerGround",
+    "Num": 32
+  },
+  {
+    "Name": "PlayerJump",
+    "Num": 33
+  },
+  {
+    "Name": "NESRPG0112",
+    "Num": 29
+  },
+  {
+    "Name": "SNESRPG01",
+    "Num": 28
+  },
+  {
+    "Name": "ThunderBullet",
+    "Num": 38
+  },
+  {
+    "Name": "TuinURT",
+    "Num": 35
+  },
+  {
+    "Name": "UltThunder",
+    "Num": 36
+  },
+  {
+    "Name": "電撃魔法2",
+    "Num": 39
+  },
+  {
+    "Name": "魔法1",
+    "Num": 37
   }
 ]

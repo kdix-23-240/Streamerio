@@ -2,40 +2,56 @@ using System.Threading;
 using Alchemy.Inspector;
 using Common.UI.Animation;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Common.UI.Loading
 {
     /// <summary>
-    /// ローディング画面の見た目
+    /// ローディング画面の View。
+    /// - Image に専用マテリアルを割り当て、シェーダプロパティを書き換えてイリス演出を実現
+    /// - IrisIn/IrisOut コンポーネントを用いて表示/非表示/シーン遷移をアニメーション制御
     /// </summary>
-    public class LoadingScreenView: UIBehaviourBase
+    public class LoadingScreenView : UIBehaviourBase
     {
         [SerializeField, ReadOnly]
         private Image _image;
-        
+
+        /// <summary>
+        /// 実行時に複製して利用するマテリアル。
+        /// （共有マテリアルを直接操作すると他オブジェクトへ影響するため注意）
+        /// </summary>
         private Material _irisOutMaterial;
-        
-        [Header("アニメーション")]
-        [SerializeField, LabelText("ローディング入りのアニメーション")]
+
+        [Header("アニメーションパラメータ")]
+        [SerializeField, LabelText("ローディング入りのアニメーション (外→内)")]
         private IrisAnimationComponentParam _loadingInAnimationParam;
-        [SerializeField, LabelText("ローディング出のアニメーション")]
+
+        [SerializeField, LabelText("ローディング出のアニメーション (内→外)")]
         private IrisAnimationComponentParam _loadingOutAnimationParam;
-        
-        [SerializeField, LabelText("タイトルからローディングへのアニメーション")]
+
+        [SerializeField, LabelText("タイトル→ローディング (外→内)")]
         private IrisAnimationComponentParam _titleToLoadingAnimationParam;
-        
-        [SerializeField, LabelText("ローディングからインゲームへのアニメーション")]
+
+        [SerializeField, LabelText("ローディング→インゲーム (内→外)")]
         private IrisAnimationComponentParam _loadingToInGameAnimationParam;
 
+        [SerializeField, LabelText("任意中心 (クリック位置など) からのアニメーション (外→内)")]
+        private IrisAnimationComponentParam _cheiceIrisAnimationParam = new()
+        {
+            DurationSec = 1.5f,
+            Ease = Ease.Linear,
+            MinRadius = 0f,
+            MaxRadius = 2f,
+        };
+
+        // 実際のアニメーション制御用コンポーネント
         private IrisInAnimationComponent _loadingInAnimation;
         private IrisOutAnimationComponent _loadingOutAnimation;
-        
         private IrisInAnimationComponent _titleToLoadingAnimation;
-        
         private IrisOutAnimationComponent _loadingToInGameAnimation;
-        
+
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
@@ -43,56 +59,79 @@ namespace Common.UI.Loading
             _image ??= GetComponent<Image>();
         }
 #endif
-        
+
+        /// <summary>
+        /// 初期化。
+        /// - Image.material を複製して専用マテリアルを生成
+        /// - 各種アニメーションコンポーネントを作成
+        /// </summary>
         public override void Initialize()
         {
             base.Initialize();
-            _irisOutMaterial = _image.material;
-            
-            _loadingInAnimation = new IrisInAnimationComponent(_irisOutMaterial, _loadingInAnimationParam);
-            _loadingOutAnimation = new IrisOutAnimationComponent(_irisOutMaterial, _loadingOutAnimationParam);
-            
-            _titleToLoadingAnimation = new IrisInAnimationComponent(_irisOutMaterial, _titleToLoadingAnimationParam);
+
+            // 実行時に専用マテリアルを複製
+            _irisOutMaterial = new Material(_image.material);
+            _image.material = _irisOutMaterial;
+
+            // 各種 Iris コンポーネントを作成
+            _loadingInAnimation       = new IrisInAnimationComponent(_irisOutMaterial, _loadingInAnimationParam);
+            _loadingOutAnimation      = new IrisOutAnimationComponent(_irisOutMaterial, _loadingOutAnimationParam);
+            _titleToLoadingAnimation  = new IrisInAnimationComponent(_irisOutMaterial, _titleToLoadingAnimationParam);
             _loadingToInGameAnimation = new IrisOutAnimationComponent(_irisOutMaterial, _loadingToInGameAnimationParam);
         }
-        
+
         /// <summary>
-        /// 表示アニメーション
+        /// アニメーションで表示（外→内へ収束）。
         /// </summary>
         public async UniTask ShowAsync(CancellationToken ct)
         {
             await _loadingInAnimation.PlayAsync(ct);
         }
-        
+
         /// <summary>
-        /// 表示
+        /// 任意のワールド座標を中心にしてアニメーション表示。
+        /// - WorldToViewportPoint で座標を UV に変換して中心に設定
+        /// </summary>
+        public async UniTask ShowAsync(Vector3 centerCirclePosition, CancellationToken ct)
+        {
+            var centerCircle = Camera.main.WorldToViewportPoint(centerCirclePosition);
+            _cheiceIrisAnimationParam.Center = centerCircle;
+
+            var irisInAnimation = new IrisInAnimationComponent(_irisOutMaterial, _cheiceIrisAnimationParam);
+            await irisInAnimation.PlayAsync(ct);
+
+            // アニメーション再生後は UI を操作不可にする
+            SetInteractable(false);
+        }
+
+        /// <summary>
+        /// 即時表示。
+        /// - 半径を最小値に設定（閉じた状態）
         /// </summary>
         public void Show()
         {
             _irisOutMaterial.SetFloat(_loadingInAnimationParam.RadiusPropertyName, _loadingInAnimationParam.MinRadius);
         }
-        
+
         /// <summary>
-        /// 非表示アニメーション
+        /// アニメーションで非表示（内→外へ拡散）。
         /// </summary>
         public async UniTask HideAsync(CancellationToken ct)
         {
             await _loadingOutAnimation.PlayAsync(ct);
         }
-        
+
         /// <summary>
-        /// タイトルからローディングへのアニメーション
+        /// タイトル → ローディング遷移（外→内）。
         /// </summary>
-        /// <param name="ct"></param>
         public async UniTask TitleToLoadingAsync(CancellationToken ct)
         {
             await _titleToLoadingAnimation.PlayAsync(ct);
         }
-        
+
         /// <summary>
-        /// ローディングからインゲームへのアニメーション
+        /// ローディング → インゲーム遷移（内→外）。
         /// </summary>
-        /// <param name="ct"></param>
         public async UniTask LoadingToInGameAsync(CancellationToken ct)
         {
             await _loadingToInGameAnimation.PlayAsync(ct);

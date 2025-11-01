@@ -1,16 +1,20 @@
 package service
 
 import (
-    "fmt"
-    "log"
-    "math"
+	"context"
+	"encoding/json"
+	"fmt"
+	"log/slog"
+	"math"
 
-    "streamerrio-backend/internal/model"
-    "streamerrio-backend/internal/repository"
-    "streamerrio-backend/pkg/counter"
+	"streamerrio-backend/internal/model"
+	"streamerrio-backend/internal/repository"
+	"streamerrio-backend/pkg/counter"
+	"streamerrio-backend/pkg/pubsub"
 )
 
 // WebSocket 送信用インタフェース (Unity へゲームイベント通知するための最小限)
+// NOTE: Pub/Sub導入後は下位互換のため残しているが、実際は使用しない
 type WebSocketSender interface {
 	SendEventToUnity(roomID string, payload map[string]interface{}) error
 }
@@ -18,13 +22,17 @@ type WebSocketSender interface {
 type EventService struct {
 	counter   counter.Counter
 	eventRepo repository.EventRepository
-	wsHandler WebSocketSender
+	pubsub    pubsub.PubSub // Pub/Sub経由でWebSocketサーバーに配信
 	configs   map[model.EventType]*model.EventConfig
+	logger    *slog.Logger
 }
 
-// NewEventService: 依存（カウンタ / リポジトリ / WebSocket）を束ねてサービス生成
-func NewEventService(counter counter.Counter, eventRepo repository.EventRepository, wsHandler WebSocketSender) *EventService {
-	return &EventService{counter: counter, eventRepo: eventRepo, wsHandler: wsHandler, configs: getDefaultEventConfigs()}
+// NewEventService: 依存（カウンタ / リポジトリ / PubSub）を束ねてサービス生成
+func NewEventService(counter counter.Counter, eventRepo repository.EventRepository, ps pubsub.PubSub, logger *slog.Logger) *EventService {
+	if logger == nil {
+		logger = slog.Default()
+	}
+	return &EventService{counter: counter, eventRepo: eventRepo, pubsub: ps, configs: getDefaultEventConfigs(), logger: logger}
 }
 
 // ProcessEvent: 1イベント処理の本流 (DB保存→視聴者アクティビティ更新→カウント加算→閾値判定→発動通知/リセット)
@@ -54,25 +62,36 @@ func (s *EventService) ProcessEvent(roomID string, eventType model.EventType, vi
 	// 4. Active viewer count
 	viewers := s.getActiveViewerCount(roomID)
 
-	// 5. Threshold 
+	// 5. Threshold
 	cfg := s.configs[eventType]
 	threshold := s.calculateDynamicThreshold(cfg, viewers)
 
 	res := &model.EventResult{EventType: eventType, CurrentCount: int(current), RequiredCount: threshold, ViewerCount: viewers, EffectTriggered: false, NextThreshold: threshold}
 
 	if int(current) >= threshold {
-		log.Printf("🚀 trigger room=%s event=%s count=%d threshold=%d viewers=%d", roomID, eventType, current, threshold, viewers)
+		s.logger.Info("event triggered", slog.String("room_id", roomID), slog.String("event_type", string(eventType)), slog.Int("count", int(current)), slog.Int("threshold", threshold), slog.Int("active_viewers", viewers))
+
+		// Pub/Sub経由で全WebSocketサーバーにブロードキャスト
 		payload := map[string]interface{}{
 			"type":          "game_event",
+			"room_id":       roomID, // WebSocketサーバー側で配信先を特定するため必須
 			"event_type":    string(eventType),
 			"trigger_count": int(current),
 			"viewer_count":  viewers,
 		}
-		if err := s.wsHandler.SendEventToUnity(roomID, payload); err != nil {
-			log.Printf("❌ unity send failed: %v", err)
+
+		message, err := json.Marshal(payload)
+		if err != nil {
+			s.logger.Error("json marshal failed", slog.String("room_id", roomID), slog.Any("error", err))
 		} else {
-			log.Printf("✅ unity notified: room=%s event=%s", roomID, eventType)
+			ctx := context.Background()
+			if err := s.pubsub.Publish(ctx, pubsub.ChannelGameEvents, message); err != nil {
+				s.logger.Error("pubsub publish failed", slog.String("room_id", roomID), slog.String("event_type", string(eventType)), slog.Any("error", err))
+			} else {
+				s.logger.Info("event published to pubsub", slog.String("room_id", roomID), slog.String("event_type", string(eventType)))
+			}
 		}
+
 		_ = s.counter.Reset(roomID, string(eventType))
 		res.EffectTriggered = true
 		res.NextThreshold = s.calculateDynamicThreshold(cfg, s.getActiveViewerCount(roomID))
@@ -153,11 +172,11 @@ func (s *EventService) GetRoomStats(roomID string) ([]RoomEventStat, error) {
 // getDefaultEventConfigs: 初期閾値設定マップ生成
 func getDefaultEventConfigs() map[model.EventType]*model.EventConfig {
 	return map[model.EventType]*model.EventConfig{
-		model.SKILL1:    {EventType: model.SKILL1, BaseThreshold: 5, MinThreshold: 3, MaxThreshold: 50, LevelMultiplier: 1.3},
-		model.SKILL2:     {EventType: model.SKILL2, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 60, LevelMultiplier: 1.3},
-		model.SKILL3:     {EventType: model.SKILL3, BaseThreshold: 12, MinThreshold: 8, MaxThreshold: 100, LevelMultiplier: 1.4},
-		model.ENEMY1:   {EventType: model.ENEMY1, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 45, LevelMultiplier: 1.3},
-		model.ENEMY2:   {EventType: model.ENEMY2, BaseThreshold: 7, MinThreshold: 5, MaxThreshold: 55, LevelMultiplier: 1.4},
+		model.SKILL1: {EventType: model.SKILL1, BaseThreshold: 5, MinThreshold: 3, MaxThreshold: 50, LevelMultiplier: 1.3},
+		model.SKILL2: {EventType: model.SKILL2, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 60, LevelMultiplier: 1.3},
+		model.SKILL3: {EventType: model.SKILL3, BaseThreshold: 12, MinThreshold: 8, MaxThreshold: 100, LevelMultiplier: 1.4},
+		model.ENEMY1: {EventType: model.ENEMY1, BaseThreshold: 6, MinThreshold: 4, MaxThreshold: 45, LevelMultiplier: 1.3},
+		model.ENEMY2: {EventType: model.ENEMY2, BaseThreshold: 7, MinThreshold: 5, MaxThreshold: 55, LevelMultiplier: 1.4},
 		model.ENEMY3: {EventType: model.ENEMY3, BaseThreshold: 10, MinThreshold: 6, MaxThreshold: 80, LevelMultiplier: 1.5},
 	}
 }

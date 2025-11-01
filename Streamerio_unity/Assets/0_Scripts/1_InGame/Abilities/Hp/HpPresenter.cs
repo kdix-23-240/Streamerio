@@ -1,3 +1,7 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
+using InGame;
+using InGame.UI.Heart;
 using UnityEngine;
 using R3;
 
@@ -5,7 +9,7 @@ public class HpPresenter : MonoBehaviour, IAbility
 {
     private HpModel _hpModel;
     public float Amount => _hpModel.CurrentHp.Value;
-    [SerializeField] private HpTestView _hpTestView;
+    [SerializeField] private HeartGroupView _hpView;
     [SerializeField] private PlayerScriptableObject _scriptableObject;
 
     private float _currentHp;
@@ -16,7 +20,7 @@ public class HpPresenter : MonoBehaviour, IAbility
         _currentHp = _scriptableObject.InitialHp;
         _maxHp = _scriptableObject.MaxHp;
         _hpModel = new HpModel(_currentHp, _maxHp);
-        _hpTestView.Initialize(_currentHp);
+        _hpView.Initialize(0, _currentHp);
     }
 
     void Start()
@@ -28,7 +32,11 @@ public class HpPresenter : MonoBehaviour, IAbility
     {
         _hpModel.CurrentHp.Subscribe(hp =>
         {
-            _hpTestView.UpdateView(hp);
+            _hpView.UpdateHP(hp);
+            if (hp <= 0)
+            {
+                InGameManager.Instance.GameOver();
+            }
         }).AddTo(this);
     }
 
@@ -39,6 +47,7 @@ public class HpPresenter : MonoBehaviour, IAbility
 
     public void Decrease(float amount)
     {
+        AudioManager.Instance.PlayAsync(SEType.PlayerDamage, destroyCancellationToken).Forget();
         _hpModel.Decrease(amount);
     }
 }

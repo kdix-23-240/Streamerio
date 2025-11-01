@@ -4,10 +4,14 @@ using Cysharp.Threading.Tasks;
 public class NormalBullet : MonoBehaviour
 {
     private float _speed;
+    private float _damage;
+
+    public float Damage => _damage;
     [SerializeField] private BulletScriptableObject _bulletScriptableObject;
     void Awake()
     {
         _speed = _bulletScriptableObject.Speed;
+        _damage = _bulletScriptableObject.Damage;
     }
     void Update()
     {
@@ -36,5 +40,18 @@ public class NormalBullet : MonoBehaviour
     private void Move()
     {
         transform.Translate(Vector2.right * _speed * Time.deltaTime);
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            var enemy = collision.gameObject.GetComponent<EnemyHpManager>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage((int)_damage);
+                OnDespawn();
+            }
+        }
     }
 }

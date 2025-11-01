@@ -1,18 +1,33 @@
+using Common.Audio;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using Common.UI.Part.Button;
+using R3;
 
 public class StickInput : MonoBehaviour, IController
 {
     [SerializeField] private PlayerPresenter _player;
     [SerializeField] private BulletShooter _bulletShooter;
     [SerializeField] private Joystick _joystick;
-    [SerializeField] private Button _jumpButton;
-    [SerializeField] private Button _attackButton;
+    [SerializeField] private CommonButton _jumpButton;
+    [SerializeField] private CommonButton _attackButton;
 
     void Start()
     {
-        _jumpButton.onClick.AddListener(Jump);
-        _attackButton.onClick.AddListener(Attack);
+        _jumpButton.Initialize();
+        _jumpButton.OnClickAsObservable
+            .Subscribe(_ =>
+            {
+                Jump();
+            }).RegisterTo(destroyCancellationToken);
+
+        _attackButton.Initialize();
+        _attackButton.OnClickAsObservable
+            .Subscribe(_ =>
+            {
+                Attack();
+            }).RegisterTo(destroyCancellationToken);
     }
 
     void Update()
@@ -33,6 +48,7 @@ public class StickInput : MonoBehaviour, IController
 
     public void Attack()
     {
+        AudioManager.Instance.PlayAsync(SEType.PlayerAttack, destroyCancellationToken).Forget();
         _bulletShooter.Shoot();
     }
 }

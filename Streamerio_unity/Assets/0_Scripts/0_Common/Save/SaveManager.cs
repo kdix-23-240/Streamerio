@@ -14,6 +14,8 @@ namespace Common.Save
     {
         [SerializeField, LabelText("一度遊んだかのキー名")]
         private string _playedKey = "Played";
+
+        public bool IsRetry = false;
         
         /// <summary>
         /// 一度遊んだことを保存

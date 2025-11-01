@@ -9,4 +9,5 @@ type Room struct {
 	ExpiresAt  *time.Time `json:"expires_at" db:"expires_at"`
 	Status     string     `json:"status" db:"status"`
 	Settings   string     `json:"settings" db:"settings"`
+	EndedAt    *time.Time `json:"ended_at" db:"ended_at"`
 }

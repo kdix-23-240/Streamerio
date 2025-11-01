@@ -1,79 +1,60 @@
 using Alchemy.Inspector;
 using Common;
+using Common.Audio;
 using Common.Save;
 using Common.Scene;
+using Common.UI.Dialog;
+using Common.UI.Display;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
-using InGame.UI.Displau.Mask;
 using InGame.UI.Display.Dialog.QRCode;
-using InGame.UI.Display.Overlay;
-using InGame.UI.Display.Overlay.GameOver;
 using InGame.UI.Display.Screen;
 using InGame.UI.QRCode;
+using InGame.UI.Window;
 using UnityEngine;
 
 namespace InGame
 {
     public class InGameManager: SingletonBase<InGameManager>
     {
-        [SerializeField] private string _url = "";
         [SerializeField]private float _timeLimit = 180f;
         [SerializeField, LabelText("プレイヤー")]
         private Transform _playerTransform;
-        [SerializeField, LabelText("遊び方ウィンドウ")]
-        private WindowPresenter _howToPlayWindow;
         
-        [SerializeField, LabelText("クリアUI")]
-        private ClearOverlayPresenter _clearOverlay;
-        [SerializeField, LabelText("ゲームオーバーUI")]
-        private GameOverOverlayPresenter _gameOverOverlay;
-        
-        [SerializeField, LabelText("QRコードダイアログ")]
-        private QRCodeDialogPresenter _qrCodeDialog;
         [SerializeField, LabelText("ゲーム画面")]
         private InGameScreenPresenter _inGameScreen;
-        [SerializeField, LabelText("マスク")]
-        private InGameMaskView _inGameMaskView;
 
         private async void Start()
         {
+            AudioManager.Instance.PlayAsync(BGMType.singetunoyami, destroyCancellationToken).Forget();
+            
+            DisplayBooster.Instance.Boost();
+            
             var isPlayed = SaveManager.Instance.LoadPlayed();
             
-            _howToPlayWindow.Initialize();
-            _howToPlayWindow.Hide();
+            var url = await WebsocketManager.Instance.GetFrontUrlAsync();
+            await QRCodeSpriteGenerater.InitializeSprite(url);
             
-            _gameOverOverlay.Initialize();
-            _gameOverOverlay.Hide();
-            
-            _clearOverlay.Initialize();
-            _clearOverlay.Hide();
-            
-            var qrGenerator = new QRCodeSpriteGenerater();
-            
-            _inGameScreen.Initialize(qrGenerator.Generate(_url), _timeLimit);
-            
-            _qrCodeDialog.Initialize();
-            _qrCodeDialog.SetQRCodeSprite(qrGenerator.Generate(_url));
-            _qrCodeDialog.Hide();
-            
-            _inGameMaskView.Hide();
+            _inGameScreen.Initialize(QRCodeSpriteGenerater.GetQRCodeSprite(), _timeLimit);
             
             // ゲーム画面表示
             await LoadingScreenPresenter.Instance.LoadingToInGameAsync();
             
             if (!isPlayed)
             {
-                await _howToPlayWindow.ShowAsync(destroyCancellationToken);
+                await WindowManager.Instance.OpenAndWaitCloseAsync<InGameBookWindowPresenter>(destroyCancellationToken);
                 SaveManager.Instance.SavePlayed();
+                OpenQRCodeDialog();
             }
-            else if(!SceneManager.Instance.IsReloaded)
+            else if(!SaveManager.Instance.IsRetry)
             {
                 OpenQRCodeDialog();   
             }
             else
             {
                 StartGame();
+                SaveManager.Instance.IsRetry = false;
             }
         }
 
@@ -82,25 +63,17 @@ namespace InGame
         /// </summary>
         public async void OpenQRCodeDialog()
         {
-            await _howToPlayWindow.HideAsync(destroyCancellationToken);
-            await _qrCodeDialog.ShowAsync(destroyCancellationToken);
+            await DialogManager.Instance.OpenAndWaitCloseAsync<QRCodeDialogPresenter>(destroyCancellationToken);
+            StartGame();
         }
 
         /// <summary>
         /// ゲーム開始
         /// </summary>
-        public async void StartGame()
+        public void StartGame()
         {
-            if (!SceneManager.Instance.IsReloaded)
-            {
-                await _qrCodeDialog.HideAsync(destroyCancellationToken);
-            }
-            
             _inGameScreen.StartGame(destroyCancellationToken);
             Debug.Log("ゲームスタート");
-
-            await UniTask.WaitForSeconds(3f);
-            GameOver();
         }
 
         /// <summary>
@@ -108,8 +81,9 @@ namespace InGame
         /// </summary>
         public async void GameOver()
         {
-            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
-            await _gameOverOverlay.ShowAsync(destroyCancellationToken);
+            await LoadingScreenPresenter.Instance.ShowAsync(_playerTransform.position);
+            AudioManager.Instance.StopBGM();
+            SceneManager.Instance.LoadSceneAsync(SceneType.GameOverScene).Forget();
             Debug.Log("ゲームオーバー");
         }
         
@@ -118,8 +92,10 @@ namespace InGame
         /// </summary>
         public async void GameClear()
         {
-            await _inGameMaskView.ShowAsync(_playerTransform.position, destroyCancellationToken);
-            await _clearOverlay.ShowAsync(destroyCancellationToken);
+            await LoadingScreenPresenter.Instance.ShowAsync(_playerTransform.position);
+            await WebsocketManager.Instance.GameEnd();
+            SceneManager.Instance.LoadSceneAsync(SceneType.ClearScene).Forget();
+            AudioManager.Instance.StopBGM();
             Debug.Log("ゲームクリア");
         }
     }
