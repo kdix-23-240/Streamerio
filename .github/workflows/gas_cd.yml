@@ -48,8 +48,8 @@ jobs:
               "refresh_token": "${{ secrets.REFRESH_TOKEN }}"
             },
             "oauth2ClientSettings": {
-              "clientId": "${{ secrets.CLIENTID }}",
-              "clientSecret": "${{ secrets.CLIENTSECRET }}",
+              "clientId": "${{ secrets.CLIENT_ID }}",
+              "clientSecret": "${{ secrets.CLIENT_SECRET }}",
               "redirectUri": "http://localhost"
             },
             "isLocalCreds": false
