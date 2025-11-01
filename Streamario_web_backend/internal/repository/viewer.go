@@ -19,6 +19,11 @@ type ViewerRepository interface {
 type viewerRepository struct {
 	db     *sqlx.DB
 	logger *slog.Logger
+
+	// 準備済みステートメント
+	createStmt *sqlx.Stmt
+	existsStmt *sqlx.Stmt
+	getStmt    *sqlx.Stmt
 }
 
 func NewViewerRepository(db *sqlx.DB, logger *slog.Logger) ViewerRepository {
