@@ -5,6 +5,7 @@ namespace Common.GAS
         None,
         GameSettings,
         PlayerStatus,
+        UltStatus,
         EnemyStatus,
     }
 }
