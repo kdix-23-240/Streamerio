@@ -25,11 +25,11 @@ type eventRepository struct {
 	logger *slog.Logger
 
 	// 準備済みステートメントを保持
- 	createEventStmt         *sqlx.Stmt
- 	listEventViewerCountsStmt *sqlx.Stmt
- 	listEventTotalsStmt       *sqlx.Stmt
- 	listViewerTotalsStmt      *sqlx.Stmt
- 	listViewerEventCountsStmt *sqlx.Stmt
+	createEventStmt           *sqlx.Stmt
+	listEventViewerCountsStmt *sqlx.Stmt
+	listEventTotalsStmt       *sqlx.Stmt
+	listViewerTotalsStmt      *sqlx.Stmt
+	listViewerEventCountsStmt *sqlx.Stmt
 }
 
 // NewEventRepository: 実装生成
@@ -39,7 +39,7 @@ func NewEventRepository(db *sqlx.DB, logger *slog.Logger) EventRepository {
 	}
 
 	// 準備に失敗した場合は、起動時エラーとして panic させる
- 	mustPrepare := func(query string) *sqlx.Stmt {
+	mustPrepare := func(query string) *sqlx.Stmt {
 		stmt, err := db.Preparex(query)
 		if err != nil {
 			logger.Error("failed to prepare statement", slog.Any("error", err), slog.String("query", query))
@@ -93,22 +93,14 @@ func (r *eventRepository) ListEventViewerCounts(roomID string) ([]model.EventAgg
 		ViewerName sql.NullString  `db:"viewer_name"`
 		Count      int             `db:"count"`
 	}{}
-	q := `SELECT e.event_type,
-             e.viewer_id,
-             v.name AS viewer_name,
-             COUNT(*) AS count
-      FROM events e
-      LEFT JOIN viewers v ON v.id = e.viewer_id
-      WHERE e.room_id = $1 AND e.viewer_id IS NOT NULL
-      GROUP BY e.event_type, e.viewer_id, v.name`
 	logger := r.logger.With(
 		slog.String("repo", "event"),
 		slog.String("op", "list_event_viewer_counts"),
 		slog.String("room_id", roomID),
 	)
 	start := time.Now()
-	if err := r.db.Select(&rows, q, roomID); err != nil {
-		logger.Error("db.query failed", slog.Any("error", err))
+	if err := r.listEventViewerCountsStmt.Select(&rows, roomID); err != nil {
+		logger.Error("db.query (prepared) failed", slog.Any("error", err))
 		return nil, err
 	}
 	logger.Debug("db.query", slog.Int("row_count", len(rows)), slog.Duration("elapsed", time.Since(start)))
