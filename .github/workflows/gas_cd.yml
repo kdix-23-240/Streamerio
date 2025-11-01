@@ -33,6 +33,7 @@ jobs:
             "rootDir": "."
           }
           EOF
+        working-directory: gas
 
       - name: Set up clasp credentials
         run: |
@@ -57,9 +58,13 @@ jobs:
 
       - name: Prefetch clasp (optional)
         run: npx --yes @google/clasp@latest --version
+        working-directory: gas
 
       - name: Push to Google Apps Script
-        run: npx clasp push
+        run: npx --yes @google/clasp@latest push
+        working-directory: gas
 
       - name: Deploy (optional)
-        run: npx clasp deploy --deploymentId ${{ secrets.DEPLOYMENT_ID }}
+        if: ${{ secrets.DEPLOYMENT_ID != '' }}
+        run: npx --yes @google/clasp@latest deploy --deploymentId ${{ secrets.DEPLOYMENT_ID }}
+        working-directory: gas
