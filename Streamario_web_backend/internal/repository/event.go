@@ -188,3 +188,23 @@ func cloneString(s string) *string {
 	val := s
 	return &val
 }
+
+func (r *eventRepository) Close() error {
+    var firstErr error
+    closeStmt := func(s *sqlx.Stmt) {
+        if s == nil {
+            return
+        }
+        if err := s.Close(); err != nil && firstErr == nil {
+            firstErr = err
+        }
+    }
+
+    closeStmt(r.createEventStmt)
+	closeStmt(r.listEventViewerCountsStmt)
+	closeStmt(r.listEventTotalsStmt)
+	closeStmt(r.listViewerTotalsStmt)
+	closeStmt(r.listViewerEventCountsStmt)
+
+    return firstErr
+}
