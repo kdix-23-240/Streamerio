@@ -30,7 +30,23 @@ func NewViewerRepository(db *sqlx.DB, logger *slog.Logger) ViewerRepository {
 	if logger == nil {
 		logger = slog.Default()
 	}
-	return &viewerRepository{db: db, logger: logger}
+
+	mustPrepare := func(query string) *sqlx.Stmt {
+		stmt, err := db.Preparex(query)
+		if err != nil {
+			logger.Error("failed to prepare statement", slog.Any("error", err), slog.String("query", query))
+			panic(err)
+		}
+		return stmt
+	}
+
+	return &viewerRepository{
+		db:         db,
+		logger:     logger,
+		createStmt: mustPrepare(queryCreateViewer),
+		existsStmt: mustPrepare(queryExistsViewer),
+		getStmt:    mustPrepare(queryGetViewer),
+	}
 }
 
 func (r *viewerRepository) Create(viewer *model.Viewer) error {
