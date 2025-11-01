@@ -1,7 +1,10 @@
 const spreadSheet = SpreadsheetApp.openById(getEnvParam('SPREAD_SHEET_ID'));
 
 const sheetName = {
+    GAME_SETTINGS: 'GameSettings',
     PLAYER_STATUS: 'PlayerStatus',
+    ULT_STATUS: 'UltStatus',
+    ENEMY_STATUS: 'EnemyStatus',
 }
 
 function getSheet(sheetName) {
