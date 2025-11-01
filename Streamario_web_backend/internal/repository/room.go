@@ -18,6 +18,7 @@ type RoomRepository interface {
 	Delete(id string) error                       // ID削除
 	Update(id string, room *model.Room) error     // ID更新
 	MarkEnded(id string, endedAt time.Time) error // 終了状態に遷移
+	Close() error
 }
 
 type roomRepository struct {

@@ -14,6 +14,7 @@ type ViewerRepository interface {
 	Create(viewer *model.Viewer) error
 	Exists(id string) (bool, error)
 	Get(id string) (*model.Viewer, error)
+	Close() error
 }
 
 type viewerRepository struct {

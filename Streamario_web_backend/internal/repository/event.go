@@ -18,6 +18,7 @@ type EventRepository interface {
 	ListEventTotals(roomID string) ([]model.EventTotal, error)
 	ListViewerTotals(roomID string) ([]model.ViewerTotal, error)
 	ListViewerEventCounts(roomID, viewerID string) ([]model.ViewerEventCount, error)
+	Close() error
 }
 
 type eventRepository struct {
