@@ -1,3 +1,4 @@
+using Common;
 using Common.Audio;
 using Common.Booster;
 using Common.QRCode;
@@ -8,14 +9,20 @@ using Common.UI.Dialog;
 using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
 public class GlobalLifetimeScope : LifetimeScope
 {
+    [SerializeField]
+    private OnlineStatusDataSO _onlineStatusDataSO;
+    
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterEntryPoint<GlobalBooster>();
+        
+        builder.RegisterInstance<IOnlineStatusData>(_onlineStatusDataSO);
         
         builder.Register<IVolumeSaveFacade, IPlayDataSaveFacade, SaveManager>(Lifetime.Singleton);
 

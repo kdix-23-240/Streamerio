@@ -13,11 +13,17 @@ namespace Common
     [CreateAssetMenu(fileName = "OnlineStatusDataSO", menuName = "SO/Online/Status")]
     public class OnlineStatusDataSO : ScriptableObject, IOnlineStatusData
     {
+#if UNITY_EDITOR
         [Button]
         private async UniTaskVoid FetchData()
         {
             await FetchDataAsync(default);
+            
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.AssetDatabase.SaveAssets();
+            UnityEditor.AssetDatabase.Refresh();
         }
+#endif
         
         [SerializeField, Min(0f)]
         private int _timeOutTime = 8;
