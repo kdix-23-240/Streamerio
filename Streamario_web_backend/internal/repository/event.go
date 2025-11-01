@@ -169,10 +169,6 @@ func (r *eventRepository) ListViewerTotals(roomID string) ([]model.ViewerTotal, 
 
 func (r *eventRepository) ListViewerEventCounts(roomID, viewerID string) ([]model.ViewerEventCount, error) {
 	rows := []model.ViewerEventCount{}
-	q := `SELECT event_type, COUNT(*) AS count
-        FROM events
-        WHERE room_id = $1 AND viewer_id = $2
-        GROUP BY event_type`
 	logger := r.logger.With(
 		slog.String("repo", "event"),
 		slog.String("op", "list_viewer_event_counts"),
@@ -180,8 +176,8 @@ func (r *eventRepository) ListViewerEventCounts(roomID, viewerID string) ([]mode
 		slog.String("viewer_id", viewerID),
 	)
 	start := time.Now()
-	if err := r.db.Select(&rows, q, roomID, viewerID); err != nil {
-		logger.Error("db.query failed", slog.Any("error", err))
+	if err := r.listViewerEventCountsStmt.Select(&rows, roomID, viewerID); err != nil {
+		logger.Error("db.query (prepared) failed", slog.Any("error", err))
 		return nil, err
 	}
 	logger.Debug("db.query", slog.Int("row_count", len(rows)), slog.Duration("elapsed", time.Since(start)))
