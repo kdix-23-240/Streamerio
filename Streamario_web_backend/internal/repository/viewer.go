@@ -35,8 +35,8 @@ func NewViewerRepository(db *sqlx.DB, logger *slog.Logger) ViewerRepository {
 		db:         db,
 		logger:     logger,
 		createStmt: mustPrepare(db, logger, queryCreateViewer),
-        existsStmt: mustPrepare(db, logger, queryExistsViewer),
-        getStmt:    mustPrepare(db, logger, queryGetViewer),
+		existsStmt: mustPrepare(db, logger, queryExistsViewer),
+		getStmt:    mustPrepare(db, logger, queryGetViewer),
 	}
 }
 
@@ -97,17 +97,17 @@ func (r *viewerRepository) Get(id string) (*model.Viewer, error) {
 }
 
 func (r *viewerRepository) Close() error {
-    var firstErr error
-    closeStmt := func(s *sqlx.Stmt) {
-        if s == nil {
-            return
-        }
-        if err := s.Close(); err != nil && firstErr == nil {
-            firstErr = err
-        }
-    }
-    closeStmt(r.createStmt)
-    closeStmt(r.existsStmt)
-    closeStmt(r.getStmt)
-    return firstErr
+	var firstErr error
+	closeStmt := func(s *sqlx.Stmt) {
+		if s == nil {
+			return
+		}
+		if err := s.Close(); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	closeStmt(r.createStmt)
+	closeStmt(r.existsStmt)
+	closeStmt(r.getStmt)
+	return firstErr
 }

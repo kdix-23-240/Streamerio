@@ -42,10 +42,10 @@ func NewEventRepository(db *sqlx.DB, logger *slog.Logger) EventRepository {
 		db:                        db,
 		logger:                    logger,
 		createEventStmt:           mustPrepare(db, logger, queryCreateEvent),
-        listEventViewerCountsStmt: mustPrepare(db, logger, queryListEventViewerCounts),
-        listEventTotalsStmt:       mustPrepare(db, logger, queryListEventTotals),
-        listViewerTotalsStmt:      mustPrepare(db, logger, queryListViewerTotals),
-        listViewerEventCountsStmt: mustPrepare(db, logger, queryListViewerEventCounts),
+		listEventViewerCountsStmt: mustPrepare(db, logger, queryListEventViewerCounts),
+		listEventTotalsStmt:       mustPrepare(db, logger, queryListEventTotals),
+		listViewerTotalsStmt:      mustPrepare(db, logger, queryListViewerTotals),
+		listViewerEventCountsStmt: mustPrepare(db, logger, queryListViewerEventCounts),
 	}
 }
 
@@ -180,21 +180,21 @@ func cloneString(s string) *string {
 }
 
 func (r *eventRepository) Close() error {
-    var firstErr error
-    closeStmt := func(s *sqlx.Stmt) {
-        if s == nil {
-            return
-        }
-        if err := s.Close(); err != nil && firstErr == nil {
-            firstErr = err
-        }
-    }
+	var firstErr error
+	closeStmt := func(s *sqlx.Stmt) {
+		if s == nil {
+			return
+		}
+		if err := s.Close(); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
 
-    closeStmt(r.createEventStmt)
+	closeStmt(r.createEventStmt)
 	closeStmt(r.listEventViewerCountsStmt)
 	closeStmt(r.listEventTotalsStmt)
 	closeStmt(r.listViewerTotalsStmt)
 	closeStmt(r.listViewerEventCountsStmt)
 
-    return firstErr
+	return firstErr
 }

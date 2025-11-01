@@ -42,10 +42,10 @@ func NewRoomRepository(db *sqlx.DB, logger *slog.Logger) RoomRepository {
 		db:            db,
 		logger:        logger,
 		createStmt:    mustPrepare(db, logger, queryCreateRoom),
-        getStmt:       mustPrepare(db, logger, queryGetRoom),
-        updateStmt:    mustPrepare(db, logger, queryUpdateRoom),
-        deleteStmt:    mustPrepare(db, logger, queryDeleteRoom),
-        markEndedStmt: mustPrepare(db, logger, queryMarkEndedRoom),
+		getStmt:       mustPrepare(db, logger, queryGetRoom),
+		updateStmt:    mustPrepare(db, logger, queryUpdateRoom),
+		deleteStmt:    mustPrepare(db, logger, queryDeleteRoom),
+		markEndedStmt: mustPrepare(db, logger, queryMarkEndedRoom),
 	}
 }
 
