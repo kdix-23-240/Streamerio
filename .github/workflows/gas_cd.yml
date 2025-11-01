@@ -65,6 +65,5 @@ jobs:
         working-directory: gas
 
       - name: Deploy (optional)
-        if: ${{ secrets.DEPLOYMENT_ID != '' }}
         run: npx --yes @google/clasp@latest deploy --deploymentId ${{ secrets.DEPLOYMENT_ID }}
         working-directory: gas
