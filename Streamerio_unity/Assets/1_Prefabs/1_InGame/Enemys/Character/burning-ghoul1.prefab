@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d57d919bda2bc48d180214defa98387c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
+  damage: 12
 --- !u!114 &951967592393679611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a29ec3b22b2f440880ec23f142d071f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 50
+  health: 30
 --- !u!70 &6895875478511990101
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
