@@ -23,6 +23,13 @@ type EventRepository interface {
 type eventRepository struct {
 	db     *sqlx.DB
 	logger *slog.Logger
+
+	// 準備済みステートメントを保持
+ 	createEventStmt         *sqlx.Stmt
+ 	listEventViewerCountsStmt *sqlx.Stmt
+ 	listEventTotalsStmt       *sqlx.Stmt
+ 	listViewerTotalsStmt      *sqlx.Stmt
+ 	listViewerEventCountsStmt *sqlx.Stmt
 }
 
 // NewEventRepository: 実装生成
