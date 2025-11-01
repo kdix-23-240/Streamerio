@@ -39,9 +39,9 @@ namespace OutGame.Result.UI
             if(WebsocketManager.Instance.GameEndSummary != null)
             {
                 WebsocketManager.GameEndSummaryNotification summary = WebsocketManager.Instance.GameEndSummary;
-                _allText.text = (summary.all ==null || summary.all.viewer_name == null) ? "名無しの視聴者" : summary.all.viewer_name;
-                _enemyText.text = (summary.enemy ==null || summary.enemy.viewer_name == null) ? "名無しの視聴者" : summary.enemy.viewer_name;
-                _skillText.text =  (summary.skill ==null || summary.skill.viewer_name == null) ? "名無しの視聴者" : summary.skill.viewer_name;
+                _allText.text = (summary.SummaryDetails["all"] ==null || summary.SummaryDetails["all"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["all"].viewer_name;
+                _enemyText.text = (summary.SummaryDetails["enemy"] ==null || summary.SummaryDetails["enemy"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["enemy"].viewer_name;
+                _skillText.text = (summary.SummaryDetails["skill"] ==null || summary.SummaryDetails["skill"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["skill"].viewer_name;
             }
             
             await base.ShowAsync(ct);

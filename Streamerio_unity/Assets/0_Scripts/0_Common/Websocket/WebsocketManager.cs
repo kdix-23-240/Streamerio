@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Common;
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
@@ -194,7 +195,32 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     {
       try
       {
-        _gameEndSummary = JsonUtility.FromJson<GameEndSummaryNotification>(message);
+        var root = MiniJSON.Json.Deserialize(message) as Dictionary<string, object>;
+        if (root == null) throw new Exception("root is null");
+
+        _gameEndSummary = new GameEndSummaryNotification();
+
+        // --- team_tops の分解 ---
+        if (root.TryGetValue("team_tops", out var teamObj) &&
+            teamObj is Dictionary<string, object> teamDict)
+        {
+          foreach (var kv in teamDict)
+          {
+            if (kv.Value is Dictionary<string, object> val)
+            {
+              var detail = new GameEndSummaryNotification.SummaryDetail
+              {
+                count       = val.TryGetValue("count", out var c)
+                  ? Convert.ToInt32(c, CultureInfo.InvariantCulture)
+                  : 0
+                ,
+                viewer_id   = val.TryGetValue("viewer_id", out var vid) ? vid?.ToString() : null,
+                viewer_name = val.TryGetValue("viewer_name", out var vname) ? vname?.ToString() : null,
+              };
+              _gameEndSummary.SummaryDetails[kv.Key] = detail; // "all" / "enemy" / "skill"
+            }
+          }
+        }
         
         return;
       }
@@ -323,9 +349,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
     public const string EnemyKey = "enemy";
     public const string SkillKey = "skill";
     
-    public SummaryDetail all;
-    public SummaryDetail enemy;
-    public SummaryDetail skill;
+    public Dictionary<string, SummaryDetail> SummaryDetails = new Dictionary<string, SummaryDetail>();
     
     public class SummaryDetail
     {
