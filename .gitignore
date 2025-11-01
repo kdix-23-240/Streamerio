@@ -178,3 +178,5 @@ crashlytics-build.properties
 */.clasprc.json
 
 */AGENTS.md
+
+node_modules/
