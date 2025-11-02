@@ -777,9 +777,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 860101363021594747, guid: 2ae8ee0b5181840da98cc65b13991642, type: 3}
+      propertyPath: _mainCamera
+      value: 
+      objectReference: {fileID: 6583393167888128269}
+    - target: {fileID: 860101363021594747, guid: 2ae8ee0b5181840da98cc65b13991642, type: 3}
       propertyPath: _hpPresenter
       value: 
       objectReference: {fileID: 873724054}
+    - target: {fileID: 860101363021594747, guid: 2ae8ee0b5181840da98cc65b13991642, type: 3}
+      propertyPath: _zoomAnimationParam
+      value: 
+      objectReference: {fileID: 11400000, guid: 73826e1b76019479a863c55dc9cd604c, type: 2}
     - target: {fileID: 5539085536265280541, guid: 2ae8ee0b5181840da98cc65b13991642, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2242,6 +2250,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 9026553274122012077, guid: d8ffd792d2041444c8a6b54c04dbfa87, type: 3}
+      propertyPath: near clip plane
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2430952927219464432, guid: d8ffd792d2041444c8a6b54c04dbfa87, type: 3}
     m_RemovedGameObjects: []
@@ -2257,6 +2269,11 @@ PrefabInstance:
 --- !u!4 &6583393167888128268 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1491685920584185645, guid: d8ffd792d2041444c8a6b54c04dbfa87, type: 3}
+  m_PrefabInstance: {fileID: 6583393167888128267}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &6583393167888128269 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 9026553274122012077, guid: d8ffd792d2041444c8a6b54c04dbfa87, type: 3}
   m_PrefabInstance: {fileID: 6583393167888128267}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &6583393167888128271 stripped

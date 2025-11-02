@@ -3,6 +3,7 @@ using Common.Audio;
 using Common.QRCode;
 using Common.Save;
 using Common.Scene;
+using Common.UI.Animation;
 using Common.UI.Loading;
 using Cysharp.Threading.Tasks;
 using InGame.Setting;
@@ -28,6 +29,8 @@ namespace Common.State
         private readonly IState _playFromTitleState;
         private readonly IState _nextState;
         
+        private readonly IUIAnimation _inGameBackgroundAnimation;
+        
         [Inject]
         public InGameStartState(
             IPlayDataSaveFacade playDataSaveFacade,
@@ -39,7 +42,8 @@ namespace Common.State
             IStateManager stateManager,
             [Key(StateType.FirstPlay)] IState firstPlayState,
             [Key(StateType.PlayFromTitle)] IState playFromTitleState,
-            [Key(StateType.InGame)] IState nextState)
+            [Key(StateType.InGame)] IState nextState,
+            [Key(AnimationType.InGameBackground)] IUIAnimation inGameBackgroundAnimation)
         {
             _playDataSaveFacade = playDataSaveFacade;
             
@@ -56,6 +60,8 @@ namespace Common.State
             _firstPlayState = firstPlayState;
             _playFromTitleState = playFromTitleState;
             _nextState = nextState;
+            
+            _inGameBackgroundAnimation = inGameBackgroundAnimation;
         }
         
         public async UniTask EnterAsync(CancellationToken ct)
@@ -81,7 +87,9 @@ namespace Common.State
         
         public async UniTask ExitAsync(CancellationToken ct)
         {
+            _inGameBackgroundAnimation.PlayAsync(ct).Forget();
             await _loadingScreen.HideAsync(ct);
+            
         }
     }
 }
