@@ -14,15 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _timeOutTime: 8
   _gameSetting:
-  - TimeLimit: 300
+    TimeLimit: 300
   _playerStatus:
-  - HP: 100
+    HP: 100
     AttackPower: 10
     Speed: 10
     JumpPower: 50
-  _ultStatus:
-  - AttackPower: 10
-  _enemyStatusDict:
+  _ultStatusDictionary:
+    _keyValuePairs:
+    - _key: 0
+      _value:
+        AttackPower: 10
+    - _key: 1
+      _value:
+        AttackPower: 20
+    - _key: 2
+      _value:
+        AttackPower: 30
+    - _key: 3
+      _value:
+        AttackPower: 50
+  _enemyStatusDictionary:
     _keyValuePairs:
     - _key: 0
       _value:

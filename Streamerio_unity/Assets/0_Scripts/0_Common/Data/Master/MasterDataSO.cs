@@ -6,6 +6,7 @@ using Alchemy.Inspector;
 using Common.GAS;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using ZLinq;
 
 namespace Common
 {
@@ -29,17 +30,17 @@ namespace Common
         private int _timeOutTime = 8;
         
         [SerializeField]
-        private MasterGameSetting[] _gameSetting;
-        public MasterGameSetting[] GameSetting => _gameSetting;
+        private MasterGameSetting _gameSetting;
+        public MasterGameSetting GameSetting => _gameSetting;
 
-        [SerializeField] private MasterPlayerStatus[] _playerStatus; 
-        public MasterPlayerStatus[] PlayerStatus => _playerStatus;
+        [SerializeField] private MasterPlayerStatus _playerStatus; 
+        public MasterPlayerStatus PlayerStatus => _playerStatus;
         [SerializeField]
-        private MasterUltStatus[] _ultStatus;
-        public MasterUltStatus[] UltStatus => _ultStatus;
+        private SerializeDictionary<MasterUltType, MasterUltStatus> _ultStatusDictionary;
+        public IReadOnlyDictionary<MasterUltType, MasterUltStatus> UltStatusDictionary => _ultStatusDictionary.ToDictionary();
         [SerializeField]
-        private SerializeDictionary<MasterEnemyType, MasterEnemyStatus> _enemyStatusDict;
-        public IReadOnlyDictionary<MasterEnemyType, MasterEnemyStatus> EnemyStatusDict => _enemyStatusDict.ToDictionary();
+        private SerializeDictionary<MasterEnemyType, MasterEnemyStatus> _enemyStatusDictionary;
+        public IReadOnlyDictionary<MasterEnemyType, MasterEnemyStatus> EnemyStatusDictionary => _enemyStatusDictionary.ToDictionary();
 
         public async UniTask FetchDataAsync(CancellationToken ct)
         {
@@ -51,51 +52,51 @@ namespace Common
             var (gameRows, playerRows, ultRows, enemyRows) =
                 await UniTask.WhenAll(gameTask, playerTask, ultTask, enemyTask);
 
-            int gameCount = gameRows[MasterGameSetting.TimeLimitKey].Count;
-            _gameSetting = new MasterGameSetting[gameCount];
-            for(int i = 0; i < gameCount; i++)
+            _gameSetting = new MasterGameSetting()
             {
-                _gameSetting[i] = new MasterGameSetting()
-                {
-                    TimeLimit = ToFloat(gameRows[MasterGameSetting.TimeLimitKey][i]),
-                };
-            }
+                TimeLimit = ToFloat(gameRows[MasterGameSetting.TimeLimitKey][0]),
+            };
             
-            int playerCount = playerRows[MasterPlayerStatus.HPKey].Count;
-            _playerStatus = new MasterPlayerStatus[playerCount];
-            for (int i = 0; i < playerCount; i++)
+            _playerStatus = new MasterPlayerStatus()
             {
-                PlayerStatus[i] = new MasterPlayerStatus()
-                {
-                    HP = ToFloat(playerRows[MasterPlayerStatus.HPKey][i]),
-                    AttackPower = ToFloat(playerRows[MasterPlayerStatus.AttackPowerKey][i]),
-                    Speed = ToFloat(playerRows[MasterPlayerStatus.SpeedKey][i]),
-                    JumpPower = ToFloat(playerRows[MasterPlayerStatus.JumpPowerKey][i]),
-                };
-            }
+                HP = ToFloat(playerRows[MasterPlayerStatus.HPKey][0]),
+                AttackPower = ToFloat(playerRows[MasterPlayerStatus.AttackPowerKey][0]),
+                Speed = ToFloat(playerRows[MasterPlayerStatus.SpeedKey][0]),
+                JumpPower = ToFloat(playerRows[MasterPlayerStatus.JumpPowerKey][0]),
+            };
             
-            int ultCount = ultRows[MasterUltStatus.AttackPowerKey].Count;
-            _ultStatus = new MasterUltStatus[ultCount];
-            for (int i = 0; i < ultCount; i++)
-            {
-                UltStatus[i] = new MasterUltStatus()
+            _ultStatusDictionary = CreateDictionary<MasterUltType, MasterUltStatus>(
+                ultRows,
+                MasterUltStatus.UltTypeKey,
+                i => new MasterUltStatus()
                 {
                     AttackPower = ToFloat(ultRows[MasterUltStatus.AttackPowerKey][i]),
-                };
-            }
-            
-            _enemyStatusDict = new SerializeDictionary<MasterEnemyType, MasterEnemyStatus>();
-            int enemyCount = enemyRows[MasterEnemyStatus.HPKey].Count;
-            for (int i = 0; i < enemyCount; i++)
-            {
-                var type = (MasterEnemyType)Enum.Parse(typeof(MasterEnemyType), (string)enemyRows[MasterEnemyStatus.EnemyTypeKey][i]);
-                _enemyStatusDict[type] = new MasterEnemyStatus()
+                });
+
+            _enemyStatusDictionary = CreateDictionary<MasterEnemyType, MasterEnemyStatus>(
+                enemyRows,
+                MasterEnemyStatus.EnemyTypeKey,
+                i => new MasterEnemyStatus()
                 {
                     HP = ToFloat(enemyRows[MasterEnemyStatus.HPKey][i]),
                     AttackPower = ToFloat(enemyRows[MasterEnemyStatus.AttackPowerKey][i]),
                     Speed = ToFloat(enemyRows[MasterEnemyStatus.SpeedKey][i]),
-                };
+                });
+        }
+        
+        private SerializeDictionary<TEnum, TValue> CreateDictionary<TEnum, TValue>(Dictionary<string, List<object>> dataRows, string typeKey, Func<int, TValue> onCreate)
+            where TEnum : Enum
+            where TValue : new()
+        {
+            var dict = new SerializeDictionary<TEnum, TValue>();
+            int count = dataRows.AsValueEnumerable().First().Value.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var type = (TEnum)Enum.Parse(typeof(TEnum), (string)dataRows[typeKey][i]);
+                dict[type] = onCreate(i);
             }
+
+            return dict;
         }
         
         private float ToFloat(object num)
@@ -106,10 +107,10 @@ namespace Common
     
     public interface IMasterData
     {
-        MasterGameSetting[] GameSetting { get; }
-        MasterPlayerStatus[] PlayerStatus { get; }
-        MasterUltStatus[] UltStatus { get; }
-        IReadOnlyDictionary<MasterEnemyType, MasterEnemyStatus> EnemyStatusDict { get; }
+        MasterGameSetting GameSetting { get; }
+        MasterPlayerStatus PlayerStatus { get; }
+        IReadOnlyDictionary<MasterUltType, MasterUltStatus> UltStatusDictionary { get; }
+        IReadOnlyDictionary<MasterEnemyType, MasterEnemyStatus> EnemyStatusDictionary { get; }
         
         UniTask FetchDataAsync(CancellationToken ct);
     }
@@ -139,9 +140,18 @@ namespace Common
     [Serializable]
     public class MasterUltStatus
     {
+        public const string UltTypeKey = "Type";
         public const string AttackPowerKey = "AttackPower";
         
         public float AttackPower;
+    }
+    
+    public enum MasterUltType
+    {
+        Beam,
+        Bullet,
+        ChargeBeam,
+        Thunder,
     }
 
     [Serializable]
