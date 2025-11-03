@@ -25,6 +25,20 @@ namespace Common
             UnityEditor.AssetDatabase.Refresh();
         }
 #endif
+#if UNITY_EDITOR
+        [Button]
+        private void Reset()
+        {
+            _gameSetting = new MasterGameSetting();
+            _playerStatus = new MasterPlayerStatus();
+            _ultStatusDictionary = new SerializeDictionary<MasterUltType, MasterUltStatus>();
+            _enemyStatusDictionary = new SerializeDictionary<MasterEnemyType, MasterEnemyStatus>();
+            
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.AssetDatabase.SaveAssets();
+            UnityEditor.AssetDatabase.Refresh();
+        }
+#endif
         
         [SerializeField, Min(0f)]
         private int _timeOutTime = 8;
@@ -52,36 +66,53 @@ namespace Common
             var (gameRows, playerRows, ultRows, enemyRows) =
                 await UniTask.WhenAll(gameTask, playerTask, ultTask, enemyTask);
 
-            _gameSetting = new MasterGameSetting()
+            if (IsValidDataRow(gameRows))
             {
-                TimeLimit = ToFloat(gameRows[MasterGameSetting.TimeLimitKey][0]),
-            };
-            
-            _playerStatus = new MasterPlayerStatus()
-            {
-                HP = ToFloat(playerRows[MasterPlayerStatus.HPKey][0]),
-                AttackPower = ToFloat(playerRows[MasterPlayerStatus.AttackPowerKey][0]),
-                Speed = ToFloat(playerRows[MasterPlayerStatus.SpeedKey][0]),
-                JumpPower = ToFloat(playerRows[MasterPlayerStatus.JumpPowerKey][0]),
-            };
-            
-            _ultStatusDictionary = CreateDictionary<MasterUltType, MasterUltStatus>(
-                ultRows,
-                MasterUltStatus.UltTypeKey,
-                i => new MasterUltStatus()
+                _gameSetting = new MasterGameSetting()
                 {
-                    AttackPower = ToFloat(ultRows[MasterUltStatus.AttackPowerKey][i]),
-                });
+                    TimeLimit = ToFloat(gameRows[MasterGameSetting.TimeLimitKey][0]),
+                };
+            }
 
-            _enemyStatusDictionary = CreateDictionary<MasterEnemyType, MasterEnemyStatus>(
-                enemyRows,
-                MasterEnemyStatus.EnemyTypeKey,
-                i => new MasterEnemyStatus()
+            if (IsValidDataRow(playerRows))
+            {
+                _playerStatus = new MasterPlayerStatus()
                 {
-                    HP = ToFloat(enemyRows[MasterEnemyStatus.HPKey][i]),
-                    AttackPower = ToFloat(enemyRows[MasterEnemyStatus.AttackPowerKey][i]),
-                    Speed = ToFloat(enemyRows[MasterEnemyStatus.SpeedKey][i]),
-                });
+                    HP = ToFloat(playerRows[MasterPlayerStatus.HPKey][0]),
+                    AttackPower = ToFloat(playerRows[MasterPlayerStatus.AttackPowerKey][0]),
+                    Speed = ToFloat(playerRows[MasterPlayerStatus.SpeedKey][0]),
+                    JumpPower = ToFloat(playerRows[MasterPlayerStatus.JumpPowerKey][0]),
+                };   
+            }
+            
+            if (IsValidDataRow(ultRows))
+            {
+                _ultStatusDictionary = CreateDictionary<MasterUltType, MasterUltStatus>(
+                    ultRows,
+                    MasterUltStatus.UltTypeKey,
+                    i => new MasterUltStatus()
+                    {
+                        AttackPower = ToFloat(ultRows[MasterUltStatus.AttackPowerKey][i]),
+                    });   
+            }
+
+            if (IsValidDataRow(enemyRows))
+            {
+                _enemyStatusDictionary = CreateDictionary<MasterEnemyType, MasterEnemyStatus>(
+                    enemyRows,
+                    MasterEnemyStatus.EnemyTypeKey,
+                    i => new MasterEnemyStatus()
+                    {
+                        HP = ToFloat(enemyRows[MasterEnemyStatus.HPKey][i]),
+                        AttackPower = ToFloat(enemyRows[MasterEnemyStatus.AttackPowerKey][i]),
+                        Speed = ToFloat(enemyRows[MasterEnemyStatus.SpeedKey][i]),
+                    });   
+            }
+        }
+        
+        private bool IsValidDataRow(Dictionary<string, List<object>> dataRows)
+        {
+            return dataRows is { Count: > 0 };
         }
         
         private SerializeDictionary<TEnum, TValue> CreateDictionary<TEnum, TValue>(Dictionary<string, List<object>> dataRows, string typeKey, Func<int, TValue> onCreate)
