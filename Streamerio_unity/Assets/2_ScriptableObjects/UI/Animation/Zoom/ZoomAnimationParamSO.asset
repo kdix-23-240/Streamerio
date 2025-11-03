@@ -17,4 +17,4 @@ MonoBehaviour:
   InitialCameraSize: 1.75
   InitialPosition: {x: 0, y: 5}
   CameraSize: 7
-  Position: {x: 0, y: 0}
+  Position: {x: 0, y: 3}
