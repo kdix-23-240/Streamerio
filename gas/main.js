@@ -4,16 +4,16 @@ function doGet(e) {
     var jsonData;
     switch(dataType) {
         case sheetName.GAME_SETTINGS:
-            jsonData = createJson(sheetName, gameSettingsInitRowIndex, gameSettingsProp);
+            jsonData = createJson(dataType, gameSettingsInitRowIndex, gameSettingsProp);
             break;
         case sheetName.PLAYER_STATUS:
-            jsonData = createJson(sheetName, playerStatusInitRowIndex, playerStatusProp);
+            jsonData = createJson(dataType, playerStatusInitRowIndex, playerStatusProp);
             break;
         case sheetName.ENEMY_STATUS:
-            jsonData = createJson(sheetName, enemyStatusInitRowIndex, enemyStatusProp);
+            jsonData = createJson(dataType, enemyStatusInitRowIndex, enemyStatusProp);
             break;
         case sheetName.ULT_STATUS:
-            jsonData = createJson(sheetName, ultStatusInitRowIndex, ultStatusProp);
+            jsonData = createJson(dataType, ultStatusInitRowIndex, ultStatusProp);
             break;
     }
 

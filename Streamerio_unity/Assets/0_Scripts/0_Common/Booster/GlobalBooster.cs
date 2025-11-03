@@ -9,14 +9,14 @@ namespace Common.Booster
 {
     public class GlobalBooster: IAsyncStartable
     {
-        private IOnlineStatusData _onlineStatusData;
+        private IMasterData _masterData;
         private ILoadingScreen _loadingScreen;
         private ISceneManager _sceneManager;
         
         [Inject]
-        public GlobalBooster(IOnlineStatusData onlineStatusData, ILoadingScreen loadingScreen, ISceneManager sceneManager)
+        public GlobalBooster(IMasterData masterData, ILoadingScreen loadingScreen, ISceneManager sceneManager)
         {
-            _onlineStatusData = onlineStatusData;
+            _masterData = masterData;
             _loadingScreen = loadingScreen;
             _sceneManager = sceneManager;
         }
@@ -25,7 +25,7 @@ namespace Common.Booster
         {
             _loadingScreen.Show();
             _sceneManager.LoadSceneAsync(SceneType.Title).Forget();
-            await _onlineStatusData.FetchDataAsync(ct);
+            await _masterData.FetchDataAsync(ct);
         }
     }
 }

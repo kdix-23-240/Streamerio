@@ -49,7 +49,7 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _onlineStatusDataSO: {fileID: 11400000, guid: 50d00b7ab0e3f41f28d07aad21b007bd, type: 2}
+  _masterDataSO: {fileID: 11400000, guid: 50d00b7ab0e3f41f28d07aad21b007bd, type: 2}
 --- !u!114 &8971091433296148511
 MonoBehaviour:
   m_ObjectHideFlags: 0
