@@ -90,7 +90,7 @@ namespace Common.UI.Display.Window.Book
         {
             View.SetInteractable(false);
             await _bookWindowModel.CurrentPagePanelIterator.GetCurrentPage().HideAsync(ct);
-            await View.PlayTurnLeftAsync(ct);
+            await View.PlayTurnRightAsync(ct);
             await _bookWindowModel.CurrentPagePanelIterator.MoveNext().ShowAsync(ct);
             View.SetInteractable(true);
         }
@@ -107,7 +107,7 @@ namespace Common.UI.Display.Window.Book
         {
             View.SetInteractable(false);
             await _bookWindowModel.CurrentPagePanelIterator.GetCurrentPage().HideAsync(ct);
-            await View.PlayTurnRightAsync(ct);
+            await View.PlayTurnLeftAsync(ct);
             await _bookWindowModel.CurrentPagePanelIterator.MoveBack().ShowAsync(ct);
             View.SetInteractable(true);
         }
