@@ -13,7 +13,7 @@ namespace InGame.UI.Timer
             base.Configure(builder);
 
             builder.Register<ITimerModel, TimerModel>(Lifetime.Singleton)
-                .WithParameter(resolver => resolver.Resolve<IInGameSetting>().TimeLimit);
+                .WithParameter(resolver => resolver.Resolve<IMasterData>().GameSetting.TimeLimit);
             
             var view = GetComponent<ITimerView>();
             builder.RegisterComponent(view);
