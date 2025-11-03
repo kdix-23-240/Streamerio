@@ -10,8 +10,8 @@ using UnityEngine;
 namespace Common
 {
     
-    [CreateAssetMenu(fileName = "OnlineStatusDataSO", menuName = "SO/Online/Status")]
-    public class OnlineStatusDataSO : ScriptableObject, IOnlineStatusData
+    [CreateAssetMenu(fileName = "MasterDataSO", menuName = "SO/Master")]
+    public class MasterDataSO : ScriptableObject, IMasterData
     {
 #if UNITY_EDITOR
         [Button]
@@ -29,17 +29,17 @@ namespace Common
         private int _timeOutTime = 8;
         
         [SerializeField]
-        private OnlineGameSetting[] _gameSetting;
-        public OnlineGameSetting[] GameSetting => _gameSetting;
+        private MasterGameSetting[] _gameSetting;
+        public MasterGameSetting[] GameSetting => _gameSetting;
 
-        [SerializeField] private OnlinePlayerStatus[] _playerStatus; 
-        public OnlinePlayerStatus[] PlayerStatus => _playerStatus;
+        [SerializeField] private MasterPlayerStatus[] _playerStatus; 
+        public MasterPlayerStatus[] PlayerStatus => _playerStatus;
         [SerializeField]
-        private OnlineUltStatus[] _ultStatus;
-        public OnlineUltStatus[] UltStatus => _ultStatus;
+        private MasterUltStatus[] _ultStatus;
+        public MasterUltStatus[] UltStatus => _ultStatus;
         [SerializeField]
-        private SerializeDictionary<OnlineEnemyType, OnlineEnemyStatus> _enemyStatusDict;
-        public IReadOnlyDictionary<OnlineEnemyType, OnlineEnemyStatus> EnemyStatusDict => _enemyStatusDict.ToDictionary();
+        private SerializeDictionary<MasterEnemyType, MasterEnemyStatus> _enemyStatusDict;
+        public IReadOnlyDictionary<MasterEnemyType, MasterEnemyStatus> EnemyStatusDict => _enemyStatusDict.ToDictionary();
 
         public async UniTask FetchDataAsync(CancellationToken ct)
         {
@@ -51,49 +51,49 @@ namespace Common
             var (gameRows, playerRows, ultRows, enemyRows) =
                 await UniTask.WhenAll(gameTask, playerTask, ultTask, enemyTask);
 
-            int gameCount = gameRows[OnlineGameSetting.TimeLimitKey].Count;
-            _gameSetting = new OnlineGameSetting[gameCount];
+            int gameCount = gameRows[MasterGameSetting.TimeLimitKey].Count;
+            _gameSetting = new MasterGameSetting[gameCount];
             for(int i = 0; i < gameCount; i++)
             {
-                _gameSetting[i] = new OnlineGameSetting()
+                _gameSetting[i] = new MasterGameSetting()
                 {
-                    TimeLimit = ToFloat(gameRows[OnlineGameSetting.TimeLimitKey][i]),
+                    TimeLimit = ToFloat(gameRows[MasterGameSetting.TimeLimitKey][i]),
                 };
             }
             
-            int playerCount = playerRows[OnlinePlayerStatus.HPKey].Count;
-            _playerStatus = new OnlinePlayerStatus[playerCount];
+            int playerCount = playerRows[MasterPlayerStatus.HPKey].Count;
+            _playerStatus = new MasterPlayerStatus[playerCount];
             for (int i = 0; i < playerCount; i++)
             {
-                PlayerStatus[i] = new OnlinePlayerStatus()
+                PlayerStatus[i] = new MasterPlayerStatus()
                 {
-                    HP = ToFloat(playerRows[OnlinePlayerStatus.HPKey][i]),
-                    AttackPower = ToFloat(playerRows[OnlinePlayerStatus.AttackPowerKey][i]),
-                    Speed = ToFloat(playerRows[OnlinePlayerStatus.SpeedKey][i]),
-                    JumpPower = ToFloat(playerRows[OnlinePlayerStatus.JumpPowerKey][i]),
+                    HP = ToFloat(playerRows[MasterPlayerStatus.HPKey][i]),
+                    AttackPower = ToFloat(playerRows[MasterPlayerStatus.AttackPowerKey][i]),
+                    Speed = ToFloat(playerRows[MasterPlayerStatus.SpeedKey][i]),
+                    JumpPower = ToFloat(playerRows[MasterPlayerStatus.JumpPowerKey][i]),
                 };
             }
             
-            int ultCount = ultRows[OnlineUltStatus.AttackPowerKey].Count;
-            _ultStatus = new OnlineUltStatus[ultCount];
+            int ultCount = ultRows[MasterUltStatus.AttackPowerKey].Count;
+            _ultStatus = new MasterUltStatus[ultCount];
             for (int i = 0; i < ultCount; i++)
             {
-                UltStatus[i] = new OnlineUltStatus()
+                UltStatus[i] = new MasterUltStatus()
                 {
-                    AttackPower = ToFloat(ultRows[OnlineUltStatus.AttackPowerKey][i]),
+                    AttackPower = ToFloat(ultRows[MasterUltStatus.AttackPowerKey][i]),
                 };
             }
             
-            _enemyStatusDict = new SerializeDictionary<OnlineEnemyType, OnlineEnemyStatus>();
-            int enemyCount = enemyRows[OnlineEnemyStatus.HPKey].Count;
+            _enemyStatusDict = new SerializeDictionary<MasterEnemyType, MasterEnemyStatus>();
+            int enemyCount = enemyRows[MasterEnemyStatus.HPKey].Count;
             for (int i = 0; i < enemyCount; i++)
             {
-                var type = (OnlineEnemyType)Enum.Parse(typeof(OnlineEnemyType), (string)enemyRows[OnlineEnemyStatus.EnemyTypeKey][i]);
-                _enemyStatusDict[type] = new OnlineEnemyStatus()
+                var type = (MasterEnemyType)Enum.Parse(typeof(MasterEnemyType), (string)enemyRows[MasterEnemyStatus.EnemyTypeKey][i]);
+                _enemyStatusDict[type] = new MasterEnemyStatus()
                 {
-                    HP = ToFloat(enemyRows[OnlineEnemyStatus.HPKey][i]),
-                    AttackPower = ToFloat(enemyRows[OnlineEnemyStatus.AttackPowerKey][i]),
-                    Speed = ToFloat(enemyRows[OnlineEnemyStatus.SpeedKey][i]),
+                    HP = ToFloat(enemyRows[MasterEnemyStatus.HPKey][i]),
+                    AttackPower = ToFloat(enemyRows[MasterEnemyStatus.AttackPowerKey][i]),
+                    Speed = ToFloat(enemyRows[MasterEnemyStatus.SpeedKey][i]),
                 };
             }
         }
@@ -104,18 +104,18 @@ namespace Common
         }
     }
     
-    public interface IOnlineStatusData
+    public interface IMasterData
     {
-        OnlineGameSetting[] GameSetting { get; }
-        OnlinePlayerStatus[] PlayerStatus { get; }
-        OnlineUltStatus[] UltStatus { get; }
-        IReadOnlyDictionary<OnlineEnemyType, OnlineEnemyStatus> EnemyStatusDict { get; }
+        MasterGameSetting[] GameSetting { get; }
+        MasterPlayerStatus[] PlayerStatus { get; }
+        MasterUltStatus[] UltStatus { get; }
+        IReadOnlyDictionary<MasterEnemyType, MasterEnemyStatus> EnemyStatusDict { get; }
         
         UniTask FetchDataAsync(CancellationToken ct);
     }
     
     [Serializable]
-    public class OnlineGameSetting
+    public class MasterGameSetting
     {
         public const string TimeLimitKey = "TimeLimit";
         
@@ -123,7 +123,7 @@ namespace Common
     }
     
     [Serializable]
-    public class OnlinePlayerStatus
+    public class MasterPlayerStatus
     {
         public const string HPKey = "HP";
         public const string AttackPowerKey = "AttackPower";
@@ -137,7 +137,7 @@ namespace Common
     }
 
     [Serializable]
-    public class OnlineUltStatus
+    public class MasterUltStatus
     {
         public const string AttackPowerKey = "AttackPower";
         
@@ -145,7 +145,7 @@ namespace Common
     }
 
     [Serializable]
-    public class OnlineEnemyStatus
+    public class MasterEnemyStatus
     {
         public const string EnemyTypeKey = "Type";
         public const string HPKey = "HP";
@@ -157,7 +157,7 @@ namespace Common
         public float Speed;
     }
     
-    public enum OnlineEnemyType
+    public enum MasterEnemyType
     {
         Skelton,
         FireMan,

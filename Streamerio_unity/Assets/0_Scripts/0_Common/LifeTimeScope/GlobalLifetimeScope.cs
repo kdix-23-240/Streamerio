@@ -10,19 +10,20 @@ using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
 public class GlobalLifetimeScope : LifetimeScope
 {
     [SerializeField]
-    private OnlineStatusDataSO _onlineStatusDataSO;
+    private MasterDataSO _masterDataSO;
     
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterEntryPoint<GlobalBooster>();
         
-        builder.RegisterInstance<IOnlineStatusData>(_onlineStatusDataSO);
+        builder.RegisterInstance<IMasterData>(_masterDataSO);
         
         builder.Register<IVolumeSaveFacade, IPlayDataSaveFacade, SaveManager>(Lifetime.Singleton);
 
