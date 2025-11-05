@@ -12,8 +12,10 @@ using UnityEngine.Networking;
 
 public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManager
 {
-  private bool _isConnected = false;
   private WebSocket _websocket;
+
+  private ReactiveProperty<bool> _isConnectedProp = new ReactiveProperty<bool>(false);
+  public ReadOnlyReactiveProperty<bool> IsConnectedProp => _isConnectedProp;
 
   private string _roomId = string.Empty;
 
@@ -57,9 +59,21 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
       _frontEventDict[key] = new Subject<Unit>();
     }
   }
+
+  private void Start()
+  {
+    Observable.EveryUpdate()
+      .Select(_ => _websocket != null && _websocket.State == WebSocketState.Open)
+      .DistinctUntilChanged()
+      .Subscribe(isConnected =>
+      {
+        _isConnectedProp.Value = isConnected;
+      })
+      .AddTo(this);
+  }
   private void Update()
   {
-    if (_isConnected)
+    if (_isConnectedProp.Value)
     {
     #if !UNITY_WEBGL || UNITY_EDITOR
       _websocket.DispatchMessageQueue();
@@ -70,7 +84,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
   // websocketのコネクションを確立する
   public async UniTask ConnectWebSocket([CanBeNull] string websocketId)
   {
-    if (_isConnected)
+    if (_isConnectedProp.Value)
     {
       Debug.Log("WebSocket is already connected!");
       return;
@@ -102,7 +116,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
     _websocket.OnOpen += () =>
     {
       Debug.Log("Connection open!");
-      _isConnected = true;
+      _isConnectedProp.Value = true;
     };
 
     _websocket.OnError += (e) =>
@@ -113,7 +127,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
     _websocket.OnClose += async (e) =>
     {
       Debug.Log("Connection closed!");
-      _isConnected = false;
+      _isConnectedProp.Value = false;
       
       // アプリケーション終了中は再接続しない
       if (_isShuttingDown) return;
@@ -242,7 +256,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
   ///</summary>
   public async UniTask DisconnectWebSocket()
   {
-    if (!_isConnected)
+    if (!_isConnectedProp.Value)
     {
       Debug.Log("WebSocket is not connected!");
       return;
@@ -255,20 +269,6 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
     }
 
     await _websocket.Close();
-  }
-
-  ///<summary>
-  /// WebSocketが接続されているかどうかを返す
-  ///</summary>
-  public bool IsWebSocketConnected()
-  {
-    if (_websocket == null)
-    {
-      Debug.Log("WebSocket is not initialized!");
-      return false;
-    }
-
-    return _websocket.State == WebSocketState.Open;
   }
   
   ///<summary>
@@ -389,7 +389,6 @@ interface IWebsocketManager
 {
   public UniTask ConnectWebSocket(string websocketId);
   public UniTask DisconnectWebSocket();
-  public bool IsWebSocketConnected();
   public UniTask<string> GetFrontUrlAsync();
   public UniTask GameEnd();
   public void HealthCheck();

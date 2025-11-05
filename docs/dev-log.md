@@ -197,3 +197,53 @@
 ### 今後の課題
 - 超過分が非常に大きくなった場合の上限設定を検討
 - 長時間プレイ時のバランス調整の必要性を検討
+
+## 2025-01-27 WebSocket接続状況のReactiveProperty公開（R3自動監視版）
+
+### 目的
+- WebSocketの接続状況をReactivePropertyとして公開し、他のコンポーネントからリアクティブに監視できるようにする
+- UIコンポーネントなどが接続状態の変化に応じて自動的に更新される仕組みを提供
+- R3の`Observable.EveryUpdate()`を使って`_websocket.State`を自動監視し、手動更新を不要にする
+
+### 実装概要
+- `WebsocketManager`に`ReactiveProperty<bool> _isConnectedProp`を追加
+- `ReadOnlyReactiveProperty<bool> IsConnectedProp`として公開（外部からの書き込みを防止）
+- `Start()`メソッドでR3の`Observable.EveryUpdate()`を使用して`_websocket.State`を監視
+- `_websocket.State == WebSocketState.Open`なら`true`、それ以外なら`false`をReactivePropertyに設定
+- `DistinctUntilChanged()`で値が変化した時のみ更新（パフォーマンス最適化）
+- 手動でのReactiveProperty更新処理を削除し、自動監視に一本化
+
+### 変更ファイル
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/WebsocketManager.cs`
+  - `ReactiveProperty<bool> _isConnectedProp`を追加
+  - `ReadOnlyReactiveProperty<bool> IsConnectedProp`プロパティを追加
+  - `Start()`メソッドで`Observable.EveryUpdate()`による自動監視を実装
+  - 手動更新処理（`OnOpen`、`OnError`、`OnClose`、`DisconnectWebSocket`内）を削除
+
+### 意図・設計上の判断
+- 高凝集: WebSocket接続状態の管理を`WebsocketManager`内に集約し、ReactivePropertyも同一クラスで管理
+- 低結合: `ReadOnlyReactiveProperty`として公開することで、外部からの直接的な変更を防止し、インターフェースを明確化
+- リアクティブ: R3ライブラリの`Observable.EveryUpdate()`を使用して、接続状態を自動的に監視・更新
+- 簡潔性: 手動更新処理を削除し、状態監視を一元化することでコードを簡潔に
+- パフォーマンス: `DistinctUntilChanged()`により、値が変化した時のみ更新処理を実行
+
+### 使用方法
+```csharp
+// 他のコンポーネントから使用例
+WebsocketManager.Instance.IsConnectedProp.Subscribe(isConnected =>
+{
+    Debug.Log($"WebSocket接続状態: {isConnected}");
+    // UI更新など
+});
+```
+
+### 実装の詳細
+- `Observable.EveryUpdate()`で毎フレーム`_websocket.State`をチェック
+- `_websocket`が`null`の場合は`false`を返す
+- `_websocket.State == WebSocketState.Open`の場合のみ`true`、それ以外は`false`
+- `DistinctUntilChanged()`で前回の値と異なる場合のみ購読者に通知
+- `.AddTo(this)`でGameObject破棄時に自動的に購読を解除
+
+### 今後の課題
+- 接続状態の変化をUIに反映するコンポーネントの実装
+- 接続状態に応じた自動リトライ機能の実装（必要に応じて）
