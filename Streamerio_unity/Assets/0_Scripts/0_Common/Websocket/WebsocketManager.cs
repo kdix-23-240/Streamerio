@@ -256,6 +256,20 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
 
     await _websocket.Close();
   }
+
+  ///<summary>
+  /// WebSocketが接続されているかどうかを返す
+  ///</summary>
+  public bool IsWebSocketConnected()
+  {
+    if (_websocket == null)
+    {
+      Debug.Log("WebSocket is not initialized!");
+      return false;
+    }
+
+    return _websocket.State == WebSocketState.Open;
+  }
   
   ///<summary>
   /// フロントエンドのURLを取得する
@@ -375,6 +389,7 @@ interface IWebsocketManager
 {
   public UniTask ConnectWebSocket(string websocketId);
   public UniTask DisconnectWebSocket();
+  public UniTask GetWebSocketState();
   public UniTask<string> GetFrontUrlAsync();
   public UniTask GameEnd();
   public void HealthCheck();
