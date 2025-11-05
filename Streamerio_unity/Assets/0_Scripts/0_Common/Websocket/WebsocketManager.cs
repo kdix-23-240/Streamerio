@@ -9,7 +9,8 @@ using UnityEngine;
 using NativeWebSocket;
 using R3;
 using UnityEngine.Networking;
-public class WebsocketManager : SingletonBase<WebsocketManager>
+
+public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManager
 {
   private bool _isConnected = false;
   private WebSocket _websocket;
@@ -368,4 +369,13 @@ public enum FrontKey
   enemy1,
   enemy2,
   enemy3,
+}
+
+interface IWebsocketManager
+{
+  public UniTask ConnectWebSocket(string websocketId);
+  public UniTask DisconnectWebSocket();
+  public UniTask<string> GetFrontUrlAsync();
+  public UniTask GameEnd();
+  public void HealthCheck();
 }
