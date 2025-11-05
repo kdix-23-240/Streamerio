@@ -239,7 +239,7 @@ public class WebsocketManager : SingletonBase<WebsocketManager>
   ///<summary>
   /// WebSocketを切断する
   ///</summary>
-  private async UniTask DisconnectWebSocket()
+  public async UniTask DisconnectWebSocket()
   {
     if (!_isConnected)
     {
