@@ -389,7 +389,7 @@ interface IWebsocketManager
 {
   public UniTask ConnectWebSocket(string websocketId);
   public UniTask DisconnectWebSocket();
-  public UniTask GetWebSocketState();
+  public bool IsWebSocketConnected();
   public UniTask<string> GetFrontUrlAsync();
   public UniTask GameEnd();
   public void HealthCheck();
