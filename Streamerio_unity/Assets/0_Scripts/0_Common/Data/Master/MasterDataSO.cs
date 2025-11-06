@@ -39,6 +39,8 @@ namespace Common
             UnityEditor.AssetDatabase.Refresh();
         }
 #endif
+        private bool _isDataFetched = false;
+        public bool IsDataFetched => _isDataFetched;
         
         [SerializeField, Min(0f)]
         private int _timeOutTime = 8;
@@ -55,7 +57,7 @@ namespace Common
         [SerializeField]
         private SerializeDictionary<MasterEnemyType, MasterEnemyStatus> _enemyStatusDictionary;
         public IReadOnlyDictionary<MasterEnemyType, MasterEnemyStatus> EnemyStatusDictionary => _enemyStatusDictionary.ToDictionary();
-
+        
         public async UniTask FetchDataAsync(CancellationToken ct)
         {
             var gameTask    = SpreadSheetClient.GetRequestAsync(SheetType.GameSettings, ct, _timeOutTime);
@@ -108,6 +110,11 @@ namespace Common
                         Speed = ToFloat(enemyRows[MasterEnemyStatus.SpeedKey][i]),
                     });   
             }
+            
+            _isDataFetched = IsValidDataRow(gameRows)
+                             && IsValidDataRow(playerRows)
+                             && IsValidDataRow(ultRows)
+                             && IsValidDataRow(enemyRows);
         }
         
         private bool IsValidDataRow(Dictionary<string, List<object>> dataRows)
@@ -138,6 +145,8 @@ namespace Common
     
     public interface IMasterData
     {
+        bool IsDataFetched { get; }
+        
         MasterGameSetting GameSetting { get; }
         MasterPlayerStatus PlayerStatus { get; }
         IReadOnlyDictionary<MasterUltType, MasterUltStatus> UltStatusDictionary { get; }

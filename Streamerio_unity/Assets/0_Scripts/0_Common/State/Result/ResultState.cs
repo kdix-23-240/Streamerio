@@ -29,7 +29,7 @@ namespace Common.State
         
         public async UniTask ExitAsync(CancellationToken ct)
         {
-            await _windowService.CloseTopAsync(ct);
+            await _loadingScreen.ShowAsync(ct);
         }
     }
 }

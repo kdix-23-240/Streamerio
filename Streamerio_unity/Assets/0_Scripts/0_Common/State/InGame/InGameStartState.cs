@@ -13,16 +13,13 @@ namespace Common.State
 {
     public class InGameStartState : IState
     {
+        private readonly IInGameSetting _inGameSetting;
         private readonly IPlayDataSaveFacade _playDataSaveFacade;
         
         private readonly ILoadingScreen _loadingScreen;
         private readonly ISceneManager _sceneManager;
         
         private readonly IAudioFacade _audioFacade;
-        
-        private readonly IInGameSetting _inGameSetting;
-        
-        private readonly IQRCodeService _qrCodeService;
         
         private readonly IStateManager _stateManager;
         private readonly IState _firstPlayState;
@@ -33,28 +30,24 @@ namespace Common.State
         
         [Inject]
         public InGameStartState(
+            IInGameSetting inGameSetting,
             IPlayDataSaveFacade playDataSaveFacade,
             ILoadingScreen loadingScreen,
             ISceneManager sceneManager,
             IAudioFacade audioFacade,
-            IInGameSetting inGameSetting,
-            IQRCodeService qrCodeService,
             IStateManager stateManager,
             [Key(StateType.FirstPlay)] IState firstPlayState,
             [Key(StateType.PlayFromTitle)] IState playFromTitleState,
             [Key(StateType.InGame)] IState nextState,
             [Key(AnimationType.InGameBackground)] IUIAnimation inGameBackgroundAnimation)
         {
+            _inGameSetting = inGameSetting;
             _playDataSaveFacade = playDataSaveFacade;
             
             _loadingScreen = loadingScreen;
             _sceneManager = sceneManager;
             
             _audioFacade = audioFacade;
-            
-            _inGameSetting = inGameSetting;
-            
-            _qrCodeService = qrCodeService;
             
             _stateManager = stateManager;
             _firstPlayState = firstPlayState;
@@ -66,8 +59,6 @@ namespace Common.State
         
         public async UniTask EnterAsync(CancellationToken ct)
         {
-            WebsocketManager.Instance.ConnectWebSocket(null).Forget();
-            _qrCodeService.UpdateSprite(await WebsocketManager.Instance.GetFrontUrlAsync());
             _audioFacade.PlayAsync(_inGameSetting.BGM, ct).Forget();
             
             if (!_playDataSaveFacade.LoadPlayed())
