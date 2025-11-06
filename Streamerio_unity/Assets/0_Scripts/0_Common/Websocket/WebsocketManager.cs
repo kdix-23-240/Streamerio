@@ -385,6 +385,8 @@ public enum FrontKey
 
 interface IWebsocketManager
 {
+  public ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
+  public IDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
   public UniTask ConnectWebSocket(string websocketId);
   public UniTask DisconnectWebSocket();
   public UniTask<string> GetFrontUrlAsync();
