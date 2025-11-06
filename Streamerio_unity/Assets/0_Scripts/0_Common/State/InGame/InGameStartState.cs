@@ -60,8 +60,8 @@ namespace Common.State
         
         public async UniTask EnterAsync(CancellationToken ct)
         {
-            WebsocketManager.Instance.ConnectWebSocket(null).Forget();
-            _qrCodeService.UpdateSprite(await WebsocketManager.Instance.GetFrontUrlAsync());
+            WebSocketManager.Instance.ConnectWebSocket(null).Forget();
+            _qrCodeService.UpdateSprite(await WebSocketManager.Instance.GetFrontUrlAsync());
             _audioFacade.PlayAsync(_inGameSetting.BGM, ct).Forget();
             
             if (!_playDataSaveFacade.LoadPlayed())

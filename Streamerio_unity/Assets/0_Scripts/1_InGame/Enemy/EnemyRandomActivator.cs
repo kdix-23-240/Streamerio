@@ -16,9 +16,9 @@ public class EnemyRandomActivator : MonoBehaviour
     
     private void Bind()
     {
-        WebsocketManager.Instance.FrontEventDict[FrontKey.enemy3].Subscribe(_ => ActivateStrongEnemy());
-        WebsocketManager.Instance.FrontEventDict[FrontKey.enemy2].Subscribe(_ => ActivateMiddleEnemy());
-        WebsocketManager.Instance.FrontEventDict[FrontKey.enemy1].Subscribe(_ => ActivateWeakEnemy());        
+        WebSocketManager.Instance.FrontEventDict[FrontKey.enemy3].Subscribe(_ => ActivateStrongEnemy());
+        WebSocketManager.Instance.FrontEventDict[FrontKey.enemy2].Subscribe(_ => ActivateMiddleEnemy());
+        WebSocketManager.Instance.FrontEventDict[FrontKey.enemy1].Subscribe(_ => ActivateWeakEnemy());        
     }
     public void ActivateStrongEnemy()
     {

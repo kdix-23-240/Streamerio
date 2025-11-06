@@ -10,7 +10,7 @@ using NativeWebSocket;
 using R3;
 using UnityEngine.Networking;
 
-public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManager
+public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManager
 {
   private WebSocket _websocket;
 
@@ -383,7 +383,7 @@ public enum FrontKey
   enemy3,
 }
 
-interface IWebsocketManager
+interface IWebSocketManager
 {
   public ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
   public IDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }

@@ -36,9 +36,9 @@ namespace OutGame.Result.UI
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         { 
-            if(WebsocketManager.Instance.GameEndSummary != null)
+            if(WebSocketManager.Instance.GameEndSummary != null)
             {
-                WebsocketManager.GameEndSummaryNotification summary = WebsocketManager.Instance.GameEndSummary;
+                WebSocketManager.GameEndSummaryNotification summary = WebSocketManager.Instance.GameEndSummary;
                 _allText.text = (summary.SummaryDetails["all"] ==null || summary.SummaryDetails["all"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["all"].viewer_name;
                 _enemyText.text = (summary.SummaryDetails["enemy"] ==null || summary.SummaryDetails["enemy"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["enemy"].viewer_name;
                 _skillText.text = (summary.SummaryDetails["skill"] ==null || summary.SummaryDetails["skill"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["skill"].viewer_name;

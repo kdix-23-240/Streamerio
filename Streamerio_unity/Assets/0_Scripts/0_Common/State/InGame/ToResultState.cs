@@ -12,7 +12,7 @@ namespace Common.State
         
         public override async UniTask ExitAsync(CancellationToken ct)
         {
-            await WebsocketManager.Instance.GameEnd();
+            await WebSocketManager.Instance.GameEnd();
         }
     }
 }
