@@ -116,7 +116,6 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
     _websocket.OnOpen += () =>
     {
       Debug.Log("Connection open!");
-      _isConnectedProp.Value = true;
     };
 
     _websocket.OnError += (e) =>
@@ -127,7 +126,6 @@ public class WebsocketManager : SingletonBase<WebsocketManager>, IWebsocketManag
     _websocket.OnClose += async (e) =>
     {
       Debug.Log("Connection closed!");
-      _isConnectedProp.Value = false;
       
       // アプリケーション終了中は再接続しない
       if (_isShuttingDown) return;
