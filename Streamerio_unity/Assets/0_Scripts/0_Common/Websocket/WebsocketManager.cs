@@ -20,7 +20,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   private string _roomId = string.Empty;
 
   private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
-  public IDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
+  public IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
   
   private GameEndSummaryNotification _gameEndSummary = null;
   public GameEndSummaryNotification GameEndSummary => _gameEndSummary;
@@ -386,7 +386,7 @@ public enum FrontKey
 interface IWebSocketManager
 {
   public ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
-  public IDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
+  public IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
   public UniTask ConnectWebSocket(string websocketId);
   public UniTask DisconnectWebSocket();
   public UniTask<string> GetFrontUrlAsync();
