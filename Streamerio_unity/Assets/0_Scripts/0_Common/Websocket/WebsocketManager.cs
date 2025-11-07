@@ -57,17 +57,6 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     }
   }
 
-  private void Start()
-  {
-    Observable.EveryUpdate()
-      .Select(_ => _websocket != null && _websocket.State == WebSocketState.Open)
-      .DistinctUntilChanged()
-      .Subscribe(isConnected =>
-      {
-        _isConnectedProp.Value = isConnected;
-      })
-      .AddTo(this);
-  }
   private void Update()
   {
     if (_isConnectedProp.Value)
@@ -113,16 +102,19 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     _websocket.OnOpen += () =>
     {
       Debug.Log("Connection open!");
+      _isConnectedProp.Value = true;
     };
 
     _websocket.OnError += (e) =>
     {
       Debug.LogError($"Error! {e}");
+      _isConnectedProp.Value = false;
     };
 
     _websocket.OnClose += (e) =>
     {
       Debug.Log("Connection closed!");
+      _isConnectedProp.Value = false;
     };
 
     _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
