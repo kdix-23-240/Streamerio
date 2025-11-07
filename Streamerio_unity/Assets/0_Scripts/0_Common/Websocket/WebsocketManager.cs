@@ -25,9 +25,6 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   private GameEndSummaryNotification _gameEndSummary = null;
   public GameEndSummaryNotification GameEndSummary => _gameEndSummary;
 
-  // アプリケーション終了中フラグ
-  private bool _isShuttingDown = false;
-  
   [SerializeField]
   private ApiConfigSO _apiConfigSO;
   
@@ -126,13 +123,6 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     _websocket.OnClose += async (e) =>
     {
       Debug.Log("Connection closed!");
-      
-      // アプリケーション終了中は再接続しない
-      if (_isShuttingDown) return;
-      
-      // 再接続を試行
-      // 現在のwebsocketIdが空の場合は新しくwebsocketIdを生成して接続
-      await ConnectWebSocket(_roomId ?? string.Empty);
     };
 
     _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
@@ -323,7 +313,6 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   ///</summary>
   private async void OnApplicationQuit()
   {
-    _isShuttingDown = true;
     try
     {
       await DisconnectWebSocket();
