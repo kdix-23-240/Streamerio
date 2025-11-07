@@ -120,7 +120,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
       Debug.Log("Error! " + e);
     };
 
-    _websocket.OnClose += async (e) =>
+    _websocket.OnClose += (e) =>
     {
       Debug.Log("Connection closed!");
     };
