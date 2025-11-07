@@ -130,6 +130,34 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   }
 
   ///<summary>
+  /// JSON文字列を指定された型に安全にパースする
+  /// </summary>
+  /// <typeparam name="T">パース対象の型</typeparam>
+  /// <param name="json">JSON文字列</param>
+  /// <param name="data">パース結果（成功時）</param>
+  /// <returns>パースが成功した場合true、失敗した場合false</returns>
+  private bool TryJsonParse<T>(string json, out T data)
+  {
+    data = default(T);
+    
+    if (string.IsNullOrEmpty(json))
+    {
+      return false;
+    }
+    
+    try
+    {
+      data = JsonUtility.FromJson<T>(json);
+      return data != null;
+    }
+    catch (Exception ex)
+    {
+      Debug.LogError($"JSON parse error for type {typeof(T).Name}: {ex.Message}");
+      return false;
+    }
+  }
+
+  ///<summary>
   /// WebSocketからメッセージを受信する
   ///</summary>
   private void ReceiveWebSocketMessage(byte[] bytes)
@@ -139,57 +167,53 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
 
     BaseMessage baseMessage = null;
     MessageType messageType = MessageType.unknown;
-    try
-    {
-      baseMessage = JsonUtility.FromJson<BaseMessage>(message);
-      messageType = (MessageType)Enum.Parse(typeof(MessageType), baseMessage.type);
-    }
-    catch (Exception ex)
-    {
-      Debug.Log($"JSON base parse error: {ex.Message}");
-    }
-
-    if (baseMessage == null || string.IsNullOrEmpty(baseMessage.type))
+    
+    if (!TryJsonParse(message, out baseMessage))
     {
       Debug.Log("No type field in JSON message.");
+      return;
+    }
+
+    if (string.IsNullOrEmpty(baseMessage.type))
+    {
+      Debug.Log("No type field in JSON message.");
+      return;
+    }
+    
+    if (!Enum.TryParse<MessageType>(baseMessage.type, out messageType))
+    {
+      Debug.Log($"MessageType parse error: Unknown message type '{baseMessage.type}'");
       return;
     }
 
     switch (messageType)
     {
       case MessageType.room_created:
-        try
+        if (TryJsonParse(message, out RoomCreatedNotification room))
         {
-          var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
-          if (room != null)
-          {
-            _roomId = room.room_id;
-            break;
-          }
+          _roomId = room.room_id;
         }
-        catch (Exception ex)
+        else
         {
-          Debug.Log($"room_created parse error: {ex.Message}");
+          Debug.Log("Failed to parse room_created message.");
         }
-        Debug.Log("Failed to parse room_created message.");
         break;
       case MessageType.game_event:
-        try
+        if (TryJsonParse(message, out GameEventNotification gameEvent))
         {
-          var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
-          if (gameEvent != null)
+          if (Enum.TryParse<FrontKey>(gameEvent.event_type, true, out var keyType))
           {
-            var keyType = (FrontKey)Enum.Parse(typeof(FrontKey), gameEvent.event_type, true);
             _frontEventDict[keyType]?.OnNext(Unit.Default);
           }
-          
-          break;
+          else
+          {
+            Debug.Log($"FrontKey parse error: Unknown event type '{gameEvent.event_type}'");
+          }
         }
-        catch (Exception ex)
+        else
         {
-          Debug.Log($"game_event parse error: {ex.Message}");
+          Debug.Log("Failed to parse game_event message.");
         }
-        Debug.Log("Failed to parse game_event message.");
         break;
 
       case MessageType.game_end_summary:
