@@ -117,7 +117,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
 
     _websocket.OnError += (e) =>
     {
-      Debug.Log("Error! " + e);
+      Debug.LogError($"Error! {e}");
     };
 
     _websocket.OnClose += (e) =>
