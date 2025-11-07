@@ -247,3 +247,36 @@ WebsocketManager.Instance.IsConnectedProp.Subscribe(isConnected =>
 ### 今後の課題
 - 接続状態の変化をUIに反映するコンポーネントの実装
 - 接続状態に応じた自動リトライ機能の実装（必要に応じて）
+
+## 2025-12-XX WebSocketManagerにIDisposable実装とDisposeパターンの適用
+
+### 目的
+- `OnApplicationQuit`の処理を`IDisposable`の`Dispose`メソッドに移動し、リソース管理を標準的なパターンに統一
+- アプリケーション終了時だけでなく、オブジェクト破棄時にも確実にリソースを解放できるようにする
+- .NET標準のリソース管理パターンに準拠し、保守性を向上させる
+
+### 実装概要
+- `WebSocketManager`クラスに`IDisposable`インターフェースを実装
+- `Dispose()`メソッドを追加し、`OnApplicationQuit`の処理（WebSocket切断）を移動
+- `OnApplicationQuit`から`Dispose()`を呼び出すように変更
+- `Dispose()`内では`DisconnectWebSocket().Forget()`を使用して非同期処理を実行
+
+### 変更ファイル
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/WebsocketManager.cs`
+  - `IDisposable`インターフェースを実装
+  - `Dispose()`メソッドを追加
+  - `OnApplicationQuit()`を`Dispose()`を呼び出すように変更
+
+### 意図・設計上の判断
+- 標準パターン: .NET標準の`IDisposable`パターンに準拠し、リソース管理を明確化
+- 高凝集: WebSocket切断処理を`Dispose()`メソッドに集約し、リソース解放の責務を明確化
+- 低結合: `OnApplicationQuit`は`Dispose()`を呼び出すだけの薄いラッパーにし、実装の詳細を`Dispose()`に集約
+- 非同期処理: `Dispose()`は同期的なメソッドだが、`Forget()`を使用して非同期処理を実行（Unityの`OnApplicationQuit`では同期的に待つことが推奨されていないため）
+
+### 実装の詳細
+- `Dispose()`メソッド内で`DisconnectWebSocket().Forget()`を呼び出し、WebSocket切断を非同期で実行
+- エラーハンドリングを`try-catch`で実装し、エラー発生時もアプリケーション終了を妨げない
+- `OnApplicationQuit`は`async void`から`void`に変更し、`Dispose()`を同期的に呼び出す
+
+### 今後の課題
+- `OnDestroy`でも`Dispose()`を呼び出すようにすることで、オブジェクト破棄時にも確実にリソースを解放する（必要に応じて）

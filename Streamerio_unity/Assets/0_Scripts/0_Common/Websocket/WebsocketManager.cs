@@ -10,7 +10,7 @@ using NativeWebSocket;
 using R3;
 using UnityEngine.Networking;
 
-public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManager
+public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManager, IDisposable
 {
   private WebSocket _websocket;
 
@@ -301,18 +301,26 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
 
 
   ///<summary>
-  /// アプリケーションが終了したときにwebsocketを閉じる
+  /// リソースを解放する
   ///</summary>
-  private async void OnApplicationQuit()
+  public void Dispose()
   {
     try
     {
-      await DisconnectWebSocket();
+      DisconnectWebSocket().Forget();
     }
     catch (Exception ex)
     {
       Debug.Log($"Error during WebSocket disconnection: {ex.Message}");
     }
+  }
+
+  ///<summary>
+  /// アプリケーションが終了したときにwebsocketを閉じる
+  ///</summary>
+  private void OnApplicationQuit()
+  {
+    Dispose();
   }
   
   ///<summary>
