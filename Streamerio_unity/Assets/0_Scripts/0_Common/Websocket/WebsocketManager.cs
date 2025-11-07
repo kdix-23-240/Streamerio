@@ -74,7 +74,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   }
 
   // websocketのコネクションを確立する
-  public async UniTask ConnectWebSocket([CanBeNull] string websocketId)
+  public async UniTask ConnectWebSocket([CanBeNull] string websocketId = null)
   {
     if (_isConnectedProp.Value)
     {
@@ -393,7 +393,7 @@ interface IWebSocketManager
 {
   public ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
   public IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
-  public UniTask ConnectWebSocket(string websocketId);
+  public UniTask ConnectWebSocket(string websocketId = null);
   public UniTask DisconnectWebSocket();
   public UniTask<string> GetFrontUrlAsync();
   public UniTask GameEnd();
