@@ -74,7 +74,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   }
 
   // websocketのコネクションを確立する
-  public async UniTask ConnectWebSocket([CanBeNull] string websocketId = null)
+  public async UniTask ConnectWebSocketAsync([CanBeNull] string websocketId = null)
   {
     if (_isConnectedProp.Value)
     {
@@ -264,7 +264,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   ///<summary>
   /// WebSocketを切断する
   ///</summary>
-  public async UniTask DisconnectWebSocket()
+  public async UniTask DisconnectWebSocketAsync()
   {
     if (!_isConnectedProp.Value)
     {
@@ -300,16 +300,16 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   ///<summary>
   /// ゲーム終了通知
   ///</summary>
-  public async UniTask GameEnd()
+  public async UniTask GameEndAsync()
   {
-    await SendWebSocketMessage( _gameEndResponse );
+    await SendWebSocketMessageAsync( _gameEndResponse );
   }
 
 
   ///<summary>
   /// UnityからWebSocketにメッセージを送信する
   ///</summary>
-  private async UniTask SendWebSocketMessage(string message)
+  private async UniTask SendWebSocketMessageAsync(string message)
   {
     if (_websocket.State == WebSocketState.Closed)
     {
@@ -337,7 +337,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   {
     try
     {
-      DisconnectWebSocket().Forget();
+      DisconnectWebSocketAsync().Forget();
     }
     catch (Exception ex)
     {
@@ -417,9 +417,9 @@ interface IWebSocketManager
 {
   public ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
   public IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
-  public UniTask ConnectWebSocket(string websocketId = null);
-  public UniTask DisconnectWebSocket();
+  public UniTask ConnectWebSocketAsync(string websocketId = null);
+  public UniTask DisconnectWebSocketAsync();
   public UniTask<string> GetFrontUrlAsync();
-  public UniTask GameEnd();
+  public UniTask GameEndAsync();
   public void HealthCheck();
 }
