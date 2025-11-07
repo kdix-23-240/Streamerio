@@ -138,9 +138,11 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     Debug.Log($"Received: {message}");
 
     BaseMessage baseMessage = null;
+    MessageType messageType = MessageType.unknown;
     try
     {
       baseMessage = JsonUtility.FromJson<BaseMessage>(message);
+      messageType = (MessageType)Enum.Parse(typeof(MessageType), baseMessage.type);
     }
     catch (Exception ex)
     {
@@ -153,87 +155,85 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
       return;
     }
 
-    if (baseMessage.type == "room_created")
+    switch (messageType)
     {
-      try
-      {
-        var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
-        if (room != null)
+      case MessageType.room_created:
+        try
         {
-          _roomId = room.room_id;
-          return;
-        }
-      }
-      catch (Exception ex)
-      {
-        Debug.Log($"room_created parse error: {ex.Message}");
-      }
-      Debug.Log("Failed to parse room_created message.");
-      return;
-    }
-
-    if (baseMessage.type == "game_event")
-    {
-      try
-      {
-        var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
-        if (gameEvent != null)
-        {
-          var keyType = (FrontKey)System.Enum.Parse(typeof(FrontKey), gameEvent.event_type, true);
-          _frontEventDict[keyType]?.OnNext(Unit.Default);
-        }
-        
-        return;
-      }
-      catch (Exception ex)
-      {
-        Debug.Log($"game_event parse error: {ex.Message}");
-      }
-      Debug.Log("Failed to parse game_event message.");
-      return;
-    }
-    if (baseMessage.type == "game_end_summary")
-    {
-      try
-      {
-        var root = MiniJSON.Json.Deserialize(message) as Dictionary<string, object>;
-        if (root == null) throw new Exception("root is null");
-
-        _gameEndSummary = new GameEndSummaryNotification();
-
-        // --- team_tops の分解 ---
-        if (root.TryGetValue("team_tops", out var teamObj) &&
-            teamObj is Dictionary<string, object> teamDict)
-        {
-          foreach (var kv in teamDict)
+          var room = JsonUtility.FromJson<RoomCreatedNotification>(message);
+          if (room != null)
           {
-            if (kv.Value is Dictionary<string, object> val)
-            {
-              var detail = new GameEndSummaryNotification.SummaryDetail
-              {
-                count       = val.TryGetValue("count", out var c)
-                  ? Convert.ToInt32(c, CultureInfo.InvariantCulture)
-                  : 0
-                ,
-                viewer_id   = val.TryGetValue("viewer_id", out var vid) ? vid?.ToString() : null,
-                viewer_name = val.TryGetValue("viewer_name", out var vname) ? vname?.ToString() : null,
-              };
-              _gameEndSummary.SummaryDetails[kv.Key] = detail; // "all" / "enemy" / "skill"
-            }
+            _roomId = room.room_id;
+            break;
           }
         }
+        catch (Exception ex)
+        {
+          Debug.Log($"room_created parse error: {ex.Message}");
+        }
+        Debug.Log("Failed to parse room_created message.");
+        break;
+      case MessageType.game_event:
+        try
+        {
+          var gameEvent = JsonUtility.FromJson<GameEventNotification>(message);
+          if (gameEvent != null)
+          {
+            var keyType = (FrontKey)Enum.Parse(typeof(FrontKey), gameEvent.event_type, true);
+            _frontEventDict[keyType]?.OnNext(Unit.Default);
+          }
+          
+          break;
+        }
+        catch (Exception ex)
+        {
+          Debug.Log($"game_event parse error: {ex.Message}");
+        }
+        Debug.Log("Failed to parse game_event message.");
+        break;
+
+      case MessageType.game_end_summary:
+        try
+        {
+          var root = MiniJSON.Json.Deserialize(message) as Dictionary<string, object>;
+          if (root == null) throw new Exception("root is null");
+
+          _gameEndSummary = new GameEndSummaryNotification();
+
+          // --- team_tops の分解 ---
+          if (root.TryGetValue("team_tops", out var teamObj) &&
+              teamObj is Dictionary<string, object> teamDict)
+          {
+            foreach (var kv in teamDict)
+            {
+              if (kv.Value is Dictionary<string, object> val)
+              {
+                var detail = new GameEndSummaryNotification.SummaryDetail
+                {
+                  count       = val.TryGetValue("count", out var c)
+                    ? Convert.ToInt32(c, CultureInfo.InvariantCulture)
+                    : 0
+                  ,
+                  viewer_id   = val.TryGetValue("viewer_id", out var vid) ? vid?.ToString() : null,
+                  viewer_name = val.TryGetValue("viewer_name", out var vname) ? vname?.ToString() : null,
+                };
+                _gameEndSummary.SummaryDetails[kv.Key] = detail; // "all" / "enemy" / "skill"
+              }
+            }
+          }
+          
+          break;
+        }
+        catch (Exception ex)
+        {
+          Debug.Log($"game_end_summary parse error: {ex.Message}");
+        }
         
-        return;
-      }
-      catch (Exception ex)
-      {
-        Debug.Log($"game_event parse error: {ex.Message}");
-      }
-      Debug.Log("Failed to parse game_event message.");
-      return;
+        Debug.Log("Failed to parse game_event message.");
+        break;
     }
 
-    Debug.Log($"Unhandled JSON payload type: {baseMessage.type}");
+    Debug.Log($"Unhandled JSON payload type: {messageType}");
     return;
   }
 
@@ -373,9 +373,20 @@ public enum FrontKey
   skill1,
   skill2,
   skill3,
-  enemy1,
+  enemy1, 
   enemy2,
   enemy3,
+}
+
+///<summary>
+/// WebSocketメッセージのタイプを表すEnum
+///</summary>
+public enum MessageType
+{
+  room_created,
+  game_event,
+  game_end_summary,
+  unknown,
 }
 
 interface IWebSocketManager

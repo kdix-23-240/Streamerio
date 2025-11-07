@@ -280,3 +280,38 @@ WebsocketManager.Instance.IsConnectedProp.Subscribe(isConnected =>
 
 ### 今後の課題
 - `OnDestroy`でも`Dispose()`を呼び出すようにすることで、オブジェクト破棄時にも確実にリソースを解放する（必要に応じて）
+
+## 2025-12-XX baseMessage.typeをEnum化
+
+### 目的
+- `baseMessage.type`を文字列からEnumに変更し、型安全性を向上させる
+- 文字列比較によるタイプミスを防ぎ、IDEの補完機能を活用できるようにする
+- メッセージタイプの管理を一元化し、保守性を向上させる
+
+### 実装概要
+- `MessageType` Enumを新規作成（`room_created`, `game_event`, `game_end_summary`）
+- `BaseMessage`, `RoomCreatedNotification`, `GameEventNotification`の`type`フィールドは文字列のまま維持（UnityのJsonUtilityの制約のため）
+- JSONから文字列として読み取った後、`Enum.Parse`で`MessageType`に変換
+- 文字列比較（`baseMessage.type == "room_created"`）をEnum比較（`messageType == MessageType.room_created`）に変更
+
+### 変更ファイル
+- `Streamerio_unity/Assets/0_Scripts/0_Common/Websocket/WebsocketManager.cs`
+  - `MessageType` Enumを追加
+  - `ReceiveWebSocketMessage`メソッドで文字列からEnumへの変換処理を追加
+  - 文字列比較をEnum比較に変更
+
+### 意図・設計上の判断
+- 型安全性: Enumを使用することで、コンパイル時にタイプミスを検出可能
+- 保守性: メッセージタイプの追加・変更時にEnumを更新するだけで、使用箇所をIDEで一括検索可能
+- 互換性: UnityのJsonUtilityはEnumを直接文字列として扱えないため、文字列として読み取った後でEnumに変換する方式を採用
+- エラーハンドリング: `Enum.Parse`で変換失敗時に適切なエラーログを出力し、デバッグを容易にする
+
+### 実装の詳細
+- JSONから文字列として`baseMessage.type`を読み取り
+- `System.Enum.Parse(typeof(MessageType), baseMessage.type, true)`でEnumに変換（大文字小文字を無視）
+- 変換に失敗した場合はエラーログを出力して処理を中断
+- 変換後の`MessageType`を使用して分岐処理を実行
+
+### 今後の課題
+- 新しいメッセージタイプが追加された場合は、`MessageType` Enumにも追加が必要
+- UnityのJsonUtilityの代わりに、より柔軟なJSONライブラリ（例: Newtonsoft.Json）の導入を検討
