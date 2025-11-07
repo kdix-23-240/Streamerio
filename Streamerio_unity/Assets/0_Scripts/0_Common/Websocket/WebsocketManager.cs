@@ -36,6 +36,10 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
 
   private string _backendWsBaseUrl = null;
 
+  private string _frontendQueryParamFormat = null;
+  
+  private string _gameEndResponse = null;
+
   protected override void Awake()
   {
     base.Awake();
@@ -45,6 +49,8 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
       _frontendUrlFormat = _apiConfigSO.frontendUrlFormat;
       _backendHttpUrl = _apiConfigSO.backendHttpUrl;
       _backendWsBaseUrl = _apiConfigSO.backendWsUrl;
+      _frontendQueryParamFormat = _apiConfigSO.frontendQueryParamFormat;
+      _gameEndResponse = _apiConfigSO.gameEndResponse;
     }
     else
     {
@@ -84,7 +90,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     }
     else
     {
-      websocketUrl = ZString.Format("{0}?room_id={1}", _backendWsBaseUrl, websocketId);
+      websocketUrl = ZString.Format(_frontendQueryParamFormat, _backendWsBaseUrl, websocketId);
     }
     
     _websocket = new WebSocket(websocketUrl);
@@ -272,7 +278,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   ///</summary>
   public async UniTask GameEnd()
   {
-    await SendWebSocketMessage( "{\"type\": \"game_end\" }" );
+    await SendWebSocketMessage( _gameEndResponse );
   }
 
 
