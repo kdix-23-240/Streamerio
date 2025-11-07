@@ -43,6 +43,7 @@ public class GlobalLifetimeScope : LifetimeScope
         builder.Register<IWindowService, WindowService>(Lifetime.Singleton);
         builder.Register<IOverlayService, OverlayService>(Lifetime.Singleton);
         builder.Register<IDialogService, DialogService>(Lifetime.Singleton);
+        builder.Register<IWebSocketManager, WebSocketManager>(Lifetime.Singleton);
 
         //builder.RegisterEntryPoint<TestWindow>();
         //builder.RegisterEntryPoint<TestOverlay>();
