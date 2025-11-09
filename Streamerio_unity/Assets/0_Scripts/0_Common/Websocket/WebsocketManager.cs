@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Common;
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
@@ -20,7 +21,9 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
 
   private string _roomId = string.Empty;
 
-  private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = new Dictionary<FrontKey, Subject<Unit>>();
+  private Dictionary<FrontKey, Subject<Unit>> _frontEventDict = Enum.GetValues(typeof(FrontKey))
+    .Cast<FrontKey>()
+    .ToDictionary(key => key, key => new Subject<Unit>());
   public IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict => _frontEventDict;
   
   private GameEndSummaryNotification _gameEndSummary = null;
@@ -30,38 +33,10 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   private ApiConfigSO _apiConfigSO;
   
   private string _qrCodeURL = string.Empty;
-
-  private string _frontendUrlFormat = null; 
-
-  private string _backendHttpUrl = null;
-
-  private string _backendWsBaseUrl = null;
-
-  private string _frontendQueryParamFormat = null;
   
-  private string _gameEndResponse = null;
-
   protected override void Awake()
   {
     base.Awake();
-    
-    if (_apiConfigSO != null)
-    {
-      _frontendUrlFormat = _apiConfigSO.frontendUrlFormat;
-      _backendHttpUrl = _apiConfigSO.backendHttpUrl;
-      _backendWsBaseUrl = _apiConfigSO.backendWsUrl;
-      _frontendQueryParamFormat = _apiConfigSO.frontendQueryParamFormat;
-      _gameEndResponse = _apiConfigSO.gameEndResponse;
-    }
-    else
-    {
-      Debug.LogError("ApiConfigSO is not assigned. Please assign an ApiConfigSO asset in the Inspector.");
-    }
-    
-    foreach (FrontKey key in Enum.GetValues(typeof(FrontKey)))
-    {
-      _frontEventDict[key] = new Subject<Unit>();
-    }
   }
 
   void ITickable.Tick()
@@ -87,11 +62,11 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     string websocketUrl;
     if (string.IsNullOrEmpty(websocketId))
     {
-      websocketUrl = _backendWsBaseUrl;
+      websocketUrl = _apiConfigSO.backendWsUrl;
     }
     else
     {
-      websocketUrl = ZString.Format(_frontendQueryParamFormat, _backendWsBaseUrl, websocketId);
+      websocketUrl = ZString.Format(_apiConfigSO.frontendQueryParamFormat, _apiConfigSO.backendWsUrl, websocketId);
     }
     
     _websocket = new WebSocket(websocketUrl);
@@ -293,7 +268,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     }
     
     await UniTask.WaitWhile(() => _roomId == string.Empty);
-    _qrCodeURL = ZString.Format(_frontendUrlFormat, _roomId);
+    _qrCodeURL = ZString.Format(_apiConfigSO.frontendUrlFormat, _roomId);
     
     return _qrCodeURL;
   }
@@ -303,7 +278,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   ///</summary>
   public async UniTask GameEndAsync()
   {
-    await SendWebSocketMessageAsync( _gameEndResponse );
+    await SendWebSocketMessageAsync( _apiConfigSO.gameEndResponse );
   }
 
 
@@ -326,7 +301,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   ///</summary>
   public void HealthCheck()
   {
-    UnityWebRequest.Get(_backendHttpUrl).SendWebRequest();
+    UnityWebRequest.Get(_apiConfigSO.backendHttpUrl).SendWebRequest();
     Debug.Log("HealthCheck");
   }
 
