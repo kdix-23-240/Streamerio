@@ -9,8 +9,9 @@ using UnityEngine;
 using NativeWebSocket;
 using R3;
 using UnityEngine.Networking;
+using VContainer.Unity;
 
-public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManager, IDisposable
+public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManager, IDisposable, ITickable
 {
   private WebSocket _websocket;
 
@@ -63,7 +64,7 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     }
   }
 
-  private void Update()
+  void ITickable.Tick()
   {
     if (_isConnectedProp.Value)
     {
