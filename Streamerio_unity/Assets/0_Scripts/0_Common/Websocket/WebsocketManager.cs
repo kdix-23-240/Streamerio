@@ -52,7 +52,7 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
   }
 
   // websocketのコネクションを確立する
-  public async UniTask ConnectWebSocketAsync([CanBeNull] string websocketId = null, CancellationToken cancellationToken)
+  public async UniTask ConnectWebSocketAsync([CanBeNull] string websocketId = null, CancellationToken cancellationToken = default)
   {
     if (_isConnectedProp.Value)
     {
@@ -109,7 +109,10 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
     _ = _websocket.Connect(); 
     Debug.Log("WebSocket connecting...");
     // _roomIdが設定されるまで待機
-    await UniTask.WhenAny( UniTask.WaitWhile(() => _roomId == string.Empty), UniTask.WaitForSeconds(_connectionTimeout));
+    await UniTask.WhenAny(
+      UniTask.WaitWhile(() => _roomId == string.Empty, cancellationToken: cancellationToken),
+      UniTask.WaitForSeconds(_connectionTimeout, cancellationToken: cancellationToken)
+    );
     Debug.Log("WebSocket connected!");
     return;
   }
