@@ -33,6 +33,8 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
   
   private string _qrCodeURL = string.Empty;
 
+  private float _connectionTimeout = 10f;
+
   public WebSocketManager(ApiConfigSO apiConfigSO)
   {
     _apiConfigSO = apiConfigSO;
@@ -103,11 +105,10 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
       ReceiveWebSocketMessage(bytes);
     };
 
-    // await _websocket.Connect();
     _ = _websocket.Connect(); 
     Debug.Log("WebSocket connecting...");
     // _roomIdが設定されるまで待機
-    await UniTask.WhenAny( UniTask.WaitWhile(() => _roomId == string.Empty), UniTask.WaitForSeconds(10f));
+    await UniTask.WhenAny( UniTask.WaitWhile(() => _roomId == string.Empty), UniTask.WaitForSeconds(_connectionTimeout));
     Debug.Log("WebSocket connected!");
     return;
   }
