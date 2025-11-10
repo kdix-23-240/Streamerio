@@ -103,7 +103,12 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
       ReceiveWebSocketMessage(bytes);
     };
 
-    await _websocket.Connect();
+    // await _websocket.Connect();
+    _ = _websocket.Connect(); 
+    Debug.Log("WebSocket connecting...");
+    // _roomIdが設定されるまで待機
+    await UniTask.WhenAny( UniTask.WaitWhile(() => _roomId == string.Empty), UniTask.WaitForSeconds(10f));
+    Debug.Log("WebSocket connected!");
     return;
   }
 
@@ -267,14 +272,13 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
   ///<summary>
   /// フロントエンドのURLを取得する
   ///</summary>
-  public async UniTask<string> GetFrontUrlAsync()
+  public string GetFrontUrl()
   {
-    if (_qrCodeURL != string.Empty)
+    if (_roomId == string.Empty)
     {
-      return _qrCodeURL;
+      Debug.LogError("Room ID is not set!");
+      return string.Empty;
     }
-    
-    await UniTask.WaitWhile(() => _roomId == string.Empty);
     _qrCodeURL = ZString.Format(_apiConfigSO.frontendUrlFormat, _roomId);
     
     return _qrCodeURL;
@@ -395,7 +399,7 @@ public interface IWebSocketManager
   WebSocketManager.GameEndSummaryNotification GameEndSummary { get; }
   UniTask ConnectWebSocketAsync(string websocketId = null);
   void DisconnectWebSocket();
-  UniTask<string> GetFrontUrlAsync();
+  string GetFrontUrl();
   UniTask GameEndAsync();
   void HealthCheck();
 }
