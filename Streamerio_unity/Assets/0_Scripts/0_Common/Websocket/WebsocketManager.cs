@@ -238,8 +238,12 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
         {
           Debug.LogError($"game_end_summary parse error: {ex.Message}");
         }
-        
-        Debug.LogError("Failed to parse game_event message.");
+          
+        Debug.LogError("Failed to parse game_end_summary message.");
+        break;
+
+      default:
+        Debug.LogError($"Unhandled JSON payload type: {messageType}");
         break;
     }
 
