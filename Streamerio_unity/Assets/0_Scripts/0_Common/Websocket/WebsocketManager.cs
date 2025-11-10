@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Common;
 using Cysharp.Text;
 using Cysharp.Threading.Tasks;
@@ -51,7 +52,7 @@ public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
   }
 
   // websocketのコネクションを確立する
-  public async UniTask ConnectWebSocketAsync([CanBeNull] string websocketId = null)
+  public async UniTask ConnectWebSocketAsync([CanBeNull] string websocketId = null, CancellationToken cancellationToken)
   {
     if (_isConnectedProp.Value)
     {
@@ -398,7 +399,7 @@ public interface IWebSocketManager
   ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
   IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
   WebSocketManager.GameEndSummaryNotification GameEndSummary { get; }
-  UniTask ConnectWebSocketAsync(string websocketId = null);
+  UniTask ConnectWebSocketAsync(string websocketId = null, CancellationToken cancellationToken = default);
   void DisconnectWebSocket();
   string GetFrontUrl();
   UniTask GameEndAsync();
