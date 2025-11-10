@@ -315,3 +315,40 @@ WebsocketManager.Instance.IsConnectedProp.Subscribe(isConnected =>
 ### 今後の課題
 - 新しいメッセージタイプが追加された場合は、`MessageType` Enumにも追加が必要
 - UnityのJsonUtilityの代わりに、より柔軟なJSONライブラリ（例: Newtonsoft.Json）の導入を検討
+
+## 2025-12-XX SkillRandomActivatorへの依存性注入設定
+
+### 目的
+- `SkillRandomActivator`に`GlobalLifetimeScope`で登録された`IWebSocketManager`のインスタンスを注入できるようにする
+- VContainerの依存性注入システムを活用し、コンポーネント間の結合を緩和する
+- `[Inject]`アトリビュートを使用した依存性注入を正しく動作させる
+
+### 実装概要
+- `InGameLifetimeScope`の`Configure`メソッドに`SkillRandomActivator`の登録を追加
+- `RegisterComponentInHierarchy<SkillRandomActivator>()`を使用して、シーン内の`SkillRandomActivator`コンポーネントをVContainerに登録
+- `InGameLifetimeScope`は`base.Configure(builder)`を呼び出しているため、親スコープ（`GlobalLifetimeScope`）で登録された`IWebSocketManager`が利用可能
+
+### 変更ファイル
+- `Streamerio_unity/Assets/0_Scripts/1_InGame/InGameLifetimeScope.cs`
+  - `RegisterComponentInHierarchy<SkillRandomActivator>()`を追加
+
+### 意図・設計上の判断
+- 高凝集: 依存性注入の設定を`LifetimeScope`に集約し、コンポーネントの登録を一元管理
+- 低結合: `SkillRandomActivator`は`IWebSocketManager`インターフェースに依存し、具体的な実装クラス（`WebSocketManager`）に直接依存しない
+- 依存性注入: VContainerの標準的なパターン（`RegisterComponentInHierarchy`）を使用し、`[Inject]`アトリビュートによる自動注入を実現
+- スコープ継承: `InGameLifetimeScope`が`GlobalLifetimeScope`の子スコープとして動作し、親スコープで登録されたシングルトンインスタンスを利用可能
+
+### 実装の詳細
+- `SkillRandomActivator`は`[Inject]`アトリビュートが付いた`Construct`メソッドを持っている
+- `RegisterComponentInHierarchy`により、シーン内の`SkillRandomActivator`コンポーネントがVContainerに登録される
+- VContainerが自動的に`Construct`メソッドを呼び出し、`GlobalLifetimeScope`で登録された`IWebSocketManager`のインスタンスを注入する
+- `GlobalLifetimeScope`で`IWebSocketManager`は`Lifetime.Singleton`として登録されているため、同じインスタンスが注入される
+
+### 使用方法
+- `SkillRandomActivator`コンポーネントをシーンに配置する
+- `InGameLifetimeScope`が存在するシーンで、VContainerが自動的に依存性を注入する
+- `SkillRandomActivator`の`Construct`メソッドが呼び出され、`_webSocketManager`フィールドに`IWebSocketManager`のインスタンスが設定される
+
+### 今後の課題
+- 他の`MonoBehaviour`コンポーネントでも同様の依存性注入が必要な場合は、適切な`LifetimeScope`で登録する必要がある
+- `EnemyRandomActivator`など、同様のパターンを持つコンポーネントも確認し、必要に応じて登録を追加する

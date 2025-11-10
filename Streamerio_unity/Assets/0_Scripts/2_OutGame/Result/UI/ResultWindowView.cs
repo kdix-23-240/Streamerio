@@ -23,11 +23,12 @@ namespace OutGame.Result.UI
         private TMP_Text _skillText;
         
         private IUIAnimation _clickTextAnimation;
-        
+        private IWebSocketManager _webSocketManager;
         [Inject]
-        public void Construct([Key(AnimationType.FlashText)] IUIAnimation clickTextAnimation)
+        public void Construct([Key(AnimationType.FlashText)] IUIAnimation clickTextAnimation, IWebSocketManager webSocketManager)
         {
             _clickTextAnimation = clickTextAnimation;
+            _webSocketManager = webSocketManager;
         }
 
         /// <summary>
@@ -36,9 +37,9 @@ namespace OutGame.Result.UI
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         { 
-            if(WebSocketManager.Instance.GameEndSummary != null)
+            if(_webSocketManager.GameEndSummary != null)
             {
-                WebSocketManager.GameEndSummaryNotification summary = WebSocketManager.Instance.GameEndSummary;
+                WebSocketManager.GameEndSummaryNotification summary = _webSocketManager.GameEndSummary;
                 _allText.text = (summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.AllKey] ==null || summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.AllKey].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.AllKey].viewer_name;
                 _enemyText.text = (summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.EnemyKey] ==null || summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.EnemyKey].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.EnemyKey].viewer_name;
                 _skillText.text = (summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.SkillKey] ==null || summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.SkillKey].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.SkillKey].viewer_name;

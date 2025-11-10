@@ -23,6 +23,8 @@ namespace Common.State
         
         private readonly IQRCodeService _qrCodeService;
         
+        private readonly IWebSocketManager _webSocketManager;
+        
         private readonly IStateManager _stateManager;
         private readonly IState _firstPlayState;
         private readonly IState _playFromTitleState;
@@ -36,6 +38,7 @@ namespace Common.State
             IAudioFacade audioFacade,
             IInGameSetting inGameSetting,
             IQRCodeService qrCodeService,
+            IWebSocketManager webSocketManager,
             IStateManager stateManager,
             [Key(StateType.FirstPlay)] IState firstPlayState,
             [Key(StateType.PlayFromTitle)] IState playFromTitleState,
@@ -52,6 +55,8 @@ namespace Common.State
             
             _qrCodeService = qrCodeService;
             
+            _webSocketManager = webSocketManager;
+            
             _stateManager = stateManager;
             _firstPlayState = firstPlayState;
             _playFromTitleState = playFromTitleState;
@@ -60,8 +65,8 @@ namespace Common.State
         
         public async UniTask EnterAsync(CancellationToken ct)
         {
-            WebSocketManager.Instance.ConnectWebSocketAsync(null).Forget();
-            _qrCodeService.UpdateSprite(await WebSocketManager.Instance.GetFrontUrlAsync());
+            _webSocketManager.ConnectWebSocketAsync(null).Forget();
+            _qrCodeService.UpdateSprite(await _webSocketManager.GetFrontUrlAsync());
             _audioFacade.PlayAsync(_inGameSetting.BGM, ct).Forget();
             
             if (!_playDataSaveFacade.LoadPlayed())

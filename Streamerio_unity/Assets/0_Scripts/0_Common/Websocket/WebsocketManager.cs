@@ -12,7 +12,7 @@ using R3;
 using UnityEngine.Networking;
 using VContainer.Unity;
 
-public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManager, IDisposable, ITickable
+public class WebSocketManager : IWebSocketManager, IDisposable, ITickable
 {
   private WebSocket _websocket;
 
@@ -29,19 +29,18 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   private GameEndSummaryNotification _gameEndSummary = null;
   public GameEndSummaryNotification GameEndSummary => _gameEndSummary;
 
-  [SerializeField]
-  private ApiConfigSO _apiConfigSO;
+  private readonly ApiConfigSO _apiConfigSO;
   
   private string _qrCodeURL = string.Empty;
-  
-  protected override void Awake()
-  {
-    base.Awake();
-  }
 
+  public WebSocketManager(ApiConfigSO apiConfigSO)
+  {
+    _apiConfigSO = apiConfigSO;
+  }
+  
   void ITickable.Tick()
   {
-    if (_isConnectedProp.Value)
+    if (_isConnectedProp.Value && _websocket != null)
     {
     #if !UNITY_WEBGL || UNITY_EDITOR
       _websocket.DispatchMessageQueue();
@@ -99,7 +98,10 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
       _isConnectedProp.Value = false;
     };
 
-    _websocket.OnMessage += (bytes) => ReceiveWebSocketMessage(bytes);
+    _websocket.OnMessage += (bytes) =>
+    {
+      ReceiveWebSocketMessage(bytes);
+    };
 
     await _websocket.Connect();
     return;
@@ -138,6 +140,12 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
   ///</summary>
   private void ReceiveWebSocketMessage(byte[] bytes)
   {
+    if (bytes == null || bytes.Length == 0)
+    {
+      Debug.LogWarning("[WebSocket] Received empty or null message");
+      return;
+    }
+    
     var message = System.Text.Encoding.UTF8.GetString(bytes);
     Debug.Log($"Received: {message}");
 
@@ -158,22 +166,24 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
     
     if (!Enum.TryParse<MessageType>(baseMessage.type, out messageType))
     {
-      Debug.Log($"MessageType parse error: Unknown message type '{baseMessage.type}'");
+      Debug.LogError($"MessageType parse error: Unknown message type '{baseMessage.type}'");
       return;
     }
 
     switch (messageType)
     {
       case MessageType.room_created:
+        Debug.Log("room_createdを受け取った");
         if (TryJsonParse(message, out RoomCreatedNotification room))
         {
           _roomId = room.room_id;
         }
         else
         {
-          Debug.Log("Failed to parse room_created message.");
+          Debug.LogError("Failed to parse room_created message.");
         }
         break;
+        
       case MessageType.game_event:
         if (TryJsonParse(message, out GameEventNotification gameEvent))
         {
@@ -183,12 +193,12 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
           }
           else
           {
-            Debug.Log($"FrontKey parse error: Unknown event type '{gameEvent.event_type}'");
+            Debug.LogError($"FrontKey parse error: Unknown event type '{gameEvent.event_type}'");
           }
         }
         else
         {
-          Debug.Log("Failed to parse game_event message.");
+          Debug.LogError("Failed to parse game_event message.");
         }
         break;
 
@@ -226,14 +236,13 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
         }
         catch (Exception ex)
         {
-          Debug.Log($"game_end_summary parse error: {ex.Message}");
+          Debug.LogError($"game_end_summary parse error: {ex.Message}");
         }
         
-        Debug.Log("Failed to parse game_event message.");
+        Debug.LogError("Failed to parse game_event message.");
         break;
     }
 
-    Debug.Log($"Unhandled JSON payload type: {messageType}");
     return;
   }
 
@@ -320,14 +329,6 @@ public class WebSocketManager : SingletonBase<WebSocketManager>, IWebSocketManag
       Debug.Log($"Error during WebSocket disconnection: {ex.Message}");
     }
   }
-
-  ///<summary>
-  /// アプリケーションが終了したときにwebsocketを閉じる
-  ///</summary>
-  private void OnApplicationQuit()
-  {
-    Dispose();
-  }
   
   ///<summary>
   /// JSONの型定義
@@ -389,13 +390,14 @@ public enum MessageType
   unknown,
 }
 
-interface IWebSocketManager
+public interface IWebSocketManager
 {
-  public ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
-  public IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
-  public UniTask ConnectWebSocketAsync(string websocketId = null);
-  public UniTask DisconnectWebSocketAsync();
-  public UniTask<string> GetFrontUrlAsync();
-  public UniTask GameEndAsync();
-  public void HealthCheck();
+  ReadOnlyReactiveProperty<bool> IsConnectedProp { get; }
+  IReadOnlyDictionary<FrontKey, Subject<Unit>> FrontEventDict { get; }
+  WebSocketManager.GameEndSummaryNotification GameEndSummary { get; }
+  UniTask ConnectWebSocketAsync(string websocketId = null);
+  UniTask DisconnectWebSocketAsync();
+  UniTask<string> GetFrontUrlAsync();
+  UniTask GameEndAsync();
+  void HealthCheck();
 }
