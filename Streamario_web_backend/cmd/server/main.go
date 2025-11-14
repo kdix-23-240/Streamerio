@@ -88,7 +88,17 @@ func main() {
 	eventService := service.NewEventService(redisCounter, eventRepo, ps, eventLogger)
 	sessionService := service.NewGameSessionService(roomService, eventRepo, viewerRepo, redisCounter, nil, sessionLogger)
 	viewerService := service.NewViewerService(viewerRepo)
-	apiHandler := handler.NewAPIHandler(roomService, eventService, sessionService, viewerService)
+	logTokenService, err := service.NewLogTokenService(
+		cfg.LogRelayTokenSecret,
+		cfg.LogRelayTokenTTL,
+		cfg.LogRelayDefaultScopes,
+		cfg.LogRelayAllowedScopes,
+	)
+	if err != nil {
+		log.Error("failed to init log token service", slog.Any("error", err))
+		os.Exit(1)
+	}
+	apiHandler := handler.NewAPIHandler(roomService, eventService, sessionService, viewerService, logTokenService).WithLogger(appLogger.With(slog.String("component", "handler")))
 
 	// 10. Echo フレームワーク初期化 & ミドルウェア
 	e := echo.New()
@@ -123,6 +133,7 @@ func main() {
 	api.GET("/rooms/:id/stats", apiHandler.GetRoomStats)
 	api.GET("/rooms/:id/results", apiHandler.GetRoomResult)
 	api.POST("/viewers/set_name", apiHandler.SetViewerName)
+	api.POST("/log-token", apiHandler.IssueLogToken)
 
 	// 13. サーバ起動
 	log.Info("starting http server", slog.String("port", cfg.Port))

@@ -16,11 +16,34 @@ type APIHandler struct {
 	eventService   *service.EventService
 	sessionService *service.GameSessionService
 	viewerService  *service.ViewerService
+	logTokenService *service.LogTokenService
+	logger          *slog.Logger
 }
 
 // NewAPIHandler: 依存するサービスを束ねて構築
-func NewAPIHandler(roomService *service.RoomService, eventService *service.EventService, sessionService *service.GameSessionService, viewerService *service.ViewerService) *APIHandler {
-	return &APIHandler{roomService: roomService, eventService: eventService, sessionService: sessionService, viewerService: viewerService}
+func NewAPIHandler(
+	roomService *service.RoomService,
+	eventService *service.EventService,
+	sessionService *service.GameSessionService,
+	viewerService *service.ViewerService,
+	logTokenService *service.LogTokenService,
+) *APIHandler {
+	return &APIHandler{
+		roomService:     roomService,
+		eventService:    eventService,
+		sessionService:  sessionService,
+		viewerService:   viewerService,
+		logTokenService: logTokenService,
+		logger:          slog.Default(),
+	}
+}
+
+func (h *APIHandler) WithLogger(logger *slog.Logger) *APIHandler {
+	if logger == nil {
+		return h
+	}
+	h.logger = logger
+	return h
 }
 
 // GetOrCreateViewerID: 視聴者端末識別用の ID を払い出す
@@ -80,6 +103,60 @@ func (h *APIHandler) SetViewerName(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"viewer_id": viewer.ID,
 		"name":      name,
+	})
+}
+
+// IssueLogToken: Cloudflare Worker 向けのログトークンを発行
+func (h *APIHandler) IssueLogToken(c echo.Context) error {
+	var req struct {
+		ClientID string   `json:"client_id"`
+		ViewerID string   `json:"viewer_id"`
+		RoomID   string   `json:"room_id"`
+		Platform string   `json:"platform"`
+		Scopes   []string `json:"scopes"`
+	}
+	if err := c.Bind(&req); err != nil {
+		h.logger.Warn("invalid_log_token_body", slog.Any("error", err))
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid body"})
+	}
+
+	clientID := req.ClientID
+	if clientID == "" {
+		clientID = req.ViewerID
+	}
+	if clientID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "client_id or viewer_id is required"})
+	}
+	if req.RoomID == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "room_id is required"})
+	}
+	if _, err := h.roomService.GetRoom(req.RoomID); err != nil {
+		h.logger.Warn("log_token_room_not_found", slog.String("room_id", req.RoomID), slog.Any("error", err))
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "room not found"})
+	}
+
+	result, err := h.logTokenService.IssueToken(service.LogTokenIssueInput{
+		ClientID: clientID,
+		ViewerID: req.ViewerID,
+		RoomID:   req.RoomID,
+		Platform: req.Platform,
+		Scopes:   req.Scopes,
+	})
+	if err != nil {
+		h.logger.Error("issue_log_token_failed", slog.String("room_id", req.RoomID), slog.Any("error", err))
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"token":       result.Token,
+		"issued_at":   result.IssuedAt,
+		"expires_at":  result.ExpiresAt,
+		"scopes":      result.Scopes,
+		"client_id":   clientID,
+		"viewer_id":   req.ViewerID,
+		"room_id":     req.RoomID,
+		"platform":    req.Platform,
+		"ttl_seconds": int(result.ExpiresAt.Sub(result.IssuedAt).Seconds()),
 	})
 }
 
