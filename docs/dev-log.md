@@ -226,3 +226,5 @@
 - GitHub Actions (`.github/workflows/deploy.yml`) を更新し、REST API（`cmd/server`）と Unity WebSocket（`cmd/unityws`）の 2 イメージをビルドして Artifact Registry にプッシュ。
 - Cloud Run も `streamario-web-backend` と `streamario-unityws` の 2 サービスを自動デプロイするようにし、後者には `UNITY_WS_PORT=8080` を明示設定して $PORT と整合させた。
 - 既存 Secret（`DATABASE_URL`, `REDIS_URL`, `FRONTEND_URL`）を使い回しつつ、WebSocket サービス側では DB/Redis のみ注入することで高凝集（専門の役割）と低結合（共通依存のみ共有）を維持。
+
+
