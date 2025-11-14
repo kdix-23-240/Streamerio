@@ -1,6 +1,7 @@
 using Common;
 using Common.Audio;
 using Common.Booster;
+using Common.Network;
 using Common.QRCode;
 using Common.Save;
 using Common.Scene;
@@ -10,7 +11,6 @@ using Common.UI.Display.Overlay;
 using Common.UI.Display.Window;
 using Common.UI.Loading;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -23,6 +23,8 @@ public class GlobalLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterEntryPoint<GlobalBooster>();
+
+        builder.Register<INetworkConnection, NetworkConnection>(Lifetime.Singleton);
         
         builder.RegisterInstance<IMasterData>(_masterDataSO);
         

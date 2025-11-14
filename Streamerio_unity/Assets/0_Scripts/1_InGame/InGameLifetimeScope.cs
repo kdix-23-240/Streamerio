@@ -1,6 +1,7 @@
 using Common.Booster;
 using Common.Scene;
 using Common.State;
+using Common.UI.Animation;
 using Common.UI.Part.Button;
 using InGame.Goal;
 using InGame.Setting;
@@ -17,6 +18,12 @@ namespace InGame
         private HpPresenter _hpPresenter;
         [SerializeField]
         private InGameSettingSO _inGameSetting;
+        
+        [SerializeField]
+        private Camera _mainCamera;
+        [SerializeField]
+        private ZoomAnimationParamSO _zoomAnimationParam;
+        
         protected override void Configure(IContainerBuilder builder)
         {
             base.Configure(builder);
@@ -51,6 +58,9 @@ namespace InGame
             builder.RegisterComponentInHierarchy<EnemyRandomActivator>();
             builder.RegisterInstance<HpPresenter>(_hpPresenter);
 
+            builder.RegisterInstance<IUIAnimation>(new ZoomAnimation(_mainCamera, _zoomAnimationParam))
+                .Keyed(AnimationType.InGameBackground);
+            
             SceneBoosterBinder.Bind(builder, StateType.InGameStart);
         }
     }
