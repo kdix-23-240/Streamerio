@@ -22,6 +22,8 @@ namespace Common.State
         
         private readonly IDialogService _dialogService;
         
+        private readonly IWebSocketManager _webSocketManager;
+        
         private readonly IStateManager _stateManager;
         private readonly IState _toInGameState;
         
@@ -30,6 +32,7 @@ namespace Common.State
             IMasterData masterData,
             IQRCodeService qrCodeService,
             IDialogService dialogService,
+            IWebSocketManager webSocketManager,
             IStateManager stateManager,
             [Key(StateType.ToInGame)] IState toInGameState)
         {
@@ -39,13 +42,15 @@ namespace Common.State
 
             _dialogService = dialogService;
             
+            _webSocketManager = webSocketManager;
+            
             _stateManager = stateManager;
             _toInGameState = toInGameState;
         }
         public async UniTask EnterAsync(CancellationToken ct)
         {
-            WebsocketManager.Instance.ConnectWebSocket(null).Forget();
-            //_qrCodeService.UpdateSprite(await WebsocketManager.Instance.GetFrontUrlAsync());
+            await _webSocketManager.ConnectWebSocketAsync(null, ct);
+            _qrCodeService.UpdateSprite(_webSocketManager.GetFrontUrl());
 
             if (!_masterData.IsDataFetched)
             {

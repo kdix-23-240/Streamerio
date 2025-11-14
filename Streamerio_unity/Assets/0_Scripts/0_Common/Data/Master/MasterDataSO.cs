@@ -115,6 +115,7 @@ namespace Common
                              && IsValidDataRow(playerRows)
                              && IsValidDataRow(ultRows)
                              && IsValidDataRow(enemyRows);
+            Debug.Log($"MasterDataSO FetchDataAsync _isDataFetched:{_isDataFetched}");
         }
         
         private bool IsValidDataRow(Dictionary<string, List<object>> dataRows)
