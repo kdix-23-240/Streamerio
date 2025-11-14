@@ -23,11 +23,12 @@ namespace OutGame.Result.UI
         private TMP_Text _skillText;
         
         private IUIAnimation _clickTextAnimation;
-        
+        private IWebSocketManager _webSocketManager;
         [Inject]
-        public void Construct([Key(AnimationType.FlashText)] IUIAnimation clickTextAnimation)
+        public void Construct([Key(AnimationType.FlashText)] IUIAnimation clickTextAnimation, IWebSocketManager webSocketManager)
         {
             _clickTextAnimation = clickTextAnimation;
+            _webSocketManager = webSocketManager;
         }
 
         /// <summary>
@@ -36,12 +37,12 @@ namespace OutGame.Result.UI
         /// </summary>
         public override async UniTask ShowAsync(CancellationToken ct)
         { 
-            if(WebsocketManager.Instance.GameEndSummary != null)
+            if(_webSocketManager.GameEndSummary != null)
             {
-                WebsocketManager.GameEndSummaryNotification summary = WebsocketManager.Instance.GameEndSummary;
-                _allText.text = (summary.SummaryDetails["all"] ==null || summary.SummaryDetails["all"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["all"].viewer_name;
-                _enemyText.text = (summary.SummaryDetails["enemy"] ==null || summary.SummaryDetails["enemy"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["enemy"].viewer_name;
-                _skillText.text = (summary.SummaryDetails["skill"] ==null || summary.SummaryDetails["skill"].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails["skill"].viewer_name;
+                WebSocketManager.GameEndSummaryNotification summary = _webSocketManager.GameEndSummary;
+                _allText.text = (summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.AllKey] ==null || summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.AllKey].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.AllKey].viewer_name;
+                _enemyText.text = (summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.EnemyKey] ==null || summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.EnemyKey].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.EnemyKey].viewer_name;
+                _skillText.text = (summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.SkillKey] ==null || summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.SkillKey].viewer_name == null) ? "名無しの視聴者" : summary.SummaryDetails[WebSocketManager.GameEndSummaryNotification.SkillKey].viewer_name;
             }
             
             await base.ShowAsync(ct);

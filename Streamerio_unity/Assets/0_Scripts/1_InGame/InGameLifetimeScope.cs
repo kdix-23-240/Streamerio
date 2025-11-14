@@ -47,6 +47,8 @@ namespace InGame
 
             builder.Register<StickInput>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<Result>();
+            builder.RegisterComponentInHierarchy<SkillRandomActivator>();
+            builder.RegisterComponentInHierarchy<EnemyRandomActivator>();
             builder.RegisterInstance<HpPresenter>(_hpPresenter);
 
             SceneBoosterBinder.Bind(builder, StateType.InGameStart);

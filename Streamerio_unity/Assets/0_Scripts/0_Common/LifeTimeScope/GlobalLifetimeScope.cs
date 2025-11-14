@@ -18,7 +18,8 @@ public class GlobalLifetimeScope : LifetimeScope
 {
     [SerializeField]
     private MasterDataSO _masterDataSO;
-    
+    [SerializeField]
+    private ApiConfigSO _apiConfigSO;
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterEntryPoint<GlobalBooster>();
@@ -43,6 +44,11 @@ public class GlobalLifetimeScope : LifetimeScope
         builder.Register<IWindowService, WindowService>(Lifetime.Singleton);
         builder.Register<IOverlayService, OverlayService>(Lifetime.Singleton);
         builder.Register<IDialogService, DialogService>(Lifetime.Singleton);
+        builder.Register<IWebSocketManager, WebSocketManager>(Lifetime.Singleton)
+# if UNITY_EDITOR
+    .As<ITickable>()
+# endif
+    .WithParameter(_ => _apiConfigSO);
 
         //builder.RegisterEntryPoint<TestWindow>();
         //builder.RegisterEntryPoint<TestOverlay>();
