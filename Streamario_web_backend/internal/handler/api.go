@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -54,10 +55,12 @@ func (h *APIHandler) GetOrCreateViewerID(c echo.Context) error {
 	}
 	viewerID, err := h.viewerService.EnsureViewerID(existing)
 	if err != nil {
+		h.logger.Error("ensure_viewer_id_failed", slog.Any("error", err))
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	viewer, err := h.viewerService.GetViewer(viewerID)
 	if err != nil {
+		h.logger.Error("get_viewer_failed", slog.String("viewer_id", viewerID), slog.Any("error", err))
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	// クロスサイト（フロント: vercel.app, バックエンド: Cloud Run）で
@@ -94,6 +97,7 @@ func (h *APIHandler) SetViewerName(c echo.Context) error {
 	}
 	viewer, err := h.viewerService.SetViewerName(req.ViewerID, req.Name)
 	if err != nil {
+		h.logger.Error("set_viewer_name_failed", slog.String("viewer_id", req.ViewerID), slog.Any("error", err))
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 	var name interface{}
@@ -204,6 +208,7 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 		}
 		summary, err := h.sessionService.GetViewerSummary(roomID, *viewerID)
 		if err != nil {
+			h.logger.Error("viewer_summary_failed", slog.String("room_id", roomID), slog.String("viewer_id", *viewerID), slog.Any("error", err))
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
@@ -213,6 +218,7 @@ func (h *APIHandler) SendEvent(c echo.Context) error {
 	}
 	res, err := h.eventService.ProcessEvent(roomID, evType, viewerID)
 	if err != nil {
+		h.logger.Error("process_event_failed", slog.String("room_id", roomID), slog.String("event_type", string(evType)), slog.Any("error", err))
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, res)
@@ -226,6 +232,7 @@ func (h *APIHandler) GetRoomStats(c echo.Context) error {
 	}
 	stats, err := h.eventService.GetRoomStats(roomID)
 	if err != nil {
+		h.logger.Error("get_room_stats_failed", slog.String("room_id", roomID), slog.Any("error", err))
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -247,6 +254,7 @@ func (h *APIHandler) GetRoomResult(c echo.Context) error {
 	}
 	summary, err := h.sessionService.GetRoomResult(roomID)
 	if err != nil {
+		h.logger.Error("get_room_result_failed", slog.String("room_id", roomID), slog.Any("error", err))
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	var viewerSummary *model.ViewerSummary

@@ -10,6 +10,7 @@ import (
 
 	"streamerrio-backend/internal/config"
 	"streamerrio-backend/internal/handler"
+	httpmiddleware "streamerrio-backend/internal/middleware"
 	"streamerrio-backend/internal/repository"
 	"streamerrio-backend/internal/service"
 	"streamerrio-backend/pkg/counter"
@@ -38,7 +39,7 @@ func main() {
 	}
 
 	// 3. ロガー初期化
-	logCfg := logger.Config{Level: cfg.LogLevel, Format: cfg.LogFormat, AddSource: cfg.LogAddSource}
+	logCfg := logger.Config{Level: cfg.LogLevel, Format: cfg.LogFormat, AddSource: cfg.LogAddSource, Service: "streamerio-api", Component: "api"}
 	appLogger, err := logger.Init(logCfg)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to init logger: %v\n", err)
@@ -103,7 +104,7 @@ func main() {
 	// 10. Echo フレームワーク初期化 & ミドルウェア
 	e := echo.New()
 	e.Logger.SetLevel(elog.DEBUG)
-	e.Use(middleware.Logger())  // アクセスログ
+	e.Use(httpmiddleware.StructuredLogger(appLogger.With(slog.String("component", "http"))))
 	e.Use(middleware.Recover()) // パニック回復
 
 	// 11. CORS 設定

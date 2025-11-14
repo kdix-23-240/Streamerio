@@ -299,9 +299,9 @@
 
 ## 2025-11-10 Backend ログ構造化対応
 
-- `pkg/logger` に Cloud Logging 互換の `slog` ハンドラを実装し、JSON で `severity`/`timestamp`/`message`/`fields` を出力するよう変更。サービス名などのメタも出せるよう `Config.Service` 等を追加。
+- `pkg/logger` に Cloud Logging 互換の `slog` ハンドラを実装し、JSON で `severity`/`timestamp`/`message`/`fields` を出力するよう変更。サービス名などのメタも出せるよう `Config.Service` 等を追加し、デフォルトの `LOG_LEVEL` は `error` に落として INFO ログを抑制。
 - API サーバ起動時 (`cmd/server/main.go`) に新ロガーを利用し、Echo のアクセスログを `middlewarex.StructuredLogger` に置き換え。Cloud Run → Logging でもレベルフィルタ可能になった。
-- REST ハンドラ (`internal/handler/api.go`) に `*slog.Logger` を注入し、500/4xx 発生時に必ず `logger.Error/Warn` を吐くようガード。これでエラー原因がログに残る。
+- REST ハンドラ (`internal/handler/api.go`) に `*slog.Logger` を注入し、500 系など致命的ケースのみ `logger.Error` を吐くよう整理（4xx はロギングせず）。これでエラー原因がログに残りつつ、不要なレベルは出力しない。
 - 付随して `pkg/logger/logger_test.go` を追加し、JSON フォーマットと severity マッピングを検証。
 
 ### 今後の TODO

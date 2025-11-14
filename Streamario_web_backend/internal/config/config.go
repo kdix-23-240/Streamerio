@@ -74,7 +74,7 @@ func Load() (*Config, error) {
 	}
 
 	// Logging
-	cfg.LogLevel = getEnv("LOG_LEVEL", "info")
+	cfg.LogLevel = getEnv("LOG_LEVEL", "error")
 	cfg.LogFormat = getEnv("LOG_FORMAT", "text")
 	cfg.LogAddSource = getEnvBool("LOG_ADD_SOURCE", false)
 
