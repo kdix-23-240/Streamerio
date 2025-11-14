@@ -210,6 +210,7 @@
 - 設定値に `UNITY_WS_PORT` を追加して WebSocket サーバーの待受ポートを独立管理
 - API サーバー側の `GameSessionService` には WebSocket 送信者を注入せず、終了集計と REST レスポンスに専念させた
 - Cloud Run 用のイメージ切り分け準備として `Dockerfile.unityws` を新設し、WebSocket サーバー専用バイナリをビルドできるようにした
+- WebSocket イベント確認を容易にする `docs/ws-debug.html` を追加し、ブラウザから `/ws-unity` に接続して Pub/Sub 経由の通知を可視化できるようにした
 
 ### 意図・設計上の判断
 - **高凝集**: API サーバーは REST, WebSocket サーバーは Unity 通信という単一責務になるよう依存を整理
@@ -220,3 +221,8 @@
 ### 今後の課題
 - Docker やデプロイ定義で新しい WebSocket サーバーの起動フローを明記（別コンテナ化）
 - 監視・ヘルスチェックエンドポイントを整備し、両サーバーの死活監視を行えるようにする
+
+#### 2025-11-09 GitHub Actions / Cloud Run デュアルサービス対応
+- GitHub Actions (`.github/workflows/deploy.yml`) を更新し、REST API（`cmd/server`）と Unity WebSocket（`cmd/unityws`）の 2 イメージをビルドして Artifact Registry にプッシュ。
+- Cloud Run も `streamario-web-backend` と `streamario-unityws` の 2 サービスを自動デプロイするようにし、後者には `UNITY_WS_PORT=8080` を明示設定して $PORT と整合させた。
+- 既存 Secret（`DATABASE_URL`, `REDIS_URL`, `FRONTEND_URL`）を使い回しつつ、WebSocket サービス側では DB/Redis のみ注入することで高凝集（専門の役割）と低結合（共通依存のみ共有）を維持。
