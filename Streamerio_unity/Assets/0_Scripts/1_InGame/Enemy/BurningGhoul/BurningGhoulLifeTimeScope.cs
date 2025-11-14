@@ -1,20 +1,20 @@
-using System;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-/// <summary>
-/// BurningGhoul プレハブ用 LifetimeScope: SO をスコープに登録しコンポーネントを登録します
-/// </summary>
 public class BurningGhoulLifeTimeScope : LifetimeScope
 {
-    [SerializeField] private BurningGhoulScriptableObject config;
-    public BurningGhoulScriptableObject Config => config;
+    [SerializeField] private BurningGhoulScriptableObject _config;
+    public BurningGhoulScriptableObject Config => _config;
 
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterInstance<BurningGhoulScriptableObject>(config);
-        builder.RegisterComponentInHierarchy<BurningGhoulMovement>();
+        // Prefab に割当てた ScriptableObject を先に登録（Inject で必要）
+        if (_config != null)
+        {
+            builder.RegisterInstance(_config);
+        }
+        builder.RegisterComponentInHierarchy<BurningGhoulMovement>().As<ITickable>().As<IStartable>();
         builder.RegisterComponentInHierarchy<EnemyHpManager>();
     }
 }

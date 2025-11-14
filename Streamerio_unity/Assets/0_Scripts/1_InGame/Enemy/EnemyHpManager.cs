@@ -9,7 +9,6 @@ public class EnemyHpManager : MonoBehaviour
     public int CurrentHealth => _health;
     public bool IsDead => _health <= 0;
 
-    // ...existing code...
     public void Initialize(int health)
     {
         _health = health;

@@ -1,9 +1,11 @@
+// ...existing code...
 using Common.Audio;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 
-public class BurningGhoulMovement : MonoBehaviour, IAttackable, IHealth
+public class BurningGhoulMovement : MonoBehaviour, IAttackable, IHealth, IStartable, ITickable
 {
     private BurningGhoulScriptableObject _config;
     private float _speed;
@@ -17,17 +19,9 @@ public class BurningGhoulMovement : MonoBehaviour, IAttackable, IHealth
     public float Power => _config.Power;
     public int Health => _config.Health;
 
-    void Awake()
-    {
-        _enemyHpManager = GetComponent<EnemyHpManager>();
-    }
-
     [Inject]
     private void Construct(BurningGhoulScriptableObject config, EnemyHpManager enemyHpManager)
     {
-        if (config == null) throw new System.ArgumentNullException(nameof(config));
-        if (enemyHpManager == null) throw new System.ArgumentNullException(nameof(enemyHpManager));
-
         _config = config;
         _enemyHpManager = enemyHpManager;
 
@@ -36,52 +30,44 @@ public class BurningGhoulMovement : MonoBehaviour, IAttackable, IHealth
         _stopDistance = _config.StopRange;
 
         _enemyHpManager.Initialize(Health);
+                
     }
 
-    private void EnsureConfigFromScopeFallback()
+    void IStartable.Start()
     {
-        if (_config != null) return;
-
-        var scope = GetComponentInParent<BurningGhoulLifeTimeScope>(true);
-        if (scope == null) throw new System.InvalidOperationException("BurningGhoulLifeTimeScope not found in parent hierarchy.");
-
-        var cfg = scope.Config;
-        if (cfg == null) throw new System.InvalidOperationException("BurningGhoulLifeTimeScope.Config is null.");
-
-        _config = cfg;
-        _speed = _config.Speed;
-        _detectionRange = _config.DetectionRange;
-        _stopDistance = _config.StopRange;
-    }
-
-    void Start()
-    {
-        _player = GameObject.FindGameObjectWithTag("Player")?.transform;
         EnsureConfigFromScopeFallback();
-
-        // 保険：EnemyHpManager が null なら取得し、必ず初期化する
-        if (_enemyHpManager == null) _enemyHpManager = GetComponent<EnemyHpManager>();
-        _enemyHpManager.Initialize(Health);
-
-        float randPosX = Random.Range(_config.MinRelativeSpawnPosX, _config.MaxRelativeSpawnPosX);
-        float randPosY = Random.Range(_config.MinRelativeSpawnPosY, _config.MaxRelativeSpawnPosY);
-        transform.position += new Vector3(_player.position.x + randPosX, _player.position.y + randPosY, 0);
+        _player = PlayerSingleton.Instance.transform;
+        InitializePositions();
     }
 
-    void Update()
+    void ITickable.Tick()
     {
-        if (_enemyHpManager != null && _enemyHpManager.IsDead) return;
         FollowPlayer();
+    }
+
+    private void InitializePositions()
+    {
+        float randX = Random.Range(_config.MinRelativeSpawnPosX, _config.MaxRelativeSpawnPosX);
+        float randY = Random.Range(_config.MinRelativeSpawnPosY, _config.MaxRelativeSpawnPosY);
+        transform.position = new Vector3(_player.position.x + randX, _player.position.y + randY, 0f);
     }
 
     private void FollowPlayer()
     {
+        if (_player == null)
+        {
+            Debug.LogError($"[BurningGhoul] FollowPlayer: _player is null id:{gameObject?.GetInstanceID().ToString() ?? "null"}");
+            return;
+        }
+
         float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
+        Debug.Log($"[BurningGhoul] FollowPlayer id:{gameObject?.GetInstanceID().ToString() ?? "null"} distance:{distanceToPlayer} detectionRange:{_detectionRange} stopDistance:{_stopDistance}");
 
         if (distanceToPlayer <= _detectionRange && distanceToPlayer > _stopDistance)
         {
             Vector2 direction = (_player.position - transform.position).normalized;
             transform.Translate(direction * _speed * Time.deltaTime);
+            Debug.Log($"[BurningGhoul] Moving id:{gameObject?.GetInstanceID().ToString() ?? "null"} dir:{direction} speed:{_speed}");
 
             if (direction.x < 0)
             {
@@ -93,10 +79,39 @@ public class BurningGhoulMovement : MonoBehaviour, IAttackable, IHealth
             }
         }
     }
-    
+
+    private void EnsureConfigFromScopeFallback()
+    {
+        if (_config != null) return;
+
+        var scope = GetComponentInParent<BurningGhoulLifeTimeScope>(true);
+        if (scope == null)
+        {
+            Debug.LogError($"[BurningGhoul] EnsureConfigFromScopeFallback: BurningGhoulLifeTimeScope not found in parent hierarchy for id:{gameObject?.GetInstanceID().ToString() ?? "null"}");
+            throw new System.InvalidOperationException("BurningGhoulLifeTimeScope not found in parent hierarchy.");
+        }
+
+        var config = scope.Config;
+        if (config == null)
+        {
+            Debug.LogError($"[BurningGhoul] EnsureConfigFromScopeFallback: BurningGhoulLifeTimeScope.Config is null for id:{gameObject?.GetInstanceID().ToString() ?? "null"}");
+            throw new System.InvalidOperationException("BurningGhoulLifeTimeScope.Config is null.");
+        }
+        _config = config;
+        _speed = _config.Speed;
+        _detectionRange = _config.DetectionRange;
+        _stopDistance = _config.StopRange;
+        Debug.Log($"[BurningGhoul] Config fallback assigned id:{gameObject?.GetInstanceID().ToString() ?? "null"} speed:{_speed} detection:{_detectionRange} stop:{_stopDistance}");
+    }
+
     public void TakeDamage(int amount)
     {
-        if (_enemyHpManager == null) _enemyHpManager = GetComponent<EnemyHpManager>();
+        Debug.Log($"[BurningGhoul] TakeDamage called id:{gameObject?.GetInstanceID().ToString() ?? "null"} amount:{amount} beforeHpManagerNull:{_enemyHpManager == null}");
+        if (_enemyHpManager == null)
+        {
+            Debug.LogError($"[BurningGhoul] TakeDamage: _enemyHpManager is null id:{gameObject?.GetInstanceID().ToString() ?? "null"}");
+            return;
+        }
         _enemyHpManager.TakeDamage(amount);
     }
 
@@ -105,3 +120,4 @@ public class BurningGhoulMovement : MonoBehaviour, IAttackable, IHealth
         TakeDamage(Mathf.CeilToInt(amount));
     }
 }
+// ...existing code...
